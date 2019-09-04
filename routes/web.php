@@ -15,6 +15,13 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Auth::routes();
+Auth::routes(['register' => false]);
 
-Route::get('/home', 'HomeController@index')->name('home');
+
+Route::group(['middleware' => ['auth'], 'prefix' => 'admin'], function () {
+    Route::get('/home', 'HomeController@index')->name('home');
+    Route::get('/profile/edit', 'ProfileController@edit')->name('profile.edit');
+    Route::post('/profile/update', 'ProfileController@update')->name('profile.update');
+    Route::get('/profile/password', 'ProfileController@password')->name('profile.password');
+    Route::post('/profile/change-password', 'ProfileController@changePassword')->name('profile.changePassword');
+});
