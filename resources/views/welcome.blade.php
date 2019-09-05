@@ -36,7 +36,7 @@
         <!-- Reference item-->
         <!-- navbar-->
         <header class="header">
-            <nav class="navbar navbar-expand-lg fixed-top">
+            <nav class="navbar navbar-expand fixed-top">
                 <div class="container"><a href="#intro" class="navbar-brand scrollTo">{{$user->name}}</a>
                     <button type="button" data-toggle="collapse" data-target="#navbarcollapse" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler navbar-toggler-right"><span class="fa fa-bars"></span></button>
                     <div id="navbarcollapse" class="collapse navbar-collapse">
@@ -54,7 +54,7 @@
             </nav>
         </header>
         <!-- Intro Image-->
-        <section id="intro" style="background: url({{asset('client/img/home.jpg')}}) center center no-repeat; background-size: cover;" class="intro-section pb-2">
+        <section id="intro" style="background: url({{asset('client/img/home2.jpg')}}) center center no-repeat; background-size: cover;" class="intro-section pb-2">
             <div class="container text-center">
                 <div data-animate="fadeInDown" class="logo"><img src="{{asset('client/img/favicon.png')}}" alt="logo" width="130"></div>
                 <h1 data-animate="fadeInDown" class="text-shadow mb-5">Hello, Welcome!!!</h1>
@@ -143,7 +143,7 @@
             </div>
         </section>
         <!-- Statistics-->
-        <section id="statistics" data-dir="up" style="background: url(&quot;client/img/parallax.jpg&quot;);" class="statistics-section text-white parallax parallax">
+        <section id="statistics" data-dir="up" style="background: url(&quot;client/img/parallax2.jpg&quot;);" class="statistics-section text-white parallax parallax">
             <div class="container">
                 <div class="row showcase text-center"> 
                     <div data-animate="fadeInUp" class="col-lg-3 col-md-6">
@@ -253,7 +253,10 @@
         </section>
         <!-- Customers-->
         <section id="customers" class="customers-section bg-gray">
-            <div class="container">
+            <div class="container mt-3">
+                <header class="text-center">
+                    <h2 class="title">Technology That I Use</h2>
+                </header>
                 <div class="col-md-12">
                     <div class="row align-items-center">
                         @foreach ($tech as $item)
@@ -307,11 +310,33 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-6 text-center text-lg-left">
-                        <p class="social"><a href="#" class="external facebook wow fadeInUp"><i class="fa fa-facebook"></i></a><a href="#" data-wow-delay="0.2s" class="external instagram wow fadeInUp"><i class="fa fa-instagram"></i></a><a href="#" data-wow-delay="0.4s" class="external gplus wow fadeInUp"><i class="fa fa-google-plus"></i></a><a href="#" data-wow-delay="0.6s" class="email wow fadeInUp"><i class="fa fa-envelope"></i></a></p>
+                        <p class="social">
+                            <a target="_blank" href="{{$profile->facebook}}" class="external facebook wow fadeInUp">
+                                <i class="fab fa-facebook"></i>
+                            </a>
+                            <a target="_blank" href="{{$profile->instagram}}" data-wow-delay="0.1s" class="external instagram wow fadeInUp">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            <a target="_blank" href="{{$profile->twitter}}" data-wow-delay="0.3s" class="external twitter wow fadeInUp">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            <a target="_blank" href="{{$profile->github}}" data-wow-delay="0.5s" class="external github wow fadeInUp">
+                                <i class="fab fa-github"></i>
+                            </a>
+                            <a target="_blank" href="{{$profile->linkedin}}" data-wow-delay="0.7s" class="external linkedin wow fadeInUp">
+                                <i class="fab fa-linkedin"></i>
+                            </a>
+                            <a target="_blank" href="{{$profile->youtube}}" data-wow-delay="0.9s" class="external youtube wow fadeInUp">
+                                <i class="fab fa-youtube"></i>
+                            </a>
+                            <a href="mailto:{{$user->email}}" data-wow-delay="1.1s" class="email wow fadeInUp">
+                                <i class="fa fa-envelope"></i>
+                            </a>
+                        </p>
                     </div>
                     <!-- /.6-->
                     <div class="col-md-6 text-center text-lg-right mt-4 mt-lg-0">
-                        <p>© 2018 Your name goes here. All rights reserved.</p>
+                        <p>© 2019 Granite Bagas. All rights reserved.</p>
                     </div>
                     <div class="col-12 mt-4">
                         <p class="template-bootstrapious">Template by <a href='https://bootstrapious.com/p/bootstrap-carousel'>Bootstrapious</a> & <a href="https://fity.cz/ostrava">Fity</a></p>
@@ -320,6 +345,7 @@
                 </div>
             </div>
         </footer>
+
         <!-- JavaScript files-->
         <script src="{{asset('client/vendor/jquery/jquery.min.js')}}"></script>
         <script src="{{asset('client/vendor/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
@@ -332,14 +358,5 @@
         <script src="https://kit.fontawesome.com/f09f131f5f.js"></script>
         <!-- Toastr -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-
-        <script>
-            @if(Session::has('success'))
-                toastr.success("{{Session::get('success')}}")
-            @endif
-            @if(Session::has('error'))
-                toastr.error("{{Session::get('error')}}")
-            @endif
-        </script>
     </body>
     </html>
