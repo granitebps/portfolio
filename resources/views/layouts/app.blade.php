@@ -18,6 +18,11 @@
 
     <!-- Toastr -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+
+    <!-- Font Awesome -->
+    <script src="https://kit.fontawesome.com/f09f131f5f.js"></script>
+
+    @yield('style')
 </head>
 <body>
     <div id="app">
@@ -33,18 +38,35 @@
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <!-- Left Side Of Navbar -->
                     <ul class="navbar-nav mr-auto">
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('home') }}">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('profile.edit') }}">Profile</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('profile.password') }}">Ganti Password</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('skill.index') }}">Skill</a>
-                        </li>
+                        @auth
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('home') }}">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('profile.edit') }}">Profile</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('profile.password') }}">Ganti Password</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('skill.index') }}">Skill</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('tech.index') }}">Technology</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('service.index') }}">Service</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('experience.index') }}">Experience</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('portfolio.index') }}">Portfolio</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('message.index') }}">Message</a>
+                            </li>
+                        @endauth
                     </ul>
 
                     <!-- Right Side Of Navbar -->
@@ -105,6 +127,8 @@
 		@if(Session::has('error'))
             toastr.error("{{Session::get('error')}}")
 		@endif
-	</script>
+    </script>
+    
+    @yield('script')
 </body>
 </html>

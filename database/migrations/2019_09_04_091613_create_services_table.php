@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateTechnolgiesTable extends Migration
+class CreateServicesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,11 @@ class CreateTechnolgiesTable extends Migration
      */
     public function up()
     {
-        Schema::create('technolgies', function (Blueprint $table) {
+        Schema::create('services', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->string('name');
+            $table->string('icon');
+            $table->text('desc');
             $table->timestamps();
         });
     }
@@ -26,6 +29,6 @@ class CreateTechnolgiesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('technolgies');
+        Schema::dropIfExists('services');
     }
 }
