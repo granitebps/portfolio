@@ -18,11 +18,11 @@
                       @csrf
                       <div class="form-group">
                         <label for="company">Company Name</label>
-                        <input type="text" placeholder="Company Name" name="company" class="form-control">
+                        <input type="text" placeholder="Company Name" name="company" class="form-control" value="{{old('company')}}">
                       </div>
                       <div class="form-group">
                         <label for="position">Position</label>
-                        <input type="text" placeholder='Position' name="position" class="form-control">
+                        <input type="text" placeholder='Position' name="position" class="form-control" value="{{old('position')}}">
                       </div>
                       <div class="form-group">
                         <label for="start_date">Start Date</label>

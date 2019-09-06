@@ -14,11 +14,11 @@
                       @csrf
                       <div class="form-group">
                         <label for="name">Skill Name</label>
-                        <input type="text" placeholder="Skill Name" name="name" class="form-control">
+                        <input type="text" placeholder="Skill Name" name="name" class="form-control" value="{{old('name')}}">
                       </div>
                       <div class="form-group">
                         <label for="percentage">Skill Percentage</label>
-                        <input type="number" placeholder="Skill Percentage" name="percentage" class="form-control">
+                        <input type="number" placeholder="Skill Percentage" name="percentage" class="form-control" value="{{old('percentage')}}">
                       </div>
                       <button type="submit" class="btn btn-success btn-block">Save</button>
                     </form>

@@ -14,7 +14,7 @@
                       @csrf
                       <div class="form-group">
                         <label for="name">Technology Name</label>
-                        <input type="text" placeholder="Technology Name" name="name" class="form-control">
+                        <input type="text" placeholder="Technology Name" name="name" class="form-control" value="{{old('name')}}">
                       </div>
                       <div class="form-group">
                         <label for="pic">Technology Picture</label>

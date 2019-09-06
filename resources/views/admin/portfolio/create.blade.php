@@ -14,11 +14,11 @@
                       @csrf
                       <div class="form-group">
                         <label for="name">Portfolio Name</label>
-                        <input type="text" placeholder="Portfolio Name" name="name" class="form-control">
+                        <input type="text" placeholder="Portfolio Name" name="name" class="form-control" value="{{old('name')}}">
                       </div>
                       <div class="form-group">
                         <label for="desc">Portfolio Description</label>
-                        <textarea name="desc" class="form-control" cols="30" rows="5"></textarea>
+                        <textarea name="desc" class="form-control" cols="30" rows="5">{{old('desc')}}</textarea>
                       </div>
                       <div class="form-group">
                         <label for="thumbnail">Portfolio Thumbnail</label>
@@ -30,7 +30,7 @@
                       </div>
                       <div class="form-group">
                         <label for="url">Portfolio URL</label>
-                        <input type="text" placeholder="Portfolio URL" name="url" class="form-control">
+                        <input type="text" placeholder="Portfolio URL" name="url" class="form-control" value="{{old('url')}}">
                       </div>
                       <div class="form-group">
                         <label for="type">Portfolio Type</label>
