@@ -209,7 +209,7 @@
                                     <div class="reference"><a href="#"><img src="{{asset('storage/images/portfolio/'.\Illuminate\Support\Str::slug($item->name,'-').'/'.$item->thumbnail)}}" alt="" class="img-fluid">
                                         <div class="overlay">
                                             <div class="inner">
-                                                <h3 class="h4 reference-title">{{$item->name}}</h3>
+                                                <h5 class="h5 reference-title">{{$item->name}}</h5>
                                                 <p>
                                                     @if ($item->type == 1)
                                                         Personal Project
