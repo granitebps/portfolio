@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Technology;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 
@@ -34,7 +35,9 @@ class TechnologyController extends Controller
         try {
             $pic = $request->pic;
             $picName = $pic->getClientOriginalName();
-            Storage::putFileAs('public/images/tech', $pic, $picName);
+            // Save to public because of shared hosting
+            $pic->storeAs('tech', $picName, 'hosting');
+            // Storage::putFileAs('public/images/tech', $pic, $picName);
             Technology::create([
                 'name' => $request->name,
                 'pic' => $picName,
@@ -44,6 +47,7 @@ class TechnologyController extends Controller
             Session::flash('success', 'Technology Created');
             return redirect()->route('tech.index');
         } catch (\Exception $e) {
+            throw $e;
             DB::rollback();
             Session::flash('error', 'Something Wrong');
             return redirect()->back();
@@ -70,8 +74,11 @@ class TechnologyController extends Controller
             if ($request->hasFile('pic')) {
                 $pic = $request->pic;
                 $picName = $pic->getClientOriginalName();
-                Storage::delete('public/images/tech/' . $tech->pic);
-                Storage::putFileAs('public/images/tech', $pic, $picName);
+                // Storage::delete('public/images/tech/' . $tech->pic);
+                // Storage::putFileAs('public/images/tech', $pic, $picName);
+                // Hosting
+                $pic->storeAs('tech', $picName, 'hosting');
+                File::delete(public_path() . '/images/tech/' . $tech->pic);
                 $tech->update([
                     'pic' => $picName,
                 ]);
@@ -95,7 +102,9 @@ class TechnologyController extends Controller
         $tech = Technology::findOrFail($id);
         DB::beginTransaction();
         try {
-            Storage::delete('public/images/tech/' . $tech->pic);
+            // Hosting
+            File::delete(public_path() . '/images/tech/' . $tech->pic);
+            // Storage::delete('public/images/tech/' . $tech->pic);
             $tech->delete();
 
             DB::commit();

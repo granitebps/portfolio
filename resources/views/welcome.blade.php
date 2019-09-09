@@ -81,7 +81,7 @@
                             </div>
                         @endforeach
                     </div>
-                    <div data-animate="fadeInUp" class="col-sm-6 mx-auto mt-5"><img src="{{asset('storage/images/avatar/'.$profile->avatar)}}" alt="This is me - IT worker" class="image rounded-circle img-fluid"></div>
+                    <div data-animate="fadeInUp" class="col-sm-6 mx-auto mt-5"><img src="{{asset('images/avatar/'.$profile->avatar)}}" alt="This is me - IT worker" class="image rounded-circle img-fluid"></div>
                 </div>
             </div>
         </section>
@@ -206,7 +206,7 @@
                         <div class="row">
                             @foreach ($portfolio as $item)
                                 <div data-category="{{$item->type == 1 ? 'personal' : 'client'}}" class="reference-item col-lg-3 col-md-6">
-                                    <div class="reference"><a href="#"><img src="{{asset('storage/images/portfolio/'.\Illuminate\Support\Str::slug($item->name,'-').'/'.$item->thumbnail)}}" alt="" class="img-fluid">
+                                    <div class="reference"><a href="#"><img src="{{asset('images/portfolio/'.\Illuminate\Support\Str::slug($item->name,'-').'/'.$item->thumbnail)}}" alt="" class="img-fluid">
                                         <div class="overlay">
                                             <div class="inner">
                                                 <h5 class="h5 reference-title">{{$item->name}}</h5>
@@ -222,9 +222,9 @@
                                         <div data-images=" 
                                         @foreach ($item->pic as $index => $value)
                                             @if ($index == $item->pic()->count() - 1)
-                                                {{asset('storage/images/portfolio/'.\Illuminate\Support\Str::slug($item->name,'-').'/'.$value->pic)}}
+                                                {{asset('images/portfolio/'.\Illuminate\Support\Str::slug($item->name,'-').'/'.$value->pic)}}
                                             @else
-                                                {{asset('storage/images/portfolio/'.\Illuminate\Support\Str::slug($item->name,'-').'/'.$value->pic)}},
+                                                {{asset('images/portfolio/'.\Illuminate\Support\Str::slug($item->name,'-').'/'.$value->pic)}},
                                             @endif
                                         @endforeach
                                         " class="sr-only reference-description">
@@ -261,7 +261,7 @@
                     <div class="row align-items-center">
                         @foreach ($tech as $item)
                             <div class="col-lg-2 col-md-4 col-sm-6">
-                                <div class="customer"><img src="{{asset('storage/images/tech/'.$item->pic)}}" title="{{$item->name}}" data-placement="bottom" data-toggle="tooltip" alt="" class="img-fluid d-block mx-auto"></div>
+                                <div class="customer"><img src="{{asset('images/tech/'.$item->pic)}}" title="{{$item->name}}" data-placement="bottom" data-toggle="tooltip" alt="" class="img-fluid d-block mx-auto"></div>
                             </div>
                         @endforeach
                     </div>
