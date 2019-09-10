@@ -43,7 +43,9 @@
                                           Client Project
                                       @endif
                                     </td>
-                                    <td>{{$value->url}}</td>
+                                    <td>
+                                      <a href="{{$value->url}}" target="_blank" class="btn btn-warning">Link</a>
+                                    </td>
                                     <td>
                                       <a href="{{route('portfolio.edit', ['id'=>$value->id])}}" class="btn btn-primary">Edit</a>
                                     </td>
