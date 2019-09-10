@@ -12,7 +12,7 @@
                       @csrf
                       <div class="form-group">
                         <label for="avatar">Avatar</label><br>
-                        <img class="img-thumbnail" src="{{asset('images/avatar/'.$user->profile->avatar)}}" alt="">
+                        <img class="img-thumbnail" src="{{asset('storage/images/avatar/'.$user->profile->avatar)}}" alt="">
                         <input type="file" name="avatar" class="form-control-file">
                       </div>
                       <div class="form-group">
