@@ -21,9 +21,9 @@
                         <label for="pic">Technology Picture</label><br>
 
                         {{-- Hosting --}}
-                        <img src="{{asset('images/tech/'.$tech->pic)}}" class="img-thumbnail" width="20%">
+                        {{-- <img src="{{asset('images/tech/'.$tech->pic)}}" class="img-thumbnail" width="20%"> --}}
 
-                        {{-- <img src="{{asset('storage/images/tech/'.$tech->pic)}}" class="img-thumbnail" width="20%"> --}}
+                        <img src="{{asset('storage/images/tech/'.$tech->pic)}}" class="img-thumbnail" width="20%">
                         <input type="file" placeholder='Technology Picture' name="pic" class="form-control-file">
                       </div>
                       <button type="submit" class="btn btn-success btn-block">Edit</button>

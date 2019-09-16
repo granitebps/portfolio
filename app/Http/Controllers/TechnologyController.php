@@ -37,9 +37,9 @@ class TechnologyController extends Controller
             $picName = $pic->getClientOriginalName();
 
             // Image upload for shared hosting
-            $pic->storeAs('tech', $picName, 'hosting');
+            // $pic->storeAs('tech', $picName, 'hosting');
 
-            // Storage::putFileAs('public/images/tech', $pic, $picName);
+            Storage::putFileAs('public/images/tech', $pic, $picName);
             Technology::create([
                 'name' => $request->name,
                 'pic' => $picName,
@@ -78,11 +78,11 @@ class TechnologyController extends Controller
                 $picName = $pic->getClientOriginalName();
 
                 // Image upload for shared hosting
-                $pic->storeAs('tech', $picName, 'hosting');
-                File::delete(public_path() . '/images/tech/' . $tech->pic);
+                // $pic->storeAs('tech', $picName, 'hosting');
+                // File::delete(public_path() . '/images/tech/' . $tech->pic);
 
-                // Storage::delete('public/images/tech/' . $tech->pic);
-                // Storage::putFileAs('public/images/tech', $pic, $picName);
+                Storage::delete('public/images/tech/' . $tech->pic);
+                Storage::putFileAs('public/images/tech', $pic, $picName);
                 $tech->update([
                     'pic' => $picName,
                 ]);
@@ -107,9 +107,9 @@ class TechnologyController extends Controller
         DB::beginTransaction();
         try {
             // Hosting
-            File::delete(public_path() . '/images/tech/' . $tech->pic);
+            // File::delete(public_path() . '/images/tech/' . $tech->pic);
 
-            // Storage::delete('public/images/tech/' . $tech->pic);
+            Storage::delete('public/images/tech/' . $tech->pic);
             $tech->delete();
 
             DB::commit();

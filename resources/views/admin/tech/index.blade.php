@@ -30,9 +30,9 @@
                                     <td>
 
                                       {{-- Image upload for shared hosting --}}
-                                      <a href="{{asset('images/tech/'.$value->pic)}}" class="btn btn-secondary" target="_blank">View Pic</a>
+                                      {{-- <a href="{{asset('images/tech/'.$value->pic)}}" class="btn btn-secondary" target="_blank">View Pic</a> --}}
 
-                                      {{-- <a href="{{asset('storage/images/tech/'.$value->pic)}}" class="btn btn-secondary" target="_blank">View Pic</a> --}}
+                                      <a href="{{asset('storage/images/tech/'.$value->pic)}}" class="btn btn-secondary" target="_blank">View Pic</a>
                                     </td>
                                     <td>
                                       <a href="{{route('tech.edit', ['id'=>$value->id])}}" class="btn btn-primary">Edit</a>

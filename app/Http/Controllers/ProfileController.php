@@ -45,9 +45,9 @@ class ProfileController extends Controller
                 $avatarName = $avatar->getClientOriginalName();
 
                 // Hosting
-                $avatar->storeAs('avatar', $avatarName, 'hosting');
+                // $avatar->storeAs('avatar', $avatarName, 'hosting');
 
-                // Storage::putFileAs('public/images/avatar', $avatar, $avatarName);
+                Storage::putFileAs('public/images/avatar', $avatar, $avatarName);
                 $profile->update([
                     'avatar' => $avatarName,
                 ]);
