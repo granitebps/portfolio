@@ -35,7 +35,11 @@ class TechnologyController extends Controller
         try {
             $pic = $request->pic;
             $picName = $pic->getClientOriginalName();
-            Storage::putFileAs('public/images/tech', $pic, $picName);
+
+            // Image upload for shared hosting
+            $pic->storeAs('tech', $picName, 'hosting');
+
+            // Storage::putFileAs('public/images/tech', $pic, $picName);
             Technology::create([
                 'name' => $request->name,
                 'pic' => $picName,
@@ -72,8 +76,13 @@ class TechnologyController extends Controller
             if ($request->hasFile('pic')) {
                 $pic = $request->pic;
                 $picName = $pic->getClientOriginalName();
-                Storage::delete('public/images/tech/' . $tech->pic);
-                Storage::putFileAs('public/images/tech', $pic, $picName);
+
+                // Image upload for shared hosting
+                $pic->storeAs('tech', $picName, 'hosting');
+                File::delete(public_path() . '/images/tech/' . $tech->pic);
+
+                // Storage::delete('public/images/tech/' . $tech->pic);
+                // Storage::putFileAs('public/images/tech', $pic, $picName);
                 $tech->update([
                     'pic' => $picName,
                 ]);
@@ -97,7 +106,10 @@ class TechnologyController extends Controller
         $tech = Technology::findOrFail($id);
         DB::beginTransaction();
         try {
-            Storage::delete('public/images/tech/' . $tech->pic);
+            // Hosting
+            File::delete(public_path() . '/images/tech/' . $tech->pic);
+
+            // Storage::delete('public/images/tech/' . $tech->pic);
             $tech->delete();
 
             DB::commit();

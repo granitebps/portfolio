@@ -47,7 +47,10 @@ class PortfolioController extends Controller
             $thumbnail = $request->thumbnail;
             $folderName = Str::slug($request->name, '-');
             $thumbnailName = 'thumbnail-' . str_replace(' ', '_', $thumbnail->getClientOriginalName());
-            Storage::putFileAs('public/images/portfolio/' . $folderName, $thumbnail, $thumbnailName);
+            // Storage::putFileAs('public/images/portfolio/' . $folderName, $thumbnail, $thumbnailName);
+
+            // Hosting
+            $thumbnail->storeAs('portfolio/' . $folderName, $thumbnailName, 'hosting');
 
             $portfolio = Portfolio::create([
                 'name' => $request->name,
@@ -60,7 +63,11 @@ class PortfolioController extends Controller
             $pic = $request->pic;
             foreach ($pic as $image) {
                 $imageName = str_replace(' ', '_', $image->getClientOriginalName());
-                Storage::putFileAs('public/images/portfolio/' . $folderName, $image, $imageName);
+
+                // Hosting
+                $image->storeAs('portfolio/' . $folderName, $imageName, 'hosting');
+
+                // Storage::putFileAs('public/images/portfolio/' . $folderName, $image, $imageName);
                 PortfolioPic::create([
                     'portfolio_id' => $portfolio->id,
                     'pic' => $imageName
@@ -103,8 +110,12 @@ class PortfolioController extends Controller
             $oldFolderName = Str::slug($portfolio->name, '-');
             $folderName = Str::slug($request->name, '-');
             if ($request->name != $portfolio->name) {
-                Storage::move('public/images/portfolio/' . $oldFolderName, 'public/images/portfolio/' . $folderName);
-                Storage::deleteDirectory('public/images/portfolio/' . $oldFolderName);
+                // Storage::move('public/images/portfolio/' . $oldFolderName, 'public/images/portfolio/' . $folderName);
+                // Storage::deleteDirectory('public/images/portfolio/' . $oldFolderName);
+
+                // Hosting
+                Storage::disk('hosting')->move('portfolio/' . $oldFolderName, 'portfolio/' . $folderName);
+                Storage::disk('hosting')->deleteDirectory('portfolio/' . $oldFolderName);
             }
 
             if ($request->hasFile('thumbnail')) {
@@ -113,10 +124,19 @@ class PortfolioController extends Controller
                 ]);
                 $thumbnail = $request->thumbnail;
                 $thumbnailName = 'thumbnail-' . str_replace(' ', '_', $thumbnail->getClientOriginalName());
-                if (File::exists(public_path() . '/storage/images/portfolio/' . $oldFolderName)) {
-                    Storage::delete('public/images/portfolio/' . $oldFolderName . '/' . $portfolio->thumbnail);
+                // if (File::exists(public_path() . '/storage/images/portfolio/' . $oldFolderName)) {
+
+                // Hosting
+                if (File::exists(public_path() . '/images/portfolio/' . $oldFolderName)) {
+                    Storage::disk('hosting')->delete('portfolio/' . $oldFolderName . '/' . $portfolio->thumbnail);
+
+                    // Storage::delete('public/images/portfolio/' . $oldFolderName . '/' . $portfolio->thumbnail);
                 } else {
-                    Storage::delete('public/images/portfolio/' . $folderName . '/' . $portfolio->thumbnail);
+
+                    // Hosting
+                    Storage::disk('hosting')->delete('portfolio/' . $folderName . '/' . $portfolio->thumbnail);
+
+                    // Storage::delete('public/images/portfolio/' . $folderName . '/' . $portfolio->thumbnail);
                 }
                 // Hosting
                 $thumbnail->storeAs('portfolio/' . $folderName, $thumbnailName, 'hosting');
@@ -141,16 +161,29 @@ class PortfolioController extends Controller
                 $pic = $request->pic;
                 $portfolioPic = PortfolioPic::where('portfolio_id', $portfolio->id)->get();
                 foreach ($portfolioPic as $value) {
+                    // if (File::exists(public_path() . '/storage/images/portfolio/' . $oldFolderName)) {
+
+                    // Hosting
                     if (File::exists(public_path() . '/images/portfolio/' . $oldFolderName)) {
-                        Storage::delete('public/images/portfolio/' . $oldFolderName . '/' . $value->pic);
+                        Storage::disk('hosting')->delete('portfolio/' . $oldFolderName . '/' . $value->pic);
+
+                        // Storage::delete('public/images/portfolio/' . $oldFolderName . '/' . $value->pic);
+
                     } else {
-                        Storage::delete('public/images/portfolio/' . $folderName . '/' . $value->pic);
+                        // Storage::delete('public/images/portfolio/' . $folderName . '/' . $value->pic);
+
+                        // Hosting
+                        Storage::disk('hosting')->delete('portfolio/' . $folderName . '/' . $value->pic);
                     }
                     $value->delete();
                 }
                 foreach ($pic as $image) {
                     $imageName = str_replace(' ', '_', $image->getClientOriginalName());
-                    Storage::putFileAs('public/images/portfolio/' . $folderName, $image, $imageName);
+                    // Storage::putFileAs('public/images/portfolio/' . $folderName, $image, $imageName);
+
+                    // Hosting
+                    $image->storeAs('portfolio/' . $folderName, $imageName, 'hosting');
+
                     PortfolioPic::create([
                         'portfolio_id' => $portfolio->id,
                         'pic' => $imageName
@@ -175,7 +208,10 @@ class PortfolioController extends Controller
         DB::beginTransaction();
         try {
             $folderName = Str::slug($portfolio->name, '-');
-            Storage::deleteDirectory('public/images/portfolio/' . $folderName);
+            // Storage::deleteDirectory('public/images/portfolio/' . $folderName);
+
+            // Hosting
+            Storage::disk('hosting')->deleteDirectory('portfolio/' . $folderName);
 
             $portfolio->pic()->delete();
             $portfolio->delete();
@@ -195,14 +231,22 @@ class PortfolioController extends Controller
     {
         $portfolio = Portfolio::findOrFail($request->id);
         $folder = Str::slug($portfolio->name, '-');
-        $pathThumbnail = asset('storage/images/portfolio/' . $folder . '/' . $portfolio->thumbnail);
+        // $pathThumbnail = asset('storage/images/portfolio/' . $folder . '/' . $portfolio->thumbnail);
+
+        // Hosting
+        $pathThumbnail = asset('images/portfolio/' . $folder . '/' . $portfolio->thumbnail);
+
         $output = '
             <h5 class="text-center">Thumbnail</h5>
             <a target="_blank" href="' . $pathThumbnail . '"><img class="img-thumbnail" src="' . $pathThumbnail . '" alt=""></a><hr>
             <h5 class="text-center">Picture</h5>
         ';
         foreach ($portfolio->pic as $index => $file) {
-            $path = asset('storage/images/portfolio/' . $folder . '/' . $file->pic);
+            // $path = asset('storage/images/portfolio/' . $folder . '/' . $file->pic);
+
+            // Hosting
+            $path = asset('images/portfolio/' . $folder . '/' . $file->pic);
+
             $output .= '
                 <a target="_blank" href="' . $path . '"><img class="img-thumbnail" src="' . $path . '" alt=""></a><br>
             ';
