@@ -37,6 +37,7 @@ class ProfileController extends Controller
             'youtube' => 'required|url',
             'github' => 'required|url',
             'linkedin' => 'required|url',
+            'cv' => 'mimes:pdf|file|max:2048'
         ]);
         DB::beginTransaction();
         try {
@@ -45,11 +46,23 @@ class ProfileController extends Controller
                 $avatarName = $avatar->getClientOriginalName();
 
                 // Hosting
-                // $avatar->storeAs('avatar', $avatarName, 'hosting');
+                $avatar->storeAs('avatar', $avatarName, 'hosting');
 
-                Storage::putFileAs('public/images/avatar', $avatar, $avatarName);
+                // Storage::putFileAs('public/images/avatar', $avatar, $avatarName);
                 $profile->update([
                     'avatar' => $avatarName,
+                ]);
+            }
+            if ($request->hasFile('cv')) {
+                $cv = $request->cv;
+                $cvName = 'cv.pdf';
+
+                // Hosting
+                $cv->storeAs('cv', $cvName, 'hosting');
+
+                // Storage::putFileAs('public/images/cv', $cv, $cvName);
+                $profile->update([
+                    'cv' => $cvName,
                 ]);
             }
             $user->update([

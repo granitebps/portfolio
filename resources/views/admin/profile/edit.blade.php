@@ -12,7 +12,11 @@
                       @csrf
                       <div class="form-group">
                         <label for="avatar">Avatar</label><br>
-                        <img class="img-thumbnail" src="{{asset('storage/images/avatar/'.$user->profile->avatar)}}" alt="">
+                        {{-- <img class="img-thumbnail" src="{{asset('storage/images/avatar/'.$user->profile->avatar)}}" alt=""> --}}
+                        
+                        {{-- Hosting --}}
+                        <img class="img-thumbnail" src="{{asset('images/avatar/'.$user->profile->avatar)}}" alt="">
+
                         <input type="file" name="avatar" class="form-control-file">
                       </div>
                       <div class="form-group">
@@ -62,6 +66,10 @@
                       <div class="form-group">
                         <label for="youtube">YouTube</label>
                         <input type="text" name="youtube" class="form-control" placeholder="YouTube" value="{{$user->profile->youtube}}">
+                      </div>
+                      <div class="form-group">
+                        <label for="cv">CV</label><br>
+                        <input type="file" name="cv" class="form-control-file">
                       </div>
                       <button type="submit" class="btn btn-success btn-block">Edit</button>
                     </form>
