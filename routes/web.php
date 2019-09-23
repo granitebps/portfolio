@@ -59,6 +59,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'admin'], function () {
     Route::delete('/portfolio/{id}', 'PortfolioController@destroy')->name('portfolio.destroy');
 
     Route::get('/message', 'HomeController@getMessage')->name('message.index');
+    Route::get('/message-delete/{id}', 'HomeController@deleteMessage')->name('message.delete');
 });
 
 Route::get('/preview', 'PortfolioController@preview')->name('portfolio.preview');

@@ -81,7 +81,24 @@ class HomeController extends Controller
     public function getMessage()
     {
         $data['title'] = 'Message List';
-        $data['message'] = Message::all();
+        $data['message'] = Message::orderBy('created_at', 'desc')->get();
         return view('admin.message.index')->with($data);
+    }
+
+    public function deleteMessage($id)
+    {
+        $message = Message::findOrFail($id);
+        DB::beginTransaction();
+        try {
+            $message->delete();
+
+            DB::commit();
+            Session::flash('success', 'Message Deleted');
+            return redirect()->route('message.index');
+        } catch (\Exception $e) {
+            DB::rollback();
+            Session::flash('error', 'Something Wrong');
+            return redirect()->route('message.index');
+        }
     }
 }

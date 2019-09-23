@@ -20,6 +20,7 @@
                             <th>Email</th>
                             <th>Phone</th>
                             <th>Message</th>
+                            <th>Action</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -32,6 +33,7 @@
                                     <td>{{$value->email}}</td>
                                     <td>{{$value->phone}}</td>
                                     <td>{{$value->message}}</td>
+                                    <td><a href="{{route('message.delete', ['id'=>$value->id])}}" class="btn btn-danger btn-sm">Delete</a></td>
                                   </tr>
                               @endforeach
                           @else
