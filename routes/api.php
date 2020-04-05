@@ -1,6 +1,6 @@
 <?php
 
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,6 +13,18 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+Route::group(['namespace' => 'Api\v1', 'prefix' => 'v1'], function () {
+    Route::group(['middleware' => ['auth:airlock']], function () {
+        Route::get('auth/me', 'AuthController@me');
+    });
+
+    Route::get('skill', 'SkillController@index');
+    Route::post('skill', 'SkillController@store');
+    Route::put('skill/{id}', 'SkillController@update');
+    Route::delete('skill/{id}', 'SkillController@destroy');
+
+    Route::get('skill', 'SkillController@index');
+    Route::post('skill', 'SkillController@store');
+    Route::put('skill/{id}', 'SkillController@update');
+    Route::delete('skill/{id}', 'SkillController@destroy');
 });

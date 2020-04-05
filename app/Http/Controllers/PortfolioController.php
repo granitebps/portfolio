@@ -32,7 +32,7 @@ class PortfolioController extends Controller
             'name' => 'required|max:255',
             'desc' => 'required',
             'type' => 'required',
-            'thumbnail' => 'required|image|max:512',
+            'thumbnail' => 'required|image|max:2048',
             'pic' => 'required',
             'pic.*' => 'image|max:512',
         ]);
@@ -120,7 +120,7 @@ class PortfolioController extends Controller
 
             if ($request->hasFile('thumbnail')) {
                 $this->validate($request, [
-                    'thumbnail' => 'required|image|max:512',
+                    'thumbnail' => 'required|image|max:2048',
                 ]);
                 $thumbnail = $request->thumbnail;
                 $thumbnailName = 'thumbnail-' . str_replace(' ', '_', $thumbnail->getClientOriginalName());
@@ -158,7 +158,7 @@ class PortfolioController extends Controller
             if ($request->hasFile('pic')) {
                 $this->validate($request, [
                     'pic' => 'required',
-                    'pic.*' => 'image|max:512',
+                    'pic.*' => 'image|max:2048',
                 ]);
                 $pic = $request->pic;
                 $portfolioPic = PortfolioPic::where('portfolio_id', $portfolio->id)->get();
