@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::group(['namespace' => 'Api\v1', 'prefix' => 'v1'], function () {
-    Route::group(['middleware' => ['auth:airlock']], function () {
+    Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('auth/me', 'AuthController@me');
     });
 
