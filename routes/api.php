@@ -23,8 +23,8 @@ Route::group(['namespace' => 'Api\v1', 'prefix' => 'v1'], function () {
     Route::put('skill/{id}', 'SkillController@update');
     Route::delete('skill/{id}', 'SkillController@destroy');
 
-    Route::get('skill', 'SkillController@index');
-    Route::post('skill', 'SkillController@store');
-    Route::put('skill/{id}', 'SkillController@update');
-    Route::delete('skill/{id}', 'SkillController@destroy');
+    Route::get('service', 'ServiceController@index');
+    Route::post('service', 'ServiceController@store');
+    Route::put('service/{id}', 'ServiceController@update');
+    Route::delete('service/{id}', 'ServiceController@destroy');
 });
