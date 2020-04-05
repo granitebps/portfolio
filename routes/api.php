@@ -27,4 +27,8 @@ Route::group(['namespace' => 'Api\v1', 'prefix' => 'v1'], function () {
     Route::post('service', 'ServiceController@store');
     Route::put('service/{id}', 'ServiceController@update');
     Route::delete('service/{id}', 'ServiceController@destroy');
+
+    Route::get('profile', 'ProfileController@index');
+    Route::post('profile', 'ProfileController@update');
+    Route::post('profile-password', 'ProfileController@password');
 });
