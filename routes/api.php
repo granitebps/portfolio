@@ -44,4 +44,9 @@ Route::group(['namespace' => 'Api\v1', 'prefix' => 'v1'], function () {
     Route::post('portfolio', 'PortfolioController@store');
     Route::put('portfolio/{id}', 'PortfolioController@update');
     Route::delete('portfolio/{id}', 'PortfolioController@destroy');
+
+    Route::get('experience', 'ExperienceController@index');
+    Route::post('experience', 'ExperienceController@store');
+    Route::put('experience/{id}', 'ExperienceController@update');
+    Route::delete('experience/{id}', 'ExperienceController@destroy');
 });
