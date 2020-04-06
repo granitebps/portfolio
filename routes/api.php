@@ -31,4 +31,9 @@ Route::group(['namespace' => 'Api\v1', 'prefix' => 'v1'], function () {
     Route::get('profile', 'ProfileController@index');
     Route::post('profile', 'ProfileController@update');
     Route::post('profile-password', 'ProfileController@password');
+
+    Route::get('technology', 'TechnologyController@index');
+    Route::post('technology', 'TechnologyController@store');
+    Route::put('technology/{id}', 'TechnologyController@update');
+    Route::delete('technology/{id}', 'TechnologyController@destroy');
 });
