@@ -39,4 +39,9 @@ Route::group(['namespace' => 'Api\v1', 'prefix' => 'v1'], function () {
 
     Route::get('message', 'MessageController@index');
     Route::post('message', 'MessageController@store');
+
+    Route::get('portfolio', 'PortfolioController@index');
+    Route::post('portfolio', 'PortfolioController@store');
+    Route::put('portfolio/{id}', 'PortfolioController@update');
+    Route::delete('portfolio/{id}', 'PortfolioController@destroy');
 });
