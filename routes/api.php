@@ -36,4 +36,7 @@ Route::group(['namespace' => 'Api\v1', 'prefix' => 'v1'], function () {
     Route::post('technology', 'TechnologyController@store');
     Route::put('technology/{id}', 'TechnologyController@update');
     Route::delete('technology/{id}', 'TechnologyController@destroy');
+
+    Route::get('message', 'MessageController@index');
+    Route::post('message', 'MessageController@store');
 });
