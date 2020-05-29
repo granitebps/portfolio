@@ -23,35 +23,42 @@ Route::group(['namespace' => 'Api\v1', 'prefix' => 'v1'], function () {
 
         Route::post('profile', 'ProfileController@update');
         Route::post('profile-password', 'ProfileController@password');
+
+        Route::post('skill', 'SkillController@store');
+        Route::put('skill/{id}', 'SkillController@update');
+        Route::delete('skill/{id}', 'SkillController@destroy');
+
+        Route::post('service', 'ServiceController@store');
+        Route::put('service/{id}', 'ServiceController@update');
+        Route::delete('service/{id}', 'ServiceController@destroy');
+
+        Route::post('technology', 'TechnologyController@store');
+        Route::put('technology/{id}', 'TechnologyController@update');
+        Route::delete('technology/{id}', 'TechnologyController@destroy');
+
+        Route::get('message', 'MessageController@index');
+
+        Route::post('portfolio', 'PortfolioController@store');
+        Route::put('portfolio/{id}', 'PortfolioController@update');
+        Route::delete('portfolio/{id}', 'PortfolioController@destroy');
+
+        Route::post('experience', 'ExperienceController@store');
+        Route::put('experience/{id}', 'ExperienceController@update');
+        Route::delete('experience/{id}', 'ExperienceController@destroy');
     });
+
     Route::get('profile', 'ProfileController@index');
 
     Route::get('skill', 'SkillController@index');
-    Route::post('skill', 'SkillController@store');
-    Route::put('skill/{id}', 'SkillController@update');
-    Route::delete('skill/{id}', 'SkillController@destroy');
 
     Route::get('service', 'ServiceController@index');
-    Route::post('service', 'ServiceController@store');
-    Route::put('service/{id}', 'ServiceController@update');
-    Route::delete('service/{id}', 'ServiceController@destroy');
 
 
     Route::get('technology', 'TechnologyController@index');
-    Route::post('technology', 'TechnologyController@store');
-    Route::put('technology/{id}', 'TechnologyController@update');
-    Route::delete('technology/{id}', 'TechnologyController@destroy');
 
-    Route::get('message', 'MessageController@index');
     Route::post('message', 'MessageController@store');
 
     Route::get('portfolio', 'PortfolioController@index');
-    Route::post('portfolio', 'PortfolioController@store');
-    Route::put('portfolio/{id}', 'PortfolioController@update');
-    Route::delete('portfolio/{id}', 'PortfolioController@destroy');
 
     Route::get('experience', 'ExperienceController@index');
-    Route::post('experience', 'ExperienceController@store');
-    Route::put('experience/{id}', 'ExperienceController@update');
-    Route::delete('experience/{id}', 'ExperienceController@destroy');
 });
