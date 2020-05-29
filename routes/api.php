@@ -13,8 +13,12 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::get('get-token', 'AuthController@get_token');;
+
 Route::group(['namespace' => 'Api\v1', 'prefix' => 'v1'], function () {
-    Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::post('auth/login', 'AuthController@login');
+
+    Route::group(['middleware' => ['authToken']], function () {
         Route::get('auth/me', 'AuthController@me');
     });
 
