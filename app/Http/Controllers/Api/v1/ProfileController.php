@@ -5,10 +5,12 @@ namespace App\Http\Controllers\Api\v1;
 use App\Http\Controllers\Controller;
 use App\Traits\Helpers;
 use App\User;
+use Carbon\Carbon;
+use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
@@ -51,15 +53,9 @@ class ProfileController extends Controller
 
             if ($request->hasFile('avatar')) {
                 $avatar = $request->avatar;
-                $avatar_full = $avatar->getClientOriginalName();
-                $filename = Str::slug(pathinfo($avatar_full, PATHINFO_FILENAME));
-                $extension = pathinfo($avatar_full, PATHINFO_EXTENSION);
-                $nama_avatar = time() . '_' . $filename . '.' . $extension;
+                $nama_avatar = 'avatar.png';
 
-                // Hosting
-                $avatar->storeAs('avatar', $nama_avatar, 'hosting');
-
-                // Storage::putFileAs('public/images/avatar', $avatar, $avatarName);
+                Storage::putFileAs('avatar', $avatar, $nama_avatar);
                 $user->profile->update([
                     'avatar' => $nama_avatar,
                 ]);
@@ -68,10 +64,7 @@ class ProfileController extends Controller
                 $cv = $request->cv;
                 $cvName = 'cv.pdf';
 
-                // Hosting
-                $cv->storeAs('cv', $cvName, 'hosting');
-
-                // Storage::putFileAs('public/images/cv', $cv, $cvName);
+                Storage::putFileAs('cv', $cv, $cvName);
                 $user->profile->update([
                     'cv' => $cvName,
                 ]);
@@ -94,7 +87,15 @@ class ProfileController extends Controller
             ]);
             DB::commit();
 
-            return Helpers::apiResponse(true, 'Profile Updated');
+            $secret = config('jwt.secret');
+            $payload = [
+                'sub' => $user->email,
+                'iat' => Carbon::now()->timestamp,
+                'exp' => Carbon::now()->addHours(24)->timestamp,
+            ];
+            $jwt = JWT::encode($payload, $secret);
+
+            return Helpers::apiResponse(true, 'Profile Updated', ['token' => $jwt]);
         } catch (\Exception $e) {
             DB::rollback();
             return Helpers::apiResponse(false, 'Something Wrong!', $e->getMessage(), 500);

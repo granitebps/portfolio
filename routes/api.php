@@ -20,7 +20,11 @@ Route::group(['namespace' => 'Api\v1', 'prefix' => 'v1'], function () {
 
     Route::group(['middleware' => ['authToken']], function () {
         Route::get('auth/me', 'AuthController@me');
+
+        Route::post('profile', 'ProfileController@update');
+        Route::post('profile-password', 'ProfileController@password');
     });
+    Route::get('profile', 'ProfileController@index');
 
     Route::get('skill', 'SkillController@index');
     Route::post('skill', 'SkillController@store');
@@ -32,9 +36,6 @@ Route::group(['namespace' => 'Api\v1', 'prefix' => 'v1'], function () {
     Route::put('service/{id}', 'ServiceController@update');
     Route::delete('service/{id}', 'ServiceController@destroy');
 
-    Route::get('profile', 'ProfileController@index');
-    Route::post('profile', 'ProfileController@update');
-    Route::post('profile-password', 'ProfileController@password');
 
     Route::get('technology', 'TechnologyController@index');
     Route::post('technology', 'TechnologyController@store');
