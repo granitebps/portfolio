@@ -48,7 +48,9 @@ class AuthController extends Controller
         ];
         $jwt = JWT::encode($payload, $secret);
         $data['token'] = $jwt;
+        $newAvatar = asset('images/avatar/' . $user->profile->avatar);
         $data['name'] = $user->name;
+        $data['avatar'] = $newAvatar;
 
         return Helpers::apiResponse(true, '', $data);
     }
@@ -56,10 +58,12 @@ class AuthController extends Controller
     public function me(Request $request)
     {
         $email = $request->payload->sub;
-        $user = User::where('email', $email)->first();
+        $user = User::with('profile')->where('email', $email)->first();
         if (!$user) {
             return Helpers::apiResponse(false, 'Email or Password Is Wrong', [], 401);
         }
+        $newAvatar = asset('images/avatar/' . $user->profile->avatar);
+        $user->profile->avatar = $newAvatar;
         return Helpers::apiResponse(true, '', $user);
     }
 }

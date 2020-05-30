@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ProfileController extends Controller
 {
@@ -53,8 +54,12 @@ class ProfileController extends Controller
 
             if ($request->hasFile('avatar')) {
                 $avatar = $request->avatar;
-                $nama_avatar = 'avatar.png';
+                $avatar_full = $avatar->getClientOriginalName();
+                $filename = Str::slug(pathinfo($avatar_full, PATHINFO_FILENAME));
+                $extension = pathinfo($avatar_full, PATHINFO_EXTENSION);
+                $nama_avatar = time() . '_' . $filename . '.' . $extension;
 
+                Storage::deleteDirectory('avatar');
                 Storage::putFileAs('avatar', $avatar, $nama_avatar);
                 $user->profile->update([
                     'avatar' => $nama_avatar,
@@ -95,7 +100,8 @@ class ProfileController extends Controller
             ];
             $jwt = JWT::encode($payload, $secret);
 
-            return Helpers::apiResponse(true, 'Profile Updated', ['token' => $jwt]);
+            $newAvatar = asset('images/avatar/' . $user->profile->avatar);
+            return Helpers::apiResponse(true, 'Profile Updated', ['token' => $jwt, 'name' => $user->name, 'avatar' => $newAvatar]);
         } catch (\Exception $e) {
             DB::rollback();
             return Helpers::apiResponse(false, 'Something Wrong!', $e->getMessage(), 500);

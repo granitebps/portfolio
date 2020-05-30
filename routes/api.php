@@ -1,5 +1,6 @@
 <?php
 
+use App\Traits\Helpers;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -61,4 +62,8 @@ Route::group(['namespace' => 'Api\v1', 'prefix' => 'v1'], function () {
     Route::get('portfolio', 'PortfolioController@index');
 
     Route::get('experience', 'ExperienceController@index');
+
+    Route::any('{path}', function () {
+        return Helpers::apiResponse(false, 'Not Found', [], 404);
+    })->where('path', '.*');
 });
