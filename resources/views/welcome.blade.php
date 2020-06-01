@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>{{$user->name}} | Portfolio</title>
+    <title>{{$user['name']}} | Portfolio</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="all,follow">
@@ -37,7 +37,7 @@
         <!-- navbar-->
         <header class="header">
             <nav class="navbar navbar-expand-lg fixed-top">
-                <div class="container"><a href="#intro" class="navbar-brand scrollTo">{{$user->name}}</a>
+                <div class="container"><a href="#intro" class="navbar-brand scrollTo">{{$user['name']}}</a>
                     <button type="button" data-toggle="collapse" data-target="#navbarcollapse" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler navbar-toggler-right"><span class="fa fa-bars"></span></button>
                     <div id="navbarcollapse" class="collapse navbar-collapse">
                         <ul class="navbar-nav ml-auto">
@@ -48,10 +48,7 @@
                             <li class="nav-item"><a href="#references" class="nav-link link-scroll">My work</a></li>
                             <li class="nav-item"><a href="#customers" class="nav-link link-scroll">Technology</a></li>
                             <li class="nav-item"><a href="#contact" class="nav-link link-scroll">Contact</a></li>
-                            {{-- <li class="nav-item"><a target="_blank" href="{{asset('storage/images/cv/cv.pdf')}}" class="nav-link link-scroll">My CV</a></li> --}}
-
-                            {{-- Hosting --}}
-                            <li class="nav-item"><a target="_blank" href="{{asset('images/cv/cv.pdf')}}" class="nav-link link-scroll">My CV</a></li>
+                            <li class="nav-item"><a target="_blank" href="{{$profile['cv']}}" class="nav-link link-scroll">My CV</a></li>
                         </ul>
                     </div>
                 </div>
@@ -73,23 +70,19 @@
                 </header>
                 <div class="row">
                     <div data-animate="fadeInUp" class="col-lg-6">
-                        <p>{{$profile->about}}</p>
+                        <p>{{$profile['about']}}</p>
                     </div>
                     <div data-animate="fadeInUp" class="col-lg-6">
                         @foreach ($skill as $item)
                             <div class="skill-item">
-                                <div class="progress-title">{{$item->name}}</div>
+                                <div class="progress-title">{{$item['name']}}</div>
                                 <div class="progress">
-                                    <div role="progressbar" style="width: {{$item->percentage}}%" aria-valuenow="0" aria-valuemin="{{$item->percentage}}" aria-valuemax="100" class="progress-bar progress-bar-skill1"></div>
+                                    <div role="progressbar" style="width: {{$item['percentage']}}%" aria-valuenow="0" aria-valuemin="{{$item['percentage']}}" aria-valuemax="100" class="progress-bar progress-bar-skill1"></div>
                                 </div>
                             </div>
                         @endforeach
                     </div>
-                    
-                    {{-- Hosting --}}
-                    <div data-animate="fadeInUp" class="col-sm-6 mx-auto mt-5"><img src="{{asset('images/avatar/'.$profile->avatar)}}" alt="This is me - IT worker" class="image rounded-circle img-fluid"></div>
-
-                    {{-- <div data-animate="fadeInUp" class="col-sm-6 mx-auto mt-5"><img src="{{asset('storage/images/avatar/'.$profile->avatar)}}" alt="This is me - IT worker" class="image rounded-circle img-fluid"></div> --}}
+                    <div data-animate="fadeInUp" class="col-sm-6 mx-auto mt-5"><img src="{{$profile['avatar']}}" alt="This is me - IT worker" class="image rounded-circle img-fluid"></div>
                 </div>
             </div>
         </section>
@@ -102,9 +95,9 @@
                 <div class="row services text-center">
                     @foreach ($service as $item)
                         <div data-animate="fadeInUp" class="col-lg-4">
-                            <div class="icon">{!! $item->icon !!}</div>
-                            <h3 class="heading mb-3 text-400">{{$item->name}}</h3>
-                            <p class="text-left description">{{$item->desc}}</p>
+                            <div class="icon">{!! $item['icon'] !!}</div>
+                            <h3 class="heading mb-3 text-400">{{$item['name']}}</h3>
+                            <p class="text-left description">{{$item['desc']}}</p>
                         </div>
                     @endforeach
                 </div>
@@ -127,19 +120,19 @@
                         <li class="item">
                             <div class="testimonial full-height">
                                 <div class="text">
-                                    <h3>{{$item->company}}</h3>
-                                    <h6><i class="fas fa-user"></i> {{$item->position}}</h6>
+                                    <h3>{{$item['company']}}</h3>
+                                    <h6><i class="fas fa-user"></i> {{$item['position']}}</h6>
                                 </div>
                                 <div class="bottom">
                                     <div class="icon"><i class="fas fa-calendar-alt"></i></div>
                                     <div class="name-picture">
-                                        <p>From {{$item->start_date}}</p>
+                                        <p>From {{$item['start_date']}}</p>
                                         <p>
                                             Until 
-                                            @if ($item->current_job == 1)
+                                            @if ($item['current_job'] == 1)
                                                 Now
                                             @else
-                                                {{$item->end_date}}
+                                                {{$item['end_date']}}
                                             @endif
                                         </p>
                                     </div>
@@ -213,17 +206,13 @@
                     <div id="references-masonry" data-animate="fadeInUp">
                         <div class="row">
                             @foreach ($portfolio as $item)
-                                <div data-category="{{$item->type == 1 ? 'personal' : 'client'}}" class="reference-item col-lg-3 col-md-6">
-
-                                    {{-- Hosting --}}
-                                    <div class="reference"><a href="#"><img src="{{asset('images/portfolio/'.\Illuminate\Support\Str::slug($item->name,'-').'/'.$item->thumbnail)}}" alt="" class="img-fluid">
-
-                                    {{-- <div class="reference"><a href="#"><img src="{{asset('storage/images/portfolio/'.\Illuminate\Support\Str::slug($item->name,'-').'/'.$item->thumbnail)}}" alt="" class="img-fluid"> --}}
+                                <div data-category="{{$item['type'] == 1 ? 'personal' : 'client'}}" class="reference-item col-lg-3 col-md-6">
+                                    <div class="reference"><a href="#"><img src="{{$item['thumbnail']}}" alt="" class="img-fluid">
                                         <div class="overlay">
                                             <div class="inner">
-                                                <h5 class="h5 reference-title">{{$item->name}}</h5>
+                                                <h5 class="h5 reference-title">{{$item['name']}}</h5>
                                                 <p>
-                                                    @if ($item->type == 1)
+                                                    @if ($item['type'] == 1)
                                                         Personal Project
                                                     @else
                                                         Client Project
@@ -232,29 +221,21 @@
                                             </div>
                                         </div></a>
                                         <div data-images=" 
-                                        @foreach ($item->pic as $index => $value)
-                                            @if ($index == $item->pic()->count() - 1)
-
-                                                {{-- Hosting --}}
-                                                {{asset('images/portfolio/'.\Illuminate\Support\Str::slug($item->name,'-').'/'.$value->pic)}}
-
-                                                {{-- {{asset('storage/images/portfolio/'.\Illuminate\Support\Str::slug($item->name,'-').'/'.$value->pic)}} --}}
+                                        @foreach ($item['pic'] as $index => $value)
+                                            @if ($index == count($item['pic']) - 1)
+                                                {{ $value }}
                                             @else
-
-                                                {{-- Hosting --}}
-                                                {{asset('images/portfolio/'.\Illuminate\Support\Str::slug($item->name,'-').'/'.$value->pic)}},
-
-                                                {{-- {{asset('storage/images/portfolio/'.\Illuminate\Support\Str::slug($item->name,'-').'/'.$value->pic)}}, --}}
+                                                {{ $value }},
                                             @endif
                                         @endforeach
                                         " class="sr-only reference-description">
                                             <p>
-                                                {{$item->desc}}
+                                                {{$item['desc']}}
                                             </p>
                                             <p class="buttons text-center">
                                                 <a target="_blank" href="
-                                                @if (!empty($item->url))
-                                                    {{$item->url}}
+                                                @if (!empty($item['url']))
+                                                    {{$item['url']}}
                                                 @else
                                                     #
                                                 @endif
@@ -281,11 +262,7 @@
                     <div class="row align-items-center">
                         @foreach ($tech as $item)
                             <div class="col-lg-2 col-md-4 col-sm-6">
-
-                                {{-- Hosting --}}
-                                <div class="customer"><img src="{{asset('images/tech/'.$item->pic)}}" title="{{$item->name}}" data-placement="bottom" data-toggle="tooltip" alt="" class="img-fluid d-block mx-auto"></div>
-
-                                {{-- <div class="customer"><img src="{{asset('storage/images/tech/'.$item->pic)}}" title="{{$item->name}}" data-placement="bottom" data-toggle="tooltip" alt="" class="img-fluid d-block mx-auto"></div> --}}
+                                <div class="customer"><img src="{{$item['pic']}}" title="{{$item['name']}}" data-placement="bottom" data-toggle="tooltip" alt="" class="img-fluid d-block mx-auto"></div>
                             </div>
                         @endforeach
                     </div>
@@ -335,25 +312,25 @@
                 <div class="row">
                     <div class="col-md-6 text-center text-lg-left">
                         <p class="social">
-                            <a target="_blank" href="{{$profile->facebook}}" class="external facebook wow fadeInUp">
+                            <a target="_blank" href="{{$profile['facebook']}}" class="external facebook wow fadeInUp">
                                 <i class="fab fa-facebook"></i>
                             </a>
-                            <a target="_blank" href="{{$profile->instagram}}" data-wow-delay="0.1s" class="external instagram wow fadeInUp">
+                            <a target="_blank" href="{{$profile['instagram']}}" data-wow-delay="0.1s" class="external instagram wow fadeInUp">
                                 <i class="fab fa-instagram"></i>
                             </a>
-                            <a target="_blank" href="{{$profile->twitter}}" data-wow-delay="0.3s" class="external twitter wow fadeInUp">
+                            <a target="_blank" href="{{$profile['twitter']}}" data-wow-delay="0.3s" class="external twitter wow fadeInUp">
                                 <i class="fab fa-twitter"></i>
                             </a>
-                            <a target="_blank" href="{{$profile->github}}" data-wow-delay="0.5s" class="external github wow fadeInUp">
+                            <a target="_blank" href="{{$profile['github']}}" data-wow-delay="0.5s" class="external github wow fadeInUp">
                                 <i class="fab fa-github"></i>
                             </a>
-                            <a target="_blank" href="{{$profile->linkedin}}" data-wow-delay="0.7s" class="external linkedin wow fadeInUp">
+                            <a target="_blank" href="{{$profile['linkedin']}}" data-wow-delay="0.7s" class="external linkedin wow fadeInUp">
                                 <i class="fab fa-linkedin"></i>
                             </a>
-                            <a target="_blank" href="{{$profile->youtube}}" data-wow-delay="0.9s" class="external youtube wow fadeInUp">
+                            <a target="_blank" href="{{$profile['youtube']}}" data-wow-delay="0.9s" class="external youtube wow fadeInUp">
                                 <i class="fab fa-youtube"></i>
                             </a>
-                            <a href="mailto:{{$user->email}}" data-wow-delay="1.1s" class="email wow fadeInUp">
+                            <a href="mailto:{{$user['email']}}" data-wow-delay="1.1s" class="email wow fadeInUp">
                                 <i class="fa fa-envelope"></i>
                             </a>
                         </p>
