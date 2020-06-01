@@ -13,6 +13,10 @@ class ExperienceController extends Controller
     public function index()
     {
         $experience = Experience::orderBy('created_at', 'desc')->get();
+        $experience->transform(function ($item) {
+            $item->current_job = $item->current_job ? $item->current_job : false;
+            return $item;
+        });
         return Helpers::apiResponse(true, '', $experience);
     }
 

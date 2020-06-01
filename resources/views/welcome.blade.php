@@ -126,13 +126,13 @@
                                 <div class="bottom">
                                     <div class="icon"><i class="fas fa-calendar-alt"></i></div>
                                     <div class="name-picture">
-                                        <p>From {{$item['start_date']}}</p>
+                                        <p>From {{\Carbon\Carbon::parse($item['start_date'])->format('F Y')}}</p>
                                         <p>
                                             Until 
                                             @if ($item['current_job'] == 1)
                                                 Now
                                             @else
-                                                {{$item['end_date']}}
+                                                {{\Carbon\Carbon::parse($item['end_date'])->format('F Y')}}
                                             @endif
                                         </p>
                                     </div>
