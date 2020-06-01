@@ -13,7 +13,7 @@ class MessageController extends Controller
     public function index()
     {
         $message = Message::orderBy('created_at', 'desc')->get();
-        $message->makeHidden(['created_at', 'updated_at']);
+        $message->makeHidden(['updated_at']);
         return Helpers::apiResponse(true, '', $message);
     }
 
@@ -41,6 +41,25 @@ class MessageController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             return Helpers::apiResponse(false, 'Something Wrong!', $e->getMessage(), 500);
+        }
+    }
+
+    public function destroy($id)
+    {
+        DB::beginTransaction();
+        try {
+            $message = Message::find($id);
+            if (!$message) {
+                return Helpers::apiResponse(false, 'Message Not Found', [], 400);
+            }
+
+            $message->delete();
+
+            DB::commit();
+            return Helpers::apiResponse(true, 'Message Deleted', []);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return Helpers::apiResponse(false, 'Server Error', [], 500);
         }
     }
 }

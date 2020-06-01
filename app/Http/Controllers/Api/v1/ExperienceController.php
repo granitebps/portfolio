@@ -23,7 +23,7 @@ class ExperienceController extends Controller
             'position' => 'required|max:255',
             'start_date' => 'required'
         ]);
-        if ($request->filled('current_job')) {
+        if (!$request->filled('current_job')) {
             $this->validate($request, [
                 'end_date' => 'required'
             ]);

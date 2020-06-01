@@ -38,6 +38,7 @@ Route::group(['namespace' => 'Api\v1', 'prefix' => 'v1'], function () {
         Route::delete('technology/{id}', 'TechnologyController@destroy');
 
         Route::get('message', 'MessageController@index');
+        Route::delete('message/{id}', 'MessageController@destroy');
 
         Route::post('portfolio', 'PortfolioController@store');
         Route::put('portfolio/{id}', 'PortfolioController@update');

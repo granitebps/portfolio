@@ -20,14 +20,10 @@ class PortfolioController extends Controller
             $folderName = Str::slug($item->name, '-');
             $newThumb = asset('images/portfolio/' . $folderName . '/' . $item->thumbnail);
             $item->thumbnail = $newThumb;
-            $newType = $item->type === 1 ? 'Personal Project' : 'Client Project';
-            $item->type = $newType;
 
             $item->pic->transform(function ($pic) use ($folderName) {
                 $newPic = asset('images/portfolio/' . $folderName . '/' . $pic->pic);
-                $pic->pic = $newPic;
-                $pic->makeHidden(['created_at', 'updated_at', 'id', 'portfolio_id']);
-                return $pic;
+                return $newPic;
             });
 
             return $item;
