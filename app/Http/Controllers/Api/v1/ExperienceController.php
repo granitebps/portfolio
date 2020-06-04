@@ -25,6 +25,7 @@ class ExperienceController extends Controller
         $this->validate($request, [
             'company' => 'required|max:255',
             'position' => 'required|max:255',
+            'desc' => 'required',
             'start_date' => 'required'
         ]);
         if (!$request->filled('current_job')) {
@@ -39,7 +40,8 @@ class ExperienceController extends Controller
                 'position' => $request->position,
                 'start_date' => $request->start_date,
                 'end_date' => $request->end_date,
-                'current_job' => $request->current_job
+                'current_job' => $request->current_job,
+                'desc' => $request->desc
             ]);
 
             DB::commit();
@@ -73,7 +75,8 @@ class ExperienceController extends Controller
                 'position' => $request->position,
                 'start_date' => $request->start_date,
                 'end_date' => $request->end_date,
-                'current_job' => $request->current_job
+                'current_job' => $request->current_job,
+                'desc' => $request->desc,
             ]);
 
             DB::commit();
