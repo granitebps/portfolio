@@ -12,4 +12,8 @@ class Profile extends Model
     {
         return $this->hasOne('App\User', 'id', 'user_id');
     }
+
+    protected $casts = [
+        'languages' => 'array',
+    ];
 }
