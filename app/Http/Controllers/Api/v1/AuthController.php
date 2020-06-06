@@ -53,6 +53,9 @@ class AuthController extends Controller
         $data['name'] = $user->name;
         $data['avatar'] = $newAvatar;
 
+        $user->token = base64_encode($jwt);
+        $user->save();
+
         return Helpers::apiResponse(true, '', $data);
     }
 

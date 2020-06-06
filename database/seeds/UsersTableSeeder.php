@@ -18,7 +18,8 @@ class UsersTableSeeder extends Seeder
             'name' => 'Admin',
             'username' => 'admin',
             'email' => 'admin@gmail.com',
-            'password' => Hash::make(12345678)
+            'password' => Hash::make(12345678),
+            'token' => 'abcde'
         ]);
 
         Profile::create([

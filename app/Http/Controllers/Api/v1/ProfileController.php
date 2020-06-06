@@ -108,6 +108,8 @@ class ProfileController extends Controller
                 'exp' => Carbon::now()->addHours(24)->timestamp,
             ];
             $jwt = JWT::encode($payload, $secret);
+            $user->token = base64_encode($jwt);
+            $user->save();
 
             $newAvatar = asset('images/avatar/' . $user->profile->avatar);
             return Helpers::apiResponse(true, 'Profile Updated', ['token' => $jwt, 'name' => $user->name, 'avatar' => $newAvatar]);
