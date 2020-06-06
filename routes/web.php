@@ -14,6 +14,6 @@ use Illuminate\Support\Facades\Auth;
 |
 */
 
-Route::get('/', 'HomeController@welcome')->name('welcome');
-
-Route::post('/message', 'HomeController@message')->name('message');
+Route::get('/', function () {
+    return 'API';
+});

@@ -42,6 +42,7 @@ class AuthController extends Controller
 
         $secret = config('jwt.secret');
         $payload = [
+            'iss' => 'granitebps.com',
             'sub' => $user->email,
             'iat' => Carbon::now()->timestamp,
             'exp' => Carbon::now()->addHours(24)->timestamp,

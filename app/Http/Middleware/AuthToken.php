@@ -29,6 +29,9 @@ class AuthToken
         } catch (\Exception $e) {
             return Helpers::apiResponse(false, 'Unauthorized', [], 401);
         }
+        if ($decoded->iss !== 'granitebps.com') {
+            return Helpers::apiResponse(false, 'Unauthorized', [], 401);
+        }
         $user = User::where('email', $decoded->sub)->first();
         if (empty($user)) {
             return Helpers::apiResponse(false, 'Unauthorized', [], 401);
