@@ -51,6 +51,10 @@ Route::group(['namespace' => 'Api\v1', 'prefix' => 'v1'], function () {
         Route::post('education', 'EducationController@store');
         Route::put('education/{id}', 'EducationController@update');
         Route::delete('education/{id}', 'EducationController@destroy');
+
+        Route::post('blog', 'BlogController@store');
+        Route::put('blog/{id}', 'BlogController@update');
+        Route::delete('blog/{id}', 'BlogController@destroy');
     });
 
     Route::get('profile', 'ProfileController@index');
@@ -69,6 +73,9 @@ Route::group(['namespace' => 'Api\v1', 'prefix' => 'v1'], function () {
     Route::get('experience', 'ExperienceController@index');
 
     Route::get('education', 'EducationController@index');
+
+    Route::get('blog', 'BlogController@index');
+    Route::get('blog/{id}', 'BlogController@show');
 
     Route::any('{path}', function () {
         return Helpers::apiResponse(false, 'Not Found', [], 404);
