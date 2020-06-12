@@ -55,6 +55,10 @@ Route::group(['namespace' => 'Api\v1', 'prefix' => 'v1'], function () {
         Route::post('blog', 'BlogController@store');
         Route::put('blog/{id}', 'BlogController@update');
         Route::delete('blog/{id}', 'BlogController@destroy');
+
+        Route::get('gallery', 'GalleryController@index');
+        Route::post('gallery', 'GalleryController@store');
+        Route::delete('gallery/{id}', 'GalleryController@destroy');
     });
 
     Route::get('profile', 'ProfileController@index');
