@@ -12,7 +12,7 @@ class EducationController extends Controller
 {
     public function index()
     {
-        $education = Education::orderBy('start_year', 'asc')->get();
+        $education = Education::orderBy('start_year', 'desc')->get();
         return Helpers::apiResponse(true, '', $education);
     }
 
