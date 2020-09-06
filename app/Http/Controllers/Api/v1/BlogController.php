@@ -70,7 +70,7 @@ class BlogController extends Controller
         if (!$blog) {
             return Helpers::apiResponse(false, 'Blog Not Found', [], 404);
         }
-        $newFoto = asset('images/blog/' . $blog->image);
+        $newFoto = Storage::url($blog->image);
         $blog->image = $newFoto;
         $blog->user->makeHidden('token');
         return Helpers::apiResponse(true, '', $blog);
