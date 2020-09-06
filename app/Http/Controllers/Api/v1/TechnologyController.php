@@ -7,7 +7,7 @@ use App\Technology;
 use App\Traits\Helpers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class TechnologyController extends Controller
@@ -17,7 +17,7 @@ class TechnologyController extends Controller
         $tech = Technology::all();
         $tech->makeHidden(['created_at', 'updated_at']);
         $tech->transform(function ($item) {
-            $newFoto = asset('images/tech/' . $item->pic);
+            $newFoto = Storage::url($item->pic);
             $item->pic = $newFoto;
             return $item;
         });
@@ -39,13 +39,11 @@ class TechnologyController extends Controller
             $extension = pathinfo($pic_full, PATHINFO_EXTENSION);
             $nama_pic = time() . '_' . $filename . '.' . $extension;
 
-            // Image upload for shared hosting
-            $pic->storeAs('tech', $nama_pic, 'hosting');
+            $aws_tech = Storage::putFileAs('tech', $pic, $nama_pic);
 
-            // Storage::putFileAs('public/images/tech', $pic, $picName);
             $tech = Technology::create([
                 'name' => $request->name,
-                'pic' => $nama_pic,
+                'pic' => $aws_tech,
             ]);
 
             DB::commit();
@@ -71,21 +69,18 @@ class TechnologyController extends Controller
                 return Helpers::apiResponse(false, 'Technology Not Found', [], 404);
             }
             if ($request->hasFile('pic')) {
-                $old_foto = $tech->pic;
                 $pic = $request->pic;
                 $pic_full = $pic->getClientOriginalName();
                 $filename = Str::slug(pathinfo($pic_full, PATHINFO_FILENAME));
                 $extension = pathinfo($pic_full, PATHINFO_EXTENSION);
                 $nama_pic = time() . '_' . $filename . '.' . $extension;
 
-                // Image upload for shared hosting
-                $pic->storeAs('tech', $nama_pic, 'hosting');
-                File::delete(public_path() . '/images/tech/' . $old_foto);
+                $aws_tech = Storage::putFileAs('tech', $pic, $nama_pic);
 
-                // Storage::delete('public/images/tech/' . $tech->pic);
-                // Storage::putFileAs('public/images/tech', $pic, $picName);
+                Storage::delete($tech->pic);
+
                 $tech->update([
-                    'pic' => $nama_pic,
+                    'pic' => $aws_tech,
                 ]);
             }
             $tech->update([
@@ -108,10 +103,9 @@ class TechnologyController extends Controller
             if (!$tech) {
                 return Helpers::apiResponse(false, 'Technology Not Found', [], 404);
             }
-            // Hosting
-            File::delete(public_path() . '/images/tech/' . $tech->pic);
 
-            // Storage::delete('public/images/tech/' . $tech->pic);
+            Storage::delete($tech->pic);
+
             $tech->delete();
 
             DB::commit();

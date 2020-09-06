@@ -7,7 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Traits\Helpers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class GalleryController extends Controller
@@ -18,7 +18,7 @@ class GalleryController extends Controller
         $tech->makeHidden(['updated_at']);
         $tech->transform(function ($item) {
             $item->name = $item->image;
-            $newFoto = asset('images/galeries/' . $item->image);
+            $newFoto = Storage::url($item->image);
             $item->image = $newFoto;
             return $item;
         });
@@ -41,10 +41,10 @@ class GalleryController extends Controller
                 $extension = pathinfo($pic_full, PATHINFO_EXTENSION);
                 $nama_pic = time() . '_' . $filename . '.' . $extension;
 
-                $image->storeAs('galeries', $nama_pic, 'hosting');
+                $aws_galery = Storage::putFileAs('galeries', $image, $nama_pic);
 
                 Gallery::create([
-                    'image' => $nama_pic,
+                    'image' => $aws_galery,
                 ]);
             }
 
@@ -66,7 +66,7 @@ class GalleryController extends Controller
                 return Helpers::apiResponse(false, 'Image Not Found', [], 404);
             }
 
-            File::delete(public_path() . '/images/galeries/' . $gallery->image);
+            Storage::delete($gallery->image);
 
             $gallery->delete();
 

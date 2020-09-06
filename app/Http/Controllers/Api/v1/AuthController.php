@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class AuthController extends Controller
 {
@@ -66,7 +67,7 @@ class AuthController extends Controller
         if (!$user) {
             return Helpers::apiResponse(false, 'Email or Password Is Wrong', [], 401);
         }
-        $newAvatar = asset('images/avatar/' . $user->profile->avatar);
+        $newAvatar = Storage::url($user->profile->avatar);
         $user->profile->avatar = $newAvatar;
         return Helpers::apiResponse(true, '', $user);
     }

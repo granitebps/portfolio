@@ -20,10 +20,11 @@ class ProfileController extends Controller
         $user = User::with('profile')->first();
         $user->makeHidden(['created_at', 'updated_at']);
         $user->profile->makeHidden(['created_at', 'updated_at', 'id', 'user_id']);
-        $newAvatar = asset('images/avatar/' . $user->profile->avatar);
+        $newAvatar = Storage::url($user->profile->avatar);
         $user->profile->avatar = $newAvatar;
-        $newCv = asset('images/cv/' . $user->profile->cv);
+        $newCv = Storage::url($user->profile->cv);
         $user->profile->cv = $newCv;
+        $user->profile->freelance = (int)$user->profile->freelance;
         return Helpers::apiResponse(true, '', $user);
     }
 
@@ -64,18 +65,19 @@ class ProfileController extends Controller
                 $nama_avatar = time() . '_' . $filename . '.' . $extension;
 
                 Storage::deleteDirectory('avatar');
-                Storage::putFileAs('avatar', $avatar, $nama_avatar);
+                $aws_avatar = Storage::putFileAs('avatar', $avatar, $nama_avatar);
                 $user->profile->update([
-                    'avatar' => $nama_avatar,
+                    'avatar' => $aws_avatar,
                 ]);
             }
             if ($request->hasFile('cv')) {
                 $cv = $request->cv;
-                $cvName = 'cv.pdf';
+                $cvName = time() . '_' . 'cv.pdf';
 
-                Storage::putFileAs('cv', $cv, $cvName);
+                Storage::deleteDirectory('cv');
+                $aws_cv = Storage::putFileAs('cv', $cv, $cvName);
                 $user->profile->update([
-                    'cv' => $cvName,
+                    'cv' => $aws_cv,
                 ]);
             }
             $user->update([
@@ -111,8 +113,7 @@ class ProfileController extends Controller
             $user->token = base64_encode($jwt);
             $user->save();
 
-            $newAvatar = asset('images/avatar/' . $user->profile->avatar);
-            return Helpers::apiResponse(true, 'Profile Updated', ['token' => $jwt, 'name' => $user->name, 'avatar' => $newAvatar]);
+            return Helpers::apiResponse(true, 'Profile Updated', ['token' => $jwt, 'name' => $user->name, 'avatar' => Storage::url($user->profile->avatar)]);
         } catch (\Exception $e) {
             DB::rollback();
             return Helpers::apiResponse(false, 'Something Wrong!', $e->getMessage(), 500);

@@ -67,7 +67,6 @@ Route::group(['namespace' => 'Api\v1', 'prefix' => 'v1'], function () {
 
     Route::get('service', 'ServiceController@index');
 
-
     Route::get('technology', 'TechnologyController@index');
 
     Route::post('message', 'MessageController@store');

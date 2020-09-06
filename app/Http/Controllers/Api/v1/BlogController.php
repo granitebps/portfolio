@@ -8,7 +8,7 @@ use App\Traits\Helpers;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class BlogController extends Controller
@@ -19,6 +19,7 @@ class BlogController extends Controller
         $blog->makeHidden(['updated_at']);
         $blog->transform(function ($item) {
             $newFoto = asset('images/blog/' . $item->image);
+            $newFoto = Storage::url($item->image);
             $item->image = $newFoto;
             $item->user->makeHidden('token');
             return $item;
@@ -42,18 +43,16 @@ class BlogController extends Controller
             $extension = pathinfo($image_full, PATHINFO_EXTENSION);
             $nama_image = time() . '_' . $filename . '.' . $extension;
 
-            // Image upload for shared hosting
-            $image->storeAs('blog', $nama_image, 'hosting');
+            $aws_blog = Storage::putFileAs('blog', $image, $nama_image);
 
             $user = User::where('email', $request->payload->sub)->first();
 
-            // Storage::putFileAs('public/images/blog', $image, $imageName);
             $blog = Blog::create([
                 'user_id' => $user->id,
                 'title' => $request->title,
                 'slug' => Str::slug($request->title),
                 'body' => $request->body,
-                'image' => $nama_image,
+                'image' => $aws_blog,
             ]);
 
             DB::commit();
@@ -100,13 +99,11 @@ class BlogController extends Controller
                 $nama_image = time() . '_' . $filename . '.' . $extension;
 
                 // Image upload for shared hosting
-                $image->storeAs('blog', $nama_image, 'hosting');
-                File::delete(public_path() . '/images/blog/' . $old_foto);
+                $aws_blog = Storage::putFileAs('blog', $image, $nama_image);
+                Storage::delete($old_foto);
 
-                // Storage::delete('public/images/blog/' . $blog->image);
-                // Storage::putFileAs('public/images/blog', $image, $imageName);
                 $blog->update([
-                    'image' => $nama_image,
+                    'image' => $aws_blog,
                 ]);
             }
             $blog->update([
@@ -131,10 +128,9 @@ class BlogController extends Controller
             if (!$blog) {
                 return Helpers::apiResponse(false, 'Blog Not Found', [], 404);
             }
-            // Hosting
-            File::delete(public_path() . '/images/blog/' . $blog->image);
 
-            // Storage::delete('public/images/blog/' . $blog->image);
+            Storage::delete($blog->image);
+
             $blog->delete();
 
             DB::commit();

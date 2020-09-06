@@ -7,7 +7,6 @@ use App\Portfolio;
 use App\Traits\Helpers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -17,12 +16,17 @@ class PortfolioController extends Controller
     {
         $portfolio = Portfolio::with('pic')->orderBy('created_at', 'desc')->get();
         $portfolio->transform(function ($item) {
-            $folderName = Str::slug($item->name, '-');
-            $newThumb = asset('images/portfolio/' . $folderName . '/' . $item->thumbnail);
+            $newThumb = Storage::url($item->thumbnail);
             $item->thumbnail = $newThumb;
 
-            $item->pic->transform(function ($pic) use ($folderName) {
-                $newPic = asset('images/portfolio/' . $folderName . '/' . $pic->pic);
+            $item->type = (int)$item->type;
+
+            if (is_null($item->url)) {
+                $item->url = '';
+            }
+
+            $item->pic->transform(function ($pic) {
+                $newPic = Storage::url($pic->pic);
                 return $newPic;
             });
 
@@ -57,17 +61,14 @@ class PortfolioController extends Controller
             $extension = pathinfo($thumbnail_full, PATHINFO_EXTENSION);
             $nama_thumbnail = time() . '_thumbnail-' . $filename . '.' . $extension;
 
-            // Storage::putFileAs('public/images/portfolio/' . $folderName, $thumbnail, $thumbnailName);
-
-            // Hosting
-            $thumbnail->storeAs('portfolio/' . $folderName, $nama_thumbnail, 'hosting');
+            $aws_thumbnail = Storage::putFileAs('portfolio/' . $folderName, $thumbnail, $nama_thumbnail);
 
             $portfolio = Portfolio::create([
                 'name' => $request->name,
                 'desc' => $request->desc,
                 'type' => $request->type,
                 'url' => $request->url,
-                'thumbnail' => $nama_thumbnail
+                'thumbnail' => $aws_thumbnail
             ]);
 
             $pic = $request->pic;
@@ -77,12 +78,10 @@ class PortfolioController extends Controller
                 $extension = pathinfo($image_full, PATHINFO_EXTENSION);
                 $nama_image = time() . '_' . $filename . '.' . $extension;
 
-                // Hosting
-                $image->storeAs('portfolio/' . $folderName, $nama_image, 'hosting');
+                $aws_pic = Storage::putFileAs('portfolio/' . $folderName, $image, $nama_image);
 
-                // Storage::putFileAs('public/images/portfolio/' . $folderName, $image, $imageName);
                 $portfolio->pic()->create([
-                    'pic' => $nama_image
+                    'pic' => $aws_pic
                 ]);
             }
 
@@ -101,7 +100,7 @@ class PortfolioController extends Controller
             'desc' => 'required|string',
             'type' => 'required',
         ]);
-        if (!empty($request->url)) {
+        if ($request->filled('url')) {
             $this->validate($request, [
                 'url' => 'url',
             ]);
@@ -116,13 +115,25 @@ class PortfolioController extends Controller
 
             $oldFolderName = Str::slug($portfolio->name, '-');
             $folderName = Str::slug($request->name, '-');
-            if ($request->name != $portfolio->name) {
-                // Storage::move('public/images/portfolio/' . $oldFolderName, 'public/images/portfolio/' . $folderName);
-                // Storage::deleteDirectory('public/images/portfolio/' . $oldFolderName);
+            if ($request->name !== $portfolio->name) {
+                $oldImages = Storage::allFiles('portfolio/' . $oldFolderName);
+                foreach ($oldImages as $oldImage) {
+                    $newLoc = str_replace('portfolio/' . $oldFolderName, 'portfolio/' . $folderName, $oldImage);
+                    Storage::copy($oldImage, $newLoc);
+                }
 
-                // Hosting
-                Storage::disk('hosting')->move('portfolio/' . $oldFolderName, 'portfolio/' . $folderName);
-                Storage::disk('hosting')->deleteDirectory('portfolio/' . $oldFolderName);
+                $newThumb = str_replace('portfolio/' . $oldFolderName, 'portfolio/' . $folderName, $portfolio->thumbnail);
+                $portfolio->update([
+                    'thumbnail' => $newThumb
+                ]);
+
+                foreach ($portfolio->pic as $value) {
+                    $newPic = str_replace('portfolio/' . $oldFolderName, 'portfolio/' . $folderName, $value->pic);
+                    $value->pic = $newPic;
+                    $value->save();
+                }
+
+                Storage::deleteDirectory('portfolio/' . $oldFolderName);
             }
 
             if ($request->hasFile('thumbnail')) {
@@ -134,27 +145,13 @@ class PortfolioController extends Controller
                 $filename = Str::slug(pathinfo($thumbnail_full, PATHINFO_FILENAME));
                 $extension = pathinfo($thumbnail_full, PATHINFO_EXTENSION);
                 $nama_thumbnail = time() . '_thumbnail-' . $filename . '.' . $extension;
-                // if (File::exists(public_path() . '/storage/images/portfolio/' . $oldFolderName)) {
 
-                // Hosting
-                if (File::exists(public_path() . '/images/portfolio/' . $oldFolderName)) {
-                    Storage::disk('hosting')->delete('portfolio/' . $oldFolderName . '/' . $portfolio->thumbnail);
+                $oldThubmnail = str_replace('portfolio/' . $oldFolderName, 'portfolio/' . $folderName, $portfolio->thumbnail);
+                Storage::delete($oldThubmnail);
+                $aws_thumbnail = Storage::putFileAs('portfolio/' . $folderName, $thumbnail, $nama_thumbnail);
 
-                    // Storage::delete('public/images/portfolio/' . $oldFolderName . '/' . $portfolio->thumbnail);
-                } else {
-
-                    // Hosting
-                    Storage::disk('hosting')->delete('portfolio/' . $folderName . '/' . $portfolio->thumbnail);
-
-                    // Storage::delete('public/images/portfolio/' . $folderName . '/' . $portfolio->thumbnail);
-                }
-
-                // Hosting
-                $thumbnail->storeAs('portfolio/' . $folderName, $nama_thumbnail, 'hosting');
-
-                // Storage::putFileAs('public/images/portfolio/' . $folderName, $thumbnail, $nama_thumbnail);
                 $portfolio->update([
-                    'thumbnail' => $nama_thumbnail
+                    'thumbnail' => $aws_thumbnail
                 ]);
             }
 
@@ -172,19 +169,8 @@ class PortfolioController extends Controller
                 ]);
                 $pic = $request->pic;
                 foreach ($portfolio->pic as $value) {
-                    // if (File::exists(public_path() . '/storage/images/portfolio/' . $oldFolderName)) {
-
-                    // // Hosting
-                    if (File::exists(public_path() . '/images/portfolio/' . $oldFolderName)) {
-                        Storage::disk('hosting')->delete('portfolio/' . $oldFolderName . '/' . $value->pic);
-
-                        // Storage::delete('public/images/portfolio/' . $oldFolderName . '/' . $value->pic);
-                    } else {
-                        // Storage::delete('public/images/portfolio/' . $folderName . '/' . $value->pic);
-
-                        // Hosting
-                        Storage::disk('hosting')->delete('portfolio/' . $folderName . '/' . $value->pic);
-                    }
+                    $oldPic = str_replace('portfolio/' . $oldFolderName, 'portfolio/' . $folderName, $value->pic);
+                    Storage::delete($oldPic);
                     $value->delete();
                 }
                 foreach ($pic as $image) {
@@ -192,13 +178,11 @@ class PortfolioController extends Controller
                     $filename = Str::slug(pathinfo($image_full, PATHINFO_FILENAME));
                     $extension = pathinfo($image_full, PATHINFO_EXTENSION);
                     $nama_image = time() . '_' . $filename . '.' . $extension;
-                    // Storage::putFileAs('public/images/portfolio/' . $folderName, $image, $imageName);
 
-                    // Hosting
-                    $image->storeAs('portfolio/' . $folderName, $nama_image, 'hosting');
+                    $aws_pic = Storage::putFileAs('portfolio/' . $folderName, $image, $nama_image);
 
                     $portfolio->pic()->create([
-                        'pic' => $nama_image
+                        'pic' => $aws_pic
                     ]);
                 }
             }
@@ -221,10 +205,8 @@ class PortfolioController extends Controller
             }
 
             $folderName = Str::slug($portfolio->name, '-');
-            // Storage::deleteDirectory('public/images/portfolio/' . $folderName);
 
-            // Hosting
-            Storage::disk('hosting')->deleteDirectory('portfolio/' . $folderName);
+            Storage::deleteDirectory('portfolio/' . $folderName);
 
             $portfolio->pic()->delete();
             $portfolio->delete();
