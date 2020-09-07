@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
 use App\Portfolio;
+use App\PortfolioPic;
 use App\Traits\Helpers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -27,7 +28,9 @@ class PortfolioController extends Controller
 
             $item->pic->transform(function ($pic) {
                 $newPic = Storage::url($pic->pic);
-                return $newPic;
+                $pic->pic = $newPic;
+                $pic->makeHidden(['portfolio_id', 'created_at', 'updated_at']);
+                return $pic;
             });
 
             return $item;
@@ -168,11 +171,6 @@ class PortfolioController extends Controller
                     'pic.*' => 'image|max:2048',
                 ]);
                 $pic = $request->pic;
-                foreach ($portfolio->pic as $value) {
-                    $oldPic = str_replace('portfolio/' . $oldFolderName, 'portfolio/' . $folderName, $value->pic);
-                    Storage::delete($oldPic);
-                    $value->delete();
-                }
                 foreach ($pic as $image) {
                     $image_full = $image->getClientOriginalName();
                     $filename = Str::slug(pathinfo($image_full, PATHINFO_FILENAME));
@@ -213,6 +211,27 @@ class PortfolioController extends Controller
 
             DB::commit();
             return Helpers::apiResponse(true, 'Portfolio Deleted');
+        } catch (\Exception $e) {
+            DB::rollback();
+            return Helpers::apiResponse(false, 'Something Wrong!', $e->getMessage(), 500);
+        }
+    }
+
+    public function destroy_photo($id)
+    {
+        DB::beginTransaction();
+        try {
+            $portfolio = PortfolioPic::find($id);
+            if (!$portfolio) {
+                return Helpers::apiResponse(false, 'Portfolio Picture Not Found', [], 404);
+            }
+
+            Storage::delete($portfolio->pic);
+
+            $portfolio->delete();
+
+            DB::commit();
+            return Helpers::apiResponse(true, 'Portfolio Picture Deleted');
         } catch (\Exception $e) {
             DB::rollback();
             return Helpers::apiResponse(false, 'Something Wrong!', $e->getMessage(), 500);
