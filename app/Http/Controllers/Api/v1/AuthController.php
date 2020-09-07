@@ -50,7 +50,7 @@ class AuthController extends Controller
         ];
         $jwt = JWT::encode($payload, $secret);
         $data['token'] = $jwt;
-        $newAvatar = asset('images/avatar/' . $user->profile->avatar);
+        $newAvatar = Storage::url($user->profile->avatar);
         $data['name'] = $user->name;
         $data['avatar'] = $newAvatar;
 
