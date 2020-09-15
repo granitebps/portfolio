@@ -6,14 +6,20 @@ use App\Http\Controllers\Controller;
 use App\Services;
 use App\Traits\Helpers;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class ServiceController extends Controller
 {
     public function index()
     {
-        $service = Services::all();
-        $service->makeHidden(['created_at', 'updated_at']);
+        if (Cache::has('services')) {
+            $service = Cache::get('services');
+        } else {
+            $service = Services::all();
+            $service->makeHidden(['created_at', 'updated_at']);
+            Cache::put('services', $service, now()->addDay());
+        }
         return Helpers::apiResponse(true, '', $service);
     }
 
@@ -33,21 +39,14 @@ class ServiceController extends Controller
                 'desc' => $request->desc,
             ]);
 
+            Cache::forget('services');
+
             DB::commit();
             return Helpers::apiResponse(true, 'Service Created', $service);
         } catch (\Exception $e) {
             DB::rollback();
             return Helpers::apiResponse(false, 'Something Wrong!', $e->getMessage(), 500);
         }
-    }
-
-    public function show($id)
-    {
-        $service = Services::findOrFail($id);
-        if (!$service) {
-            return Helpers::apiResponse(false, 'Service Not Found', [], 404);
-        }
-        return Helpers::apiResponse(true, '', $service);
     }
 
     public function update(Request $request, $id)
@@ -71,6 +70,8 @@ class ServiceController extends Controller
                 'desc' => $request->desc,
             ]);
 
+            Cache::forget('services');
+
             DB::commit();
             return Helpers::apiResponse(true, 'Service Updated', $service);
         } catch (\Exception $e) {
@@ -88,6 +89,8 @@ class ServiceController extends Controller
                 return Helpers::apiResponse(false, 'Service Not Found', [], 404);
             }
             $service->delete();
+
+            Cache::forget('services');
 
             DB::commit();
             return Helpers::apiResponse(true, 'Service Deleted');

@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Traits\Helpers;
 use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -15,15 +16,20 @@ class BlogController extends Controller
 {
     public function index()
     {
-        $blog = Blog::with('user')->latest('created_at')->get();
-        $blog->makeHidden(['updated_at']);
-        $blog->transform(function ($item) {
-            $newFoto = asset('images/blog/' . $item->image);
-            $newFoto = Storage::url($item->image);
-            $item->image = $newFoto;
-            $item->user->makeHidden('token');
-            return $item;
-        });
+        if (Cache::has('blogs')) {
+            $blog = Cache::get('blogs');
+        } else {
+            $blog = Blog::with('user')->latest('created_at')->get();
+            $blog->makeHidden(['updated_at']);
+            $blog->transform(function ($item) {
+                $newFoto = asset('images/blog/' . $item->image);
+                $newFoto = Storage::url($item->image);
+                $item->image = $newFoto;
+                $item->user->makeHidden('token');
+                return $item;
+            });
+            Cache::put('blogs', $blog, now()->addDay());
+        }
         return Helpers::apiResponse(true, '', $blog);
     }
 
@@ -54,6 +60,8 @@ class BlogController extends Controller
                 'body' => $request->body,
                 'image' => $aws_blog,
             ]);
+
+            Cache::forget('blogs');
 
             DB::commit();
             return Helpers::apiResponse(true, 'Blog Created', $blog);
@@ -112,6 +120,8 @@ class BlogController extends Controller
                 'body' => $request->body,
             ]);
 
+            Cache::forget('blogs');
+
             DB::commit();
             return Helpers::apiResponse(true, 'Blog Updated', $blog);
         } catch (\Exception $e) {
@@ -132,6 +142,8 @@ class BlogController extends Controller
             Storage::delete($blog->image);
 
             $blog->delete();
+
+            Cache::forget('blogs');
 
             DB::commit();
             return Helpers::apiResponse(true, 'Blog Deleted');

@@ -6,13 +6,19 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Education;
 use App\Traits\Helpers;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class EducationController extends Controller
 {
     public function index()
     {
-        $education = Education::orderBy('start_year', 'desc')->get();
+        if (Cache::has('educations')) {
+            $education = Cache::get('educations');
+        } else {
+            $education = Education::orderBy('start_year', 'desc')->get();
+            Cache::put('educations', $education, now()->addDay());
+        }
         return Helpers::apiResponse(true, '', $education);
     }
 
@@ -32,6 +38,8 @@ class EducationController extends Controller
                 'start_year' => $request->start_year,
                 'end_year' => $request->end_year,
             ]);
+
+            Cache::forget('educations');
 
             DB::commit();
             return Helpers::apiResponse(true, 'Education Created');
@@ -63,6 +71,8 @@ class EducationController extends Controller
                 'end_year' => $request->end_year,
             ]);
 
+            Cache::forget('educations');
+
             DB::commit();
             return Helpers::apiResponse(true, 'Education Updated');
         } catch (\Exception $e) {
@@ -80,6 +90,8 @@ class EducationController extends Controller
                 return Helpers::apiResponse(false, 'Education Not Found', [], 404);
             }
             $education->delete();
+
+            Cache::forget('educations');
 
             DB::commit();
             return Helpers::apiResponse(true, 'Education Deleted');

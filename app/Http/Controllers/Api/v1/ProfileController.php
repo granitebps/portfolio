@@ -8,6 +8,7 @@ use App\User;
 use Carbon\Carbon;
 use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -17,14 +18,19 @@ class ProfileController extends Controller
 {
     public function index()
     {
-        $user = User::with('profile')->first();
-        $user->makeHidden(['created_at', 'updated_at']);
-        $user->profile->makeHidden(['created_at', 'updated_at', 'id', 'user_id']);
-        $newAvatar = Storage::url($user->profile->avatar);
-        $user->profile->avatar = $newAvatar;
-        $newCv = Storage::url($user->profile->cv);
-        $user->profile->cv = $newCv;
-        $user->profile->freelance = (int)$user->profile->freelance;
+        if (Cache::has('profile')) {
+            $user = Cache::get('profile');
+        } else {
+            $user = User::with('profile')->first();
+            $user->makeHidden(['created_at', 'updated_at']);
+            $user->profile->makeHidden(['created_at', 'updated_at', 'id', 'user_id']);
+            $newAvatar = Storage::url($user->profile->avatar);
+            $user->profile->avatar = $newAvatar;
+            $newCv = Storage::url($user->profile->cv);
+            $user->profile->cv = $newCv;
+            $user->profile->freelance = (int)$user->profile->freelance;
+            Cache::put('profile', $user, now()->addDay());
+        }
         return Helpers::apiResponse(true, '', $user);
     }
 
@@ -112,6 +118,8 @@ class ProfileController extends Controller
             $jwt = JWT::encode($payload, $secret);
             $user->token = base64_encode($jwt);
             $user->save();
+
+            Cache::forget('profile');
 
             return Helpers::apiResponse(true, 'Profile Updated', ['token' => $jwt, 'name' => $user->name, 'avatar' => Storage::url($user->profile->avatar)]);
         } catch (\Exception $e) {

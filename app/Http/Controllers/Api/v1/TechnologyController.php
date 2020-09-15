@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Technology;
 use App\Traits\Helpers;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -14,13 +15,18 @@ class TechnologyController extends Controller
 {
     public function index()
     {
-        $tech = Technology::all();
-        $tech->makeHidden(['created_at', 'updated_at']);
-        $tech->transform(function ($item) {
-            $newFoto = Storage::url($item->pic);
-            $item->pic = $newFoto;
-            return $item;
-        });
+        if (Cache::has('tech')) {
+            $tech = Cache::get('tech');
+        } else {
+            $tech = Technology::all();
+            $tech->makeHidden(['created_at', 'updated_at']);
+            $tech->transform(function ($item) {
+                $newFoto = Storage::url($item->pic);
+                $item->pic = $newFoto;
+                return $item;
+            });
+            Cache::put('tech', $tech, now()->addDay());
+        }
         return Helpers::apiResponse(true, '', $tech);
     }
 
@@ -45,6 +51,8 @@ class TechnologyController extends Controller
                 'name' => $request->name,
                 'pic' => $aws_tech,
             ]);
+
+            Cache::forget('tech');
 
             DB::commit();
             return Helpers::apiResponse(true, 'Technology Created', $tech);
@@ -87,6 +95,8 @@ class TechnologyController extends Controller
                 'name' => $request->name,
             ]);
 
+            Cache::forget('tech');
+
             DB::commit();
             return Helpers::apiResponse(true, 'Technology Updated', $tech);
         } catch (\Exception $e) {
@@ -107,6 +117,8 @@ class TechnologyController extends Controller
             Storage::delete($tech->pic);
 
             $tech->delete();
+
+            Cache::forget('tech');
 
             DB::commit();
             return Helpers::apiResponse(true, 'Technology Deleted');

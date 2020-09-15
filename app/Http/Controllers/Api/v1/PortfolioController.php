@@ -7,6 +7,7 @@ use App\Portfolio;
 use App\PortfolioPic;
 use App\Traits\Helpers;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -15,26 +16,31 @@ class PortfolioController extends Controller
 {
     public function index()
     {
-        $portfolio = Portfolio::with('pic')->orderBy('created_at', 'desc')->get();
-        $portfolio->transform(function ($item) {
-            $newThumb = Storage::url($item->thumbnail);
-            $item->thumbnail = $newThumb;
+        if (Cache::has('portfolio')) {
+            $portfolio = Cache::get('portfolio');
+        } else {
+            $portfolio = Portfolio::with('pic')->orderBy('created_at', 'desc')->get();
+            $portfolio->transform(function ($item) {
+                $newThumb = Storage::url($item->thumbnail);
+                $item->thumbnail = $newThumb;
 
-            $item->type = (int)$item->type;
+                $item->type = (int)$item->type;
 
-            if (is_null($item->url)) {
-                $item->url = '';
-            }
+                if (is_null($item->url)) {
+                    $item->url = '';
+                }
 
-            $item->pic->transform(function ($pic) {
-                $newPic = Storage::url($pic->pic);
-                $pic->pic = $newPic;
-                $pic->makeHidden(['portfolio_id', 'created_at', 'updated_at']);
-                return $pic;
+                $item->pic->transform(function ($pic) {
+                    $newPic = Storage::url($pic->pic);
+                    $pic->pic = $newPic;
+                    $pic->makeHidden(['portfolio_id', 'created_at', 'updated_at']);
+                    return $pic;
+                });
+
+                return $item;
             });
-
-            return $item;
-        });
+            Cache::put('portfolio', $portfolio, now()->addDay());
+        }
         return Helpers::apiResponse(true, '', $portfolio);
     }
 
@@ -87,6 +93,8 @@ class PortfolioController extends Controller
                     'pic' => $aws_pic
                 ]);
             }
+
+            Cache::forget('portfolio');
 
             DB::commit();
             return Helpers::apiResponse(true, 'Portfolio Created', $portfolio);
@@ -185,6 +193,8 @@ class PortfolioController extends Controller
                 }
             }
 
+            Cache::forget('portfolio');
+
             DB::commit();
             return Helpers::apiResponse(true, 'Portfolio Updated');
         } catch (\Exception $e) {
@@ -209,6 +219,8 @@ class PortfolioController extends Controller
             $portfolio->pic()->delete();
             $portfolio->delete();
 
+            Cache::forget('portfolio');
+
             DB::commit();
             return Helpers::apiResponse(true, 'Portfolio Deleted');
         } catch (\Exception $e) {
@@ -229,6 +241,8 @@ class PortfolioController extends Controller
             Storage::delete($portfolio->pic);
 
             $portfolio->delete();
+
+            Cache::forget('portfolio');
 
             DB::commit();
             return Helpers::apiResponse(true, 'Portfolio Picture Deleted');

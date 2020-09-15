@@ -6,16 +6,22 @@ use App\Http\Controllers\Controller;
 use App\Skill;
 use App\Traits\Helpers;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class SkillController extends Controller
 {
     public function index()
     {
-        $data = Skill::all();
-        $data->makeHidden(['created_at', 'updated_at']);
+        if (Cache::has('skills')) {
+            $skills = Cache::get('skills');
+        } else {
+            $skills = Skill::all();
+            $skills->makeHidden(['created_at', 'updated_at']);
+            Cache::put('skills', $skills, now()->addDay());
+        }
 
-        return Helpers::apiResponse(true, '', $data);
+        return Helpers::apiResponse(true, '', $skills);
     }
 
     public function store(Request $request)
@@ -28,6 +34,8 @@ class SkillController extends Controller
         DB::beginTransaction();
         try {
             Skill::create($data);
+
+            Cache::forget('skills');
 
             DB::commit();
             return Helpers::apiResponse(true, 'Skill Created', $data);
@@ -53,6 +61,8 @@ class SkillController extends Controller
 
             $skill->update($data);
 
+            Cache::forget('skills');
+
             DB::commit();
             return Helpers::apiResponse(true, 'Skill Updated', $data);
         } catch (\Exception $e) {
@@ -71,6 +81,8 @@ class SkillController extends Controller
             }
 
             $skill->delete();
+
+            Cache::forget('skills');
 
             DB::commit();
             return Helpers::apiResponse(true, 'Skill Deleted', []);

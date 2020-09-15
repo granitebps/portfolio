@@ -6,17 +6,23 @@ use App\Experience;
 use App\Http\Controllers\Controller;
 use App\Traits\Helpers;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class ExperienceController extends Controller
 {
     public function index()
     {
-        $experience = Experience::orderBy('created_at', 'desc')->get();
-        $experience->transform(function ($item) {
-            $item->current_job = $item->current_job ? $item->current_job : false;
-            return $item;
-        });
+        if (Cache::has('experiences')) {
+            $experience = Cache::get('experiences');
+        } else {
+            $experience = Experience::orderBy('created_at', 'desc')->get();
+            $experience->transform(function ($item) {
+                $item->current_job = $item->current_job ? $item->current_job : false;
+                return $item;
+            });
+            Cache::put('experiences', $experience, now()->addDay());
+        }
         return Helpers::apiResponse(true, '', $experience);
     }
 
@@ -43,6 +49,8 @@ class ExperienceController extends Controller
                 'current_job' => $request->current_job,
                 'desc' => $request->desc
             ]);
+
+            Cache::forget('experiences');
 
             DB::commit();
             return Helpers::apiResponse(true, 'Experience Created');
@@ -79,6 +87,8 @@ class ExperienceController extends Controller
                 'desc' => $request->desc,
             ]);
 
+            Cache::forget('experiences');
+
             DB::commit();
             return Helpers::apiResponse(true, 'Experience Updated');
         } catch (\Exception $e) {
@@ -96,6 +106,8 @@ class ExperienceController extends Controller
                 return Helpers::apiResponse(false, 'Experience Not Found', [], 404);
             }
             $experience->delete();
+
+            Cache::forget('experiences');
 
             DB::commit();
             return Helpers::apiResponse(true, 'Experience Deleted');
