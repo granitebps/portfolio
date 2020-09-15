@@ -19,7 +19,7 @@ Route::get('get-token', 'AuthController@get_token');;
 Route::group(['namespace' => 'Api\v1', 'prefix' => 'v1'], function () {
     Route::post('auth/login', 'AuthController@login');
 
-    Route::group(['middleware' => ['authToken']], function () {
+    Route::group(['middleware' => 'auth:api'], function () {
         Route::get('auth/me', 'AuthController@me');
 
         Route::post('profile', 'ProfileController@update');
