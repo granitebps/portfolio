@@ -5,9 +5,8 @@ namespace App\Http\Controllers\Api\v1;
 use App\Http\Controllers\Controller;
 use App\Traits\Helpers;
 use App\User;
-use Carbon\Carbon;
-use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -108,20 +107,9 @@ class ProfileController extends Controller
             ]);
             DB::commit();
 
-            $secret = config('jwt.secret');
-            $payload = [
-                'iss' => 'granitebps.com',
-                'sub' => $user->email,
-                'iat' => Carbon::now()->timestamp,
-                'exp' => Carbon::now()->addHours(24)->timestamp,
-            ];
-            $jwt = JWT::encode($payload, $secret);
-            $user->token = base64_encode($jwt);
-            $user->save();
-
             Cache::forget('profile');
 
-            return Helpers::apiResponse(true, 'Profile Updated', ['token' => $jwt, 'name' => $user->name, 'avatar' => Storage::url($user->profile->avatar)]);
+            return Helpers::apiResponse(true, 'Profile Updated', ['token' => Auth::refresh(), 'name' => $user->name, 'avatar' => Storage::url($user->profile->avatar)]);
         } catch (\Exception $e) {
             DB::rollback();
             return Helpers::apiResponse(false, 'Something Wrong!', $e->getMessage(), 500);

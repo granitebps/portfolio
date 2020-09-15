@@ -4,26 +4,12 @@ namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
 use App\Traits\Helpers;
-use Carbon\Carbon;
-use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class AuthController extends Controller
 {
-    public function get_token()
-    {
-        $secret = config('jwt.secret');
-        $payload = [
-            'sub' => 'admin',
-            'iat' => Carbon::now()->timestamp,
-            'exp' => Carbon::now()->addHours(24)->timestamp,
-        ];
-        $jwt = JWT::encode($payload, $secret);
-        return Helpers::apiResponse(true, '', $jwt);
-    }
-
     public function login(Request $request)
     {
         $this->validate($request, [
