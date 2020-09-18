@@ -60,6 +60,10 @@ Route::group(['namespace' => 'Api\v1', 'prefix' => 'v1'], function () {
         Route::get('gallery', 'GalleryController@index');
         Route::post('gallery', 'GalleryController@store');
         Route::delete('gallery/{id}', 'GalleryController@destroy');
+
+        Route::post('certification', 'CertificationController@store');
+        Route::put('certification/{id}', 'CertificationController@update');
+        Route::delete('certification/{id}', 'CertificationController@destroy');
     });
 
     Route::get('profile', 'ProfileController@index');
@@ -80,6 +84,8 @@ Route::group(['namespace' => 'Api\v1', 'prefix' => 'v1'], function () {
 
     Route::get('blog', 'BlogController@index');
     Route::get('blog/{id}', 'BlogController@show');
+
+    Route::get('certification', 'CertificationController@index');
 
     Route::any('{path}', function () {
         return Helpers::apiResponse(false, 'Not Found', [], 404);
