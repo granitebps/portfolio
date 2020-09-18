@@ -52,9 +52,9 @@ return [
             'username' => env('DB_USERNAME', 'forge'),
             'password' => env('DB_PASSWORD', ''),
             'dump' => [
-                'useSingleTransaction' => true,
-                'createTables' => false,
-                'exclude_tables' => ['migations'],
+                'useSingleTransaction',
+                'doNotCreateTables',
+                'exclude_tables' => ['migrations'],
             ],
             'unix_socket' => env('DB_SOCKET', ''),
             'charset' => 'utf8mb4',
