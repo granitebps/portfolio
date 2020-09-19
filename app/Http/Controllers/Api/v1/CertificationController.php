@@ -16,7 +16,7 @@ class CertificationController extends Controller
         if (Cache::has('certifications')) {
             $certifications = Cache::get('certifications');
         } else {
-            $certifications = Certification::latest()->get();
+            $certifications = Certification::latest('published')->get();
             Cache::put('certifications', $certifications, now()->addDay());
         }
         return Helpers::apiResponse(true, '', $certifications);
