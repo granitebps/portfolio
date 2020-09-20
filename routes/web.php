@@ -14,6 +14,4 @@ use Illuminate\Support\Facades\Auth;
 |
 */
 
-Route::get('/', function () {
-    return 'API';
-});
+Route::get('/', 'BaseController@index');

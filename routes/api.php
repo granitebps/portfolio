@@ -1,6 +1,5 @@
 <?php
 
-use App\Traits\Helpers;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,8 +12,6 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-
-Route::get('get-token', 'AuthController@get_token');;
 
 Route::group(['namespace' => 'Api\v1', 'prefix' => 'v1'], function () {
     Route::post('auth/login', 'AuthController@login');
@@ -86,8 +83,5 @@ Route::group(['namespace' => 'Api\v1', 'prefix' => 'v1'], function () {
     Route::get('blog/{id}', 'BlogController@show');
 
     Route::get('certification', 'CertificationController@index');
-
-    Route::any('{path}', function () {
-        return Helpers::apiResponse(false, 'Not Found', [], 404);
-    })->where('path', '.*');
 });
+Route::any('{path}', 'BaseController@not_found')->where('path', '.*');
