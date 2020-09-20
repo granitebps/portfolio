@@ -47,4 +47,4 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           host: ${{ secrets.SSH_HOST }}
           key: ${{ secrets.SSH_KEY }}
-          script: "cd /home/granitebagas28/portfolio && ./server_deploy.sh"
+          script: "cd portfolio && ./server_deploy.sh"
