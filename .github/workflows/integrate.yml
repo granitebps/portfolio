@@ -8,9 +8,9 @@ on:
 
 jobs:
   portfolio-test:
-		runs-on: ubuntu-latest
-		
-		services:
+    runs-on: ubuntu-latest
+
+    services:
       # Label used to access the service container
       mysql:
         # Docker Hub image (also with version)
@@ -28,22 +28,22 @@ jobs:
           --health-timeout=5s
           --health-retries=3
 
-		steps:
-			- uses: actions/checkout@v2
-			- uses: supercharge/redis-github-action@1.1.0
-			- name: Laravel Setup
-				run: |
-					cp .env.example .env
-					composer install -q --no-ansi --no-interaction --no-scripts --no-suggest --no-progress --prefer-dist
-					php artisan key:generate
-					chmod -R 777 storage bootstrap/cache
-			- name: Execute tests (Unit and Feature tests) via PHPUnit
-				env:
-					DB_CONNECTION: mysql
-					DB_DATABASE: db_test
-					DB_PORT: 33306
-					DB_USER: root
-					DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-				run: |
-					php artisan migrate
-					vendor/phpunit/phpunit/phpunit
+    steps:
+      - uses: actions/checkout@v2
+      - uses: supercharge/redis-github-action@1.1.0
+      - name: Laravel Setup
+        run: |
+          cp .env.example .env
+          composer install -q --no-ansi --no-interaction --no-scripts --no-suggest --no-progress --prefer-dist
+          php artisan key:generate
+          chmod -R 777 storage bootstrap/cache
+      - name: Execute tests (Unit and Feature tests) via PHPUnit
+        env:
+          DB_CONNECTION: mysql
+          DB_DATABASE: db_test
+          DB_PORT: 33306
+          DB_USER: root
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        run: |
+          php artisan migrate
+          vendor/phpunit/phpunit/phpunit
