@@ -46,9 +46,8 @@ class AuthTest extends TestCase
 
     public function test_authenticated()
     {
-        $user = $this->authenticate();
+        $token = $this->authenticate();
 
-        $token = JWTAuth::fromUser($user);
         $response = $this->withHeaders([
             'Authorization' => "Bearer $token",
         ])->json('GET', '/api/v1/auth/me');
