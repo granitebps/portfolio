@@ -40,7 +40,7 @@ jobs:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         run: |
           php artisan migrate
-          vendor/phpunit/phpunit/phpunit
+          php artisan test
       - name: Deploy to production
         uses: appleboy/ssh-action@master
         with:
