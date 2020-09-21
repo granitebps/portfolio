@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -18,7 +17,7 @@ class AuthTest extends TestCase
     {
         $this->authenticate();
 
-        $response = $this->post('/api/v1/auth/login', [
+        $response = $this->json('POST', '/api/v1/auth/login', [
             'username' => 'admin',
             'password' => '12345678'
         ]);
@@ -33,7 +32,7 @@ class AuthTest extends TestCase
     {
         $this->authenticate();
 
-        $response = $this->post('/api/v1/auth/login', [
+        $response = $this->json('POST', '/api/v1/auth/login', [
             'username' => 'granitebps',
             'password' => 'passwordsalah'
         ]);
@@ -48,6 +47,7 @@ class AuthTest extends TestCase
     public function test_authenticated()
     {
         $user = $this->authenticate();
+
         $token = JWTAuth::fromUser($user);
         $response = $this->withHeaders([
             'Authorization' => "Bearer $token",
