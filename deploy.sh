@@ -15,9 +15,6 @@ echo "Deploying application ..."
     # Migrate database
     php artisan migrate --force
 
-    # Run Test
-    php artisan test
-
     # Note: If you're using queue workers, this is the place to restart them.
     # ...
 
