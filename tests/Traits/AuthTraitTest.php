@@ -1,18 +1,14 @@
 <?php
 
+namespace Tests\Traits;
+
 use App\Profile;
 use App\User;
-use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
-class UsersTableSeeder extends Seeder
+trait AuthTraitTest
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
-    public function run()
+    public function authenticate()
     {
         $user = User::create([
             'name' => 'Admin',
@@ -24,7 +20,9 @@ class UsersTableSeeder extends Seeder
 
         Profile::create([
             'user_id' => $user->id,
-            'avatar' => ''
+            'avatar' => '/'
         ]);
+
+        return $user;
     }
 }
