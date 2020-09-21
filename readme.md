@@ -9,6 +9,7 @@
 </h1>
 
 [![Actions Status](https://github.com/granitebps/portfolio/workflows/CI/badge.svg)](https://github.com/granitebps/portfolio/actions)
+![Build Status](https://app.chipperci.com/projects/8256a130-6770-4134-9d6a-13616436854c/status/master)
 
 ## Link
 

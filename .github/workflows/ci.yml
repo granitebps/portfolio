@@ -40,7 +40,6 @@ jobs:
           DB_DATABASE: db_test
           DB_PORT: 33306
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          FILESYSTEM_DRIVER: public
         run: |
           php artisan migrate
           vendor/phpunit/phpunit/phpunit
