@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
@@ -10,7 +9,7 @@ use Tests\Traits\AuthTraitTest;
 
 class SkillTest extends TestCase
 {
-    use DatabaseTransactions, AuthTraitTest;
+    use RefreshDatabase, AuthTraitTest;
 
     public function test_get_skills()
     {
