@@ -24,6 +24,7 @@ class SkillTest extends TestCase
 
     public function test_create_skills()
     {
+        $this->withExceptionHandling();
         $token = $this->authenticate();
 
         $response = $this->withHeaders([
