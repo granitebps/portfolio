@@ -9,7 +9,7 @@ class BaseController extends Controller
 {
     public function index()
     {
-        return Helpers::apiResponse(true, 'API GBPS', [
+        return Helpers::apiResponse(true, 'API GBPS Website', [
             'landing_page' => 'https://granitebps.com',
             'api' => 'https://api.granitebps.com'
         ], 200);
