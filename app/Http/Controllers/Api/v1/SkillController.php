@@ -56,7 +56,7 @@ class SkillController extends Controller
         try {
             $skill = Skill::find($id);
             if (!$skill) {
-                return Helpers::apiResponse(false, 'Skill Not Found', [], 400);
+                return Helpers::apiResponse(false, 'Skill Not Found', [], 404);
             }
 
             $skill->update($data);
@@ -77,7 +77,7 @@ class SkillController extends Controller
         try {
             $skill = Skill::find($id);
             if (!$skill) {
-                return Helpers::apiResponse(false, 'Skill Not Found', [], 400);
+                return Helpers::apiResponse(false, 'Skill Not Found', [], 404);
             }
 
             $skill->delete();

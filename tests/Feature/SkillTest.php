@@ -43,6 +43,14 @@ class SkillTest extends TestCase
             'success' => true,
             'message' => 'Skill Created'
         ]);
+
+        $response = $this->withHeaders([
+            'Authorization' => "Bearer $token",
+        ])->json('POST', '/api/v1/skill', [
+            'name' => '',
+            'percentage' => ''
+        ]);
+        $response->assertStatus(422);
     }
 
     /** @test */
@@ -61,12 +69,9 @@ class SkillTest extends TestCase
             'name' => 'Test',
             'percentage' => 90
         ]);
-        $response->assertStatus(400);
+        $response->assertStatus(404);
 
-        $skill = Skill::create([
-            'name' => 'Test',
-            'percentage' => 90
-        ]);
+        $skill = $this->createSkill();
         $response = $this->withHeaders([
             'Authorization' => "Bearer $token",
         ])->json('PUT', '/api/v1/skill/' . $skill->id, [
@@ -77,6 +82,14 @@ class SkillTest extends TestCase
             'success' => true,
             'message' => 'Skill Updated'
         ]);
+
+        $response = $this->withHeaders([
+            'Authorization' => "Bearer $token",
+        ])->json('PUT', '/api/v1/skill/' . $skill->id, [
+            'name' => '',
+            'percentage' => 90
+        ]);
+        $response->assertStatus(422);
     }
 
     /** @test */
@@ -95,12 +108,9 @@ class SkillTest extends TestCase
             'name' => 'Test',
             'percentage' => 90
         ]);
-        $response->assertStatus(400);
+        $response->assertStatus(404);
 
-        $skill = Skill::create([
-            'name' => 'Test',
-            'percentage' => 90
-        ]);
+        $skill = $this->createSkill();
         $response = $this->withHeaders([
             'Authorization' => "Bearer $token",
         ])->json('DELETE', '/api/v1/skill/' . $skill->id,);
@@ -108,5 +118,14 @@ class SkillTest extends TestCase
             'success' => true,
             'message' => 'Skill Deleted'
         ]);
+    }
+
+    public function createSkill()
+    {
+        $skill = Skill::create([
+            'name' => 'Test',
+            'percentage' => 90
+        ]);
+        return $skill;
     }
 }
