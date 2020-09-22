@@ -2,21 +2,21 @@
 
 namespace Tests\Feature;
 
-use App\Skill;
+use App\Services;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use Tests\Traits\AuthTraitTest;
 
-class SkillTest extends TestCase
+class ServiceTest extends TestCase
 {
     use DatabaseTransactions, AuthTraitTest;
 
     /** @test */
-    public function test_get_skills()
+    public function test_get_services()
     {
-        $response = $this->json('GET', '/api/v1/skill');
+        $response = $this->json('GET', '/api/v1/service');
         $response->assertStatus(200)->assertJson([
             'success' => true,
             'message' => ''
@@ -24,76 +24,77 @@ class SkillTest extends TestCase
     }
 
     /** @test */
-    public function test_create_skill()
+    public function test_create_service()
     {
-        $response = $this->json('POST', '/api/v1/skill', $this->skillData());
+        $response = $this->json('POST', '/api/v1/service', $this->serviceData());
         $response->assertStatus(401);
 
         $token = $this->authenticate();
         $response = $this->withHeaders([
             'Authorization' => "Bearer $token",
-        ])->json('POST', '/api/v1/skill', $this->skillData());
+        ])->json('POST', '/api/v1/service', $this->serviceData());
         $response->assertStatus(200)->assertJson([
             'success' => true,
-            'message' => 'Skill Created'
+            'message' => 'Service Created'
         ]);
     }
 
     /** @test */
-    public function test_update_skill()
+    public function test_update_service()
     {
-        $response = $this->json('PUT', '/api/v1/skill/99', $this->skillData());
+        $response = $this->json('PUT', '/api/v1/service/99', $this->serviceData());
         $response->assertStatus(401);
 
         $token = $this->authenticate();
         $response = $this->withHeaders([
             'Authorization' => "Bearer $token",
-        ])->json('PUT', '/api/v1/skill/99', $this->skillData());
+        ])->json('PUT', '/api/v1/service/99', $this->serviceData());
         $response->assertStatus(404);
 
-        $skill = $this->createSkill();
+        $service = $this->createService();
         $response = $this->withHeaders([
             'Authorization' => "Bearer $token",
-        ])->json('PUT', '/api/v1/skill/' . $skill->id, $this->skillData());
+        ])->json('PUT', '/api/v1/service/' . $service->id, $this->serviceData());
         $response->assertStatus(200)->assertJson([
             'success' => true,
-            'message' => 'Skill Updated'
+            'message' => 'Service Updated'
         ]);
     }
 
     /** @test */
-    public function test_delete_skill()
+    public function test_delete_service()
     {
-        $response = $this->json('DELETE', '/api/v1/skill/99', $this->skillData());
+        $response = $this->json('DELETE', '/api/v1/service/99', $this->serviceData());
         $response->assertStatus(401);
 
         $token = $this->authenticate();
         $response = $this->withHeaders([
             'Authorization' => "Bearer $token",
-        ])->json('DELETE', '/api/v1/skill/99', $this->skillData());
+        ])->json('DELETE', '/api/v1/service/99', $this->serviceData());
         $response->assertStatus(404);
 
-        $skill = $this->createSkill();
+        $service = $this->createService();
         $response = $this->withHeaders([
             'Authorization' => "Bearer $token",
-        ])->json('DELETE', '/api/v1/skill/' . $skill->id,);
+        ])->json('DELETE', '/api/v1/service/' . $service->id);
         $response->assertStatus(200)->assertJson([
             'success' => true,
-            'message' => 'Skill Deleted'
+            'message' => 'Service Deleted'
         ]);
     }
 
-    public function skillData()
+    public function serviceData()
     {
         return [
-            'name' => 'Test',
-            'percentage' => 90
+            'name' => 'Test Service',
+            'icon' => 'test-icon',
+            'desc' => 'Test Description'
         ];
     }
 
-    public function createSkill()
+    public function createService()
     {
-        $skill = Skill::create($this->skillData());
-        return $skill;
+        $service = Services::create($this->serviceData());
+        return $service;
     }
 }
