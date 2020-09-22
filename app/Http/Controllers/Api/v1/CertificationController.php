@@ -58,7 +58,7 @@ class CertificationController extends Controller
         try {
             $certification = Certification::find($id);
             if (!$certification) {
-                return Helpers::apiResponse(false, 'Certification Not Found', [], 400);
+                return Helpers::apiResponse(false, 'Certification Not Found', [], 404);
             }
 
             $certification->update($data);
@@ -79,7 +79,7 @@ class CertificationController extends Controller
         try {
             $certification = Certification::find($id);
             if (!$certification) {
-                return Helpers::apiResponse(false, 'Certification Not Found', [], 400);
+                return Helpers::apiResponse(false, 'Certification Not Found', [], 404);
             }
 
             $certification->delete();
