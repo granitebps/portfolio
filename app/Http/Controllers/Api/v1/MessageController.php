@@ -50,7 +50,7 @@ class MessageController extends Controller
         try {
             $message = Message::find($id);
             if (!$message) {
-                return Helpers::apiResponse(false, 'Message Not Found', [], 400);
+                return Helpers::apiResponse(false, 'Message Not Found', [], 404);
             }
 
             $message->delete();

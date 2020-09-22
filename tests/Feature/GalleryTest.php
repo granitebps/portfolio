@@ -18,6 +18,9 @@ class GalleryTest extends TestCase
     /** @test */
     public function test_get_galleries()
     {
+        $response = $this->json('GET', '/api/v1/gallery');
+        $response->assertStatus(401);
+
         $token = $this->authenticate();
 
         $response = $this->withHeaders([
