@@ -51,7 +51,7 @@ class BlogController extends Controller
 
             $aws_blog = Storage::putFileAs('blog', $image, $nama_image);
 
-            $user = User::where('email', $request->payload->sub)->first();
+            $user = auth()->user();
 
             $blog = Blog::create([
                 'user_id' => $user->id,
