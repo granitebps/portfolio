@@ -85,13 +85,13 @@ class BlogTest extends TestCase
     /** @test */
     public function test_delete_blog()
     {
-        $response = $this->json('DELETE', '/api/v1/blog/99', $this->blogData());
+        $response = $this->json('DELETE', '/api/v1/blog/99');
         $response->assertStatus(401);
 
         $token = $this->authenticate();
         $response = $this->withHeaders([
             'Authorization' => "Bearer $token",
-        ])->json('DELETE', '/api/v1/blog/99', $this->blogData());
+        ])->json('DELETE', '/api/v1/blog/99');
         $response->assertStatus(404);
 
         $blog = $this->createBlog();

@@ -64,13 +64,13 @@ class SkillTest extends TestCase
     /** @test */
     public function test_delete_skill()
     {
-        $response = $this->json('DELETE', '/api/v1/skill/99', $this->skillData());
+        $response = $this->json('DELETE', '/api/v1/skill/99');
         $response->assertStatus(401);
 
         $token = $this->authenticate();
         $response = $this->withHeaders([
             'Authorization' => "Bearer $token",
-        ])->json('DELETE', '/api/v1/skill/99', $this->skillData());
+        ])->json('DELETE', '/api/v1/skill/99');
         $response->assertStatus(404);
 
         $skill = $this->createSkill();

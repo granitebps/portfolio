@@ -65,13 +65,13 @@ class ExperienceTest extends TestCase
     /** @test */
     public function test_delete_experience()
     {
-        $response = $this->json('DELETE', '/api/v1/experience/99', $this->experienceData());
+        $response = $this->json('DELETE', '/api/v1/experience/99');
         $response->assertStatus(401);
 
         $token = $this->authenticate();
         $response = $this->withHeaders([
             'Authorization' => "Bearer $token",
-        ])->json('DELETE', '/api/v1/experience/99', $this->experienceData());
+        ])->json('DELETE', '/api/v1/experience/99');
         $response->assertStatus(404);
 
         $experience = $this->createExperience();

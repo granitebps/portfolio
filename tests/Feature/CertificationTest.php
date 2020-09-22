@@ -64,13 +64,13 @@ class CertificationTest extends TestCase
     /** @test */
     public function test_delete_certification()
     {
-        $response = $this->json('DELETE', '/api/v1/certification/99', $this->certificationData());
+        $response = $this->json('DELETE', '/api/v1/certification/99');
         $response->assertStatus(401);
 
         $token = $this->authenticate();
         $response = $this->withHeaders([
             'Authorization' => "Bearer $token",
-        ])->json('DELETE', '/api/v1/certification/99', $this->certificationData());
+        ])->json('DELETE', '/api/v1/certification/99');
         $response->assertStatus(404);
 
         $certification = $this->createCertification();

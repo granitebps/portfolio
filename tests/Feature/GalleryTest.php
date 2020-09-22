@@ -53,13 +53,13 @@ class GalleryTest extends TestCase
     /** @test */
     public function test_delete_gallery()
     {
-        $response = $this->json('DELETE', '/api/v1/gallery/99', $this->galleryData());
+        $response = $this->json('DELETE', '/api/v1/gallery/99');
         $response->assertStatus(401);
 
         $token = $this->authenticate();
         $response = $this->withHeaders([
             'Authorization' => "Bearer $token",
-        ])->json('DELETE', '/api/v1/gallery/99', $this->galleryData());
+        ])->json('DELETE', '/api/v1/gallery/99');
         $response->assertStatus(404);
 
         $gallery = $this->createGallery();

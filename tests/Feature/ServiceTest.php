@@ -64,13 +64,13 @@ class ServiceTest extends TestCase
     /** @test */
     public function test_delete_service()
     {
-        $response = $this->json('DELETE', '/api/v1/service/99', $this->serviceData());
+        $response = $this->json('DELETE', '/api/v1/service/99');
         $response->assertStatus(401);
 
         $token = $this->authenticate();
         $response = $this->withHeaders([
             'Authorization' => "Bearer $token",
-        ])->json('DELETE', '/api/v1/service/99', $this->serviceData());
+        ])->json('DELETE', '/api/v1/service/99');
         $response->assertStatus(404);
 
         $service = $this->createService();

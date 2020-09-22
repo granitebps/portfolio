@@ -64,13 +64,13 @@ class EducationTest extends TestCase
     /** @test */
     public function test_delete_education()
     {
-        $response = $this->json('DELETE', '/api/v1/education/99', $this->educationData());
+        $response = $this->json('DELETE', '/api/v1/education/99');
         $response->assertStatus(401);
 
         $token = $this->authenticate();
         $response = $this->withHeaders([
             'Authorization' => "Bearer $token",
-        ])->json('DELETE', '/api/v1/education/99', $this->educationData());
+        ])->json('DELETE', '/api/v1/education/99');
         $response->assertStatus(404);
 
         $education = $this->createEducation();
