@@ -57,7 +57,7 @@ class TechnologyController extends Controller
             DB::commit();
             return Helpers::apiResponse(true, 'Technology Created', $tech);
         } catch (\Exception $e) {
-            throw $e;
+            \Sentry\captureException($e);
             DB::rollback();
             return Helpers::apiResponse(false, 'Something Wrong!', $e->getMessage(), 500);
         }
@@ -100,6 +100,7 @@ class TechnologyController extends Controller
             DB::commit();
             return Helpers::apiResponse(true, 'Technology Updated', $tech);
         } catch (\Exception $e) {
+            \Sentry\captureException($e);
             DB::rollback();
             return Helpers::apiResponse(false, 'Something Wrong!', $e->getMessage(), 500);
         }
@@ -123,6 +124,7 @@ class TechnologyController extends Controller
             DB::commit();
             return Helpers::apiResponse(true, 'Technology Deleted');
         } catch (\Exception $e) {
+            \Sentry\captureException($e);
             DB::rollback();
             return Helpers::apiResponse(false, 'Something Wrong!', $e->getMessage(), 500);
         }

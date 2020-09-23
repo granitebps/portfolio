@@ -55,6 +55,7 @@ class ExperienceController extends Controller
             DB::commit();
             return Helpers::apiResponse(true, 'Experience Created');
         } catch (\Exception $e) {
+            \Sentry\captureException($e);
             DB::rollback();
             return Helpers::apiResponse(false, 'Something Wrong!', $e->getMessage(), 500);
         }
@@ -92,6 +93,7 @@ class ExperienceController extends Controller
             DB::commit();
             return Helpers::apiResponse(true, 'Experience Updated');
         } catch (\Exception $e) {
+            \Sentry\captureException($e);
             DB::rollback();
             return Helpers::apiResponse(false, 'Something Wrong!', $e->getMessage(), 500);
         }
@@ -112,6 +114,7 @@ class ExperienceController extends Controller
             DB::commit();
             return Helpers::apiResponse(true, 'Experience Deleted');
         } catch (\Exception $e) {
+            \Sentry\captureException($e);
             DB::rollback();
             return Helpers::apiResponse(false, 'Something Wrong!', $e->getMessage(), 500);
         }

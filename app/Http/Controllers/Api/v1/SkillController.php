@@ -40,6 +40,7 @@ class SkillController extends Controller
             DB::commit();
             return Helpers::apiResponse(true, 'Skill Created', $data);
         } catch (\Exception $e) {
+            \Sentry\captureException($e);
             DB::rollback();
             return Helpers::apiResponse(false, 'Server Error', [], 500);
         }
@@ -66,6 +67,7 @@ class SkillController extends Controller
             DB::commit();
             return Helpers::apiResponse(true, 'Skill Updated', $data);
         } catch (\Exception $e) {
+            \Sentry\captureException($e);
             DB::rollback();
             return Helpers::apiResponse(false, 'Server Error', [], 500);
         }
@@ -87,6 +89,7 @@ class SkillController extends Controller
             DB::commit();
             return Helpers::apiResponse(true, 'Skill Deleted', []);
         } catch (\Exception $e) {
+            \Sentry\captureException($e);
             DB::rollback();
             return Helpers::apiResponse(false, 'Server Error', [], 500);
         }

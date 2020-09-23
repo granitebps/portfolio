@@ -51,7 +51,7 @@ class GalleryController extends Controller
             DB::commit();
             return Helpers::apiResponse(true, 'Images Uploaded');
         } catch (\Exception $e) {
-            throw $e;
+            \Sentry\captureException($e);
             DB::rollback();
             return Helpers::apiResponse(false, 'Something Wrong!', $e->getMessage(), 500);
         }
@@ -73,6 +73,7 @@ class GalleryController extends Controller
             DB::commit();
             return Helpers::apiResponse(true, 'Image Deleted');
         } catch (\Exception $e) {
+            \Sentry\captureException($e);
             DB::rollback();
             return Helpers::apiResponse(false, 'Something Wrong!', $e->getMessage(), 500);
         }

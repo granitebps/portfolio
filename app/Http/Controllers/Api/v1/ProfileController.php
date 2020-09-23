@@ -111,6 +111,7 @@ class ProfileController extends Controller
 
             return Helpers::apiResponse(true, 'Profile Updated', ['token' => Auth::refresh(), 'name' => $user->name, 'avatar' => Storage::url($user->profile->avatar)]);
         } catch (\Exception $e) {
+            \Sentry\captureException($e);
             DB::rollback();
             return Helpers::apiResponse(false, 'Something Wrong!', $e->getMessage(), 500);
         }
@@ -135,6 +136,7 @@ class ProfileController extends Controller
                 DB::commit();
                 return Helpers::apiResponse(true, 'Password Changed');
             } catch (\Exception $e) {
+                \Sentry\captureException($e);
                 DB::rollback();
                 return Helpers::apiResponse(false, 'Something Wrong!', $e->getMessage(), 500);
             }

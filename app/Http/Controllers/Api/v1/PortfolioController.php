@@ -99,6 +99,7 @@ class PortfolioController extends Controller
             DB::commit();
             return Helpers::apiResponse(true, 'Portfolio Created', $portfolio);
         } catch (\Exception $e) {
+            \Sentry\captureException($e);
             DB::rollback();
             return Helpers::apiResponse(false, 'Something Wrong!', $e->getMessage(), 500);
         }
@@ -198,6 +199,7 @@ class PortfolioController extends Controller
             DB::commit();
             return Helpers::apiResponse(true, 'Portfolio Updated');
         } catch (\Exception $e) {
+            \Sentry\captureException($e);
             DB::rollback();
             return Helpers::apiResponse(false, 'Something Wrong!', $e->getMessage(), 500);
         }
@@ -224,6 +226,7 @@ class PortfolioController extends Controller
             DB::commit();
             return Helpers::apiResponse(true, 'Portfolio Deleted');
         } catch (\Exception $e) {
+            \Sentry\captureException($e);
             DB::rollback();
             return Helpers::apiResponse(false, 'Something Wrong!', $e->getMessage(), 500);
         }
@@ -247,6 +250,7 @@ class PortfolioController extends Controller
             DB::commit();
             return Helpers::apiResponse(true, 'Portfolio Picture Deleted');
         } catch (\Exception $e) {
+            \Sentry\captureException($e);
             DB::rollback();
             return Helpers::apiResponse(false, 'Something Wrong!', $e->getMessage(), 500);
         }

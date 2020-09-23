@@ -40,6 +40,7 @@ class CertificationController extends Controller
             DB::commit();
             return Helpers::apiResponse(true, 'Certification Created');
         } catch (\Exception $e) {
+            \Sentry\captureException($e);
             DB::rollback();
             return Helpers::apiResponse(false, 'Server Error', [], 500);
         }
@@ -68,6 +69,7 @@ class CertificationController extends Controller
             DB::commit();
             return Helpers::apiResponse(true, 'Certification Updated');
         } catch (\Exception $e) {
+            \Sentry\captureException($e);
             DB::rollback();
             return Helpers::apiResponse(false, 'Server Error', [], 500);
         }
@@ -89,6 +91,7 @@ class CertificationController extends Controller
             DB::commit();
             return Helpers::apiResponse(true, 'Certification Deleted');
         } catch (\Exception $e) {
+            \Sentry\captureException($e);
             DB::rollback();
             return Helpers::apiResponse(false, 'Server Error', [], 500);
         }

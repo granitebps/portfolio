@@ -39,6 +39,7 @@ class MessageController extends Controller
             DB::commit();
             return Helpers::apiResponse(true, 'Message Created', $message);
         } catch (\Exception $e) {
+            \Sentry\captureException($e);
             DB::rollback();
             return Helpers::apiResponse(false, 'Something Wrong!', $e->getMessage(), 500);
         }
@@ -58,6 +59,7 @@ class MessageController extends Controller
             DB::commit();
             return Helpers::apiResponse(true, 'Message Deleted', []);
         } catch (\Exception $e) {
+            \Sentry\captureException($e);
             DB::rollback();
             return Helpers::apiResponse(false, 'Server Error', [], 500);
         }

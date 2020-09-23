@@ -44,6 +44,7 @@ class ServiceController extends Controller
             DB::commit();
             return Helpers::apiResponse(true, 'Service Created', $service);
         } catch (\Exception $e) {
+            \Sentry\captureException($e);
             DB::rollback();
             return Helpers::apiResponse(false, 'Something Wrong!', $e->getMessage(), 500);
         }
@@ -75,6 +76,7 @@ class ServiceController extends Controller
             DB::commit();
             return Helpers::apiResponse(true, 'Service Updated', $service);
         } catch (\Exception $e) {
+            \Sentry\captureException($e);
             DB::rollback();
             return Helpers::apiResponse(false, 'Something Wrong!', $e->getMessage(), 500);
         }
@@ -95,6 +97,7 @@ class ServiceController extends Controller
             DB::commit();
             return Helpers::apiResponse(true, 'Service Deleted');
         } catch (\Exception $e) {
+            \Sentry\captureException($e);
             DB::rollback();
             return Helpers::apiResponse(false, 'Something Wrong!', $e->getMessage(), 500);
         }
