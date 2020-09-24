@@ -33,8 +33,8 @@ class TechnologyController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'name' => 'required|max:255',
-            'pic' => 'required|max:2048|image',
+            'name' => 'required|string|max:255',
+            'pic' => 'required|image|max:2048',
         ]);
 
         DB::beginTransaction();
@@ -66,8 +66,8 @@ class TechnologyController extends Controller
     public function update(Request $request, $id)
     {
         $this->validate($request, [
-            'name' => 'required|max:255',
-            'icon' => 'max:1024|image',
+            'name' => 'required|string|max:255',
+            'icon' => 'sometimes|image|max:2048',
         ]);
 
         DB::beginTransaction();

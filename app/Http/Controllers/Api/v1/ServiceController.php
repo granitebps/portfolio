@@ -26,9 +26,9 @@ class ServiceController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'name' => 'required|max:255',
-            'icon' => 'required|max:255',
-            'desc' => 'required',
+            'name' => 'required|string|max:255',
+            'icon' => 'required|string|max:255',
+            'desc' => 'required|string',
         ]);
 
         DB::beginTransaction();
@@ -54,9 +54,9 @@ class ServiceController extends Controller
     {
         $service = Services::find($id);
         $this->validate($request, [
-            'name' => 'required|max:255',
-            'icon' => 'required|max:255',
-            'desc' => 'required',
+            'name' => 'required|string|max:255',
+            'icon' => 'required|string|max:255',
+            'desc' => 'required|string',
         ]);
 
         DB::beginTransaction();

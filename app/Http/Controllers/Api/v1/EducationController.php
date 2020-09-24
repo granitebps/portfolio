@@ -25,10 +25,10 @@ class EducationController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'name' => 'required|max:255',
-            'institute' => 'required|max:255',
-            'start_year' => 'required',
-            'end_year' => 'required'
+            'name' => 'required|string|max:255',
+            'institute' => 'required|string|max:255',
+            'start_year' => 'required|integer|min:1900|max:9999|date_format:Y',
+            'end_year' => 'required|integer|min:1900|max:9999|date_format:Y'
         ]);
         DB::beginTransaction();
         try {
@@ -53,10 +53,10 @@ class EducationController extends Controller
     public function update(Request $request, $id)
     {
         $this->validate($request, [
-            'name' => 'required|max:255',
-            'institute' => 'required|max:255',
-            'start_year' => 'required',
-            'end_year' => 'required',
+            'name' => 'required|string|max:255',
+            'institute' => 'required|string|max:255',
+            'start_year' => 'required|integer|min:1900|max:9999|date_format:Y',
+            'end_year' => 'required|integer|min:1900|max:9999|date_format:Y'
         ]);
 
         DB::beginTransaction();

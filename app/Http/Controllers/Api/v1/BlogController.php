@@ -35,9 +35,9 @@ class BlogController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'title' => 'required|max:255',
-            'body' => 'required',
-            'image' => 'required|max:2048|image',
+            'title' => 'required|string|max:255',
+            'body' => 'required|string',
+            'image' => 'required|image|max:2048',
         ]);
 
         DB::beginTransaction();
@@ -86,9 +86,9 @@ class BlogController extends Controller
     public function update(Request $request, $id)
     {
         $this->validate($request, [
-            'title' => 'required|max:255',
-            'body' => 'required|',
-            'image' => 'nullable|max:2048|image',
+            'title' => 'required|string|max:255',
+            'body' => 'required|string',
+            'image' => 'sometimes|max:2048|image',
         ]);
 
         DB::beginTransaction();

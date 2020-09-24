@@ -49,16 +49,12 @@ class PortfolioController extends Controller
         $this->validate($request, [
             'name' => 'required|string|max:255',
             'desc' => 'required|string',
-            'type' => 'required',
+            'type' => 'required|boolean',
             'thumbnail' => 'required|image|max:2048',
             'pic' => 'required',
             'pic.*' => 'image|max:2048',
+            'url' => 'sometimes|string|max:255|url',
         ]);
-        if ($request->filled('url')) {
-            $this->validate($request, [
-                'url' => 'url',
-            ]);
-        }
 
         DB::beginTransaction();
         try {
@@ -110,13 +106,11 @@ class PortfolioController extends Controller
         $this->validate($request, [
             'name' => 'required|string|max:255',
             'desc' => 'required|string',
-            'type' => 'required',
+            'type' => 'required|boolean',
+            'url' => 'sometimes|string|max:255|url',
+            'thumbnail' => 'sometimes|image|max:2048',
+            'pic.*' => 'sometimes|image|max:2048',
         ]);
-        if ($request->filled('url')) {
-            $this->validate($request, [
-                'url' => 'url',
-            ]);
-        }
 
         DB::beginTransaction();
         try {
@@ -149,9 +143,6 @@ class PortfolioController extends Controller
             }
 
             if ($request->hasFile('thumbnail')) {
-                $this->validate($request, [
-                    'thumbnail' => 'image|max:2048',
-                ]);
                 $thumbnail = $request->thumbnail;
                 $thumbnail_full = $thumbnail->getClientOriginalName();
                 $filename = Str::slug(pathinfo($thumbnail_full, PATHINFO_FILENAME));
@@ -175,10 +166,6 @@ class PortfolioController extends Controller
             ]);
 
             if ($request->hasFile('pic')) {
-                $this->validate($request, [
-                    'pic' => 'required',
-                    'pic.*' => 'image|max:2048',
-                ]);
                 $pic = $request->pic;
                 foreach ($pic as $image) {
                     $image_full = $image->getClientOriginalName();

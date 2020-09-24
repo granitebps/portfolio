@@ -37,23 +37,23 @@ class ProfileController extends Controller
     {
         $user = User::with('profile')->first();
         $this->validate($request, [
-            'username' => 'required|max:255|unique:users,username,' . $user->id,
-            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
-            'name' => 'required|max:255',
-            'avatar' => 'max:2048|image',
-            'about' => 'required',
+            'username' => 'required|string|max:255|unique:users,username,' . $user->id,
+            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'name' => 'required|string|max:255',
+            'avatar' => 'sometimes|max:2048|image',
+            'about' => 'required|string',
             'age' => 'required|numeric',
             'phone' => 'required|numeric',
-            'address' => 'required',
-            'nationality' => 'required',
-            'languages' => 'required',
-            'freelance' => 'required',
-            'instagram' => 'required|url',
-            'facebook' => 'required|url',
-            'twitter' => 'required|url',
-            'youtube' => 'required|url',
-            'github' => 'required|url',
-            'linkedin' => 'required|url',
+            'address' => 'required|string',
+            'nationality' => 'required|string|max:255',
+            'languages' => 'required|array',
+            'freelance' => 'required|boolean',
+            'instagram' => 'required|url|string|max:255',
+            'facebook' => 'required|url|string|max:255',
+            'twitter' => 'required|url|string|max:255',
+            'youtube' => 'required|url|string|max:255',
+            'github' => 'required|url|string|max:255',
+            'linkedin' => 'required|url|string|max:255',
             'cv' => 'mimes:pdf|file|max:2048'
         ]);
         DB::beginTransaction();
@@ -120,8 +120,8 @@ class ProfileController extends Controller
     public function password(Request $request)
     {
         $this->validate($request, [
-            'password' => 'required|confirmed|min:8|string',
-            'old_password' => 'required|min:8|string'
+            'password' => 'required|confirmed|string|min:8|max:255',
+            'old_password' => 'required|string|min:8|max:255'
         ]);
         $user = User::first();
         if (!Hash::check($request->old_password, $user->password)) {

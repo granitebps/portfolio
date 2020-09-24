@@ -6,6 +6,7 @@ use App\Experience;
 use App\Http\Controllers\Controller;
 use App\Traits\Helpers;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -29,16 +30,14 @@ class ExperienceController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'company' => 'required|max:255',
-            'position' => 'required|max:255',
-            'desc' => 'required',
-            'start_date' => 'required'
+            'company' => 'required|string|max:255',
+            'position' => 'required|string|max:255',
+            'desc' => 'required|string',
+            'current_job' => 'sometimes|boolean',
+            'start_date' => 'required|string|max:255|date',
+            'end_date' => 'exclude_if:current_job,1|required|string|max:255|date'
         ]);
-        if (!$request->filled('current_job')) {
-            $this->validate($request, [
-                'end_date' => 'required'
-            ]);
-        }
+
         DB::beginTransaction();
         try {
             Experience::create([
@@ -64,15 +63,14 @@ class ExperienceController extends Controller
     public function update(Request $request, $id)
     {
         $this->validate($request, [
-            'company' => 'required|max:255',
-            'position' => 'required|max:255',
-            'start_date' => 'required'
+            'company' => 'required|string|max:255',
+            'position' => 'required|string|max:255',
+            'desc' => 'required|string',
+            'current_job' => 'sometimes|boolean',
+            'start_date' => 'required|string|max:255|date',
+            'end_date' => 'exclude_if:current_job,1|required|string|max:255|date'
         ]);
-        if (!$request->has('current_job')) {
-            $this->validate($request, [
-                'end_date' => 'required'
-            ]);
-        }
+
         DB::beginTransaction();
         try {
             $experience = Experience::find($id);

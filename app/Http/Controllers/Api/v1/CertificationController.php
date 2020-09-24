@@ -28,7 +28,7 @@ class CertificationController extends Controller
             'name' => 'required|string|max:255',
             'institution' => 'required|string|max:255',
             'link' => 'required|string|url|max:255',
-            'published' => 'required|string|max:255',
+            'published' => 'required|string|max:255|date',
         ]);
 
         DB::beginTransaction();
@@ -52,7 +52,7 @@ class CertificationController extends Controller
             'name' => 'required|string|max:255',
             'institution' => 'required|string|max:255',
             'link' => 'required|string|url|max:255',
-            'published' => 'required|string|max:255',
+            'published' => 'required|string|max:255|date',
         ]);
 
         DB::beginTransaction();
