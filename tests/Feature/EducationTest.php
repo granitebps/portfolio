@@ -88,8 +88,8 @@ class EducationTest extends TestCase
         return [
             'name' => 'Test Education Name',
             'institute' => 'Test Education Institute',
-            'start_year' => 'Test Education Start Year',
-            'end_year' => 'Test Education End Year'
+            'start_year' => '2000',
+            'end_year' => '2020'
         ];
     }
 

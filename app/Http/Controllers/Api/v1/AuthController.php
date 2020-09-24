@@ -3,21 +3,16 @@
 namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\LoginRequest;
 use App\Traits\Helpers;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class AuthController extends Controller
 {
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
-        $this->validate($request, [
-            'username' => 'required|string|max:255',
-            'password' => 'required|string|min:8|max:255'
-        ]);
-
-        $credentials = request(['username', 'password']);
+        $credentials = $request->only(['username', 'password']);
         $token = Auth::attempt($credentials);
         if (!$token) {
             return Helpers::apiResponse(false, 'Username or Password Is Wrong', [], 401);

@@ -89,7 +89,7 @@ class CertificationTest extends TestCase
             'name' => 'Test Certification',
             'institution' => 'Test Institution',
             'link' => 'https://granitebps.com',
-            'published' => 'Test Published',
+            'published' => '2019-05-28T17:00:00.000Z',
         ];
     }
 

@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Api\v1;
 
 use App\Certification;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\CertificationRequest;
 use App\Traits\Helpers;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -22,18 +22,11 @@ class CertificationController extends Controller
         return Helpers::apiResponse(true, '', $certifications);
     }
 
-    public function store(Request $request)
+    public function store(CertificationRequest $request)
     {
-        $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'institution' => 'required|string|max:255',
-            'link' => 'required|string|url|max:255',
-            'published' => 'required|string|max:255|date',
-        ]);
-
         DB::beginTransaction();
         try {
-            Certification::create($data);
+            Certification::create($request->all());
 
             Cache::forget('certifications');
 
@@ -46,15 +39,8 @@ class CertificationController extends Controller
         }
     }
 
-    public function update(Request $request, $id)
+    public function update(CertificationRequest $request, $id)
     {
-        $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'institution' => 'required|string|max:255',
-            'link' => 'required|string|url|max:255',
-            'published' => 'required|string|max:255|date',
-        ]);
-
         DB::beginTransaction();
         try {
             $certification = Certification::find($id);
@@ -62,7 +48,7 @@ class CertificationController extends Controller
                 return Helpers::apiResponse(false, 'Certification Not Found', [], 404);
             }
 
-            $certification->update($data);
+            $certification->update($request->all());
 
             Cache::forget('certifications');
 

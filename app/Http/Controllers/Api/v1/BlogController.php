@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Api\v1;
 
 use App\Blog;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\BlogRequest;
 use App\Traits\Helpers;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -32,14 +32,8 @@ class BlogController extends Controller
         return Helpers::apiResponse(true, '', $blog);
     }
 
-    public function store(Request $request)
+    public function store(BlogRequest $request)
     {
-        $this->validate($request, [
-            'title' => 'required|string|max:255',
-            'body' => 'required|string',
-            'image' => 'required|image|max:2048',
-        ]);
-
         DB::beginTransaction();
         try {
             $image = $request->image;
@@ -83,14 +77,8 @@ class BlogController extends Controller
         return Helpers::apiResponse(true, '', $blog);
     }
 
-    public function update(Request $request, $id)
+    public function update(BlogRequest $request, $id)
     {
-        $this->validate($request, [
-            'title' => 'required|string|max:255',
-            'body' => 'required|string',
-            'image' => 'sometimes|max:2048|image',
-        ]);
-
         DB::beginTransaction();
         try {
             $blog = Blog::find($id);
