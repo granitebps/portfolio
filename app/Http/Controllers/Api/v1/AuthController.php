@@ -42,4 +42,14 @@ class AuthController extends Controller
         $user->profile->avatar = $newAvatar;
         return Helpers::apiResponse(true, '', $user);
     }
+
+    public function logout()
+    {
+        $user = Auth::user();
+        if (!$user) {
+            return Helpers::apiResponse(false, 'Unauthorized', [], 401);
+        }
+        Auth::logout();
+        return Helpers::apiResponse(true, 'User Logged Out');
+    }
 }
