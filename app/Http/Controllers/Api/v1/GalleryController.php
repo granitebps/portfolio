@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Api\v1;
 
 use App\Gallery;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\GalleryRequest;
 use App\Traits\Helpers;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -25,17 +25,12 @@ class GalleryController extends Controller
         return Helpers::apiResponse(true, '', $tech);
     }
 
-    public function store(Request $request)
+    public function store(GalleryRequest $request)
     {
-        $this->validate($request, [
-            'image' => 'required',
-            'image.*' => 'max:2048|image'
-        ]);
-
         DB::beginTransaction();
         try {
             $images = $request->image;
-            foreach ($images as $key => $image) {
+            foreach ($images as $image) {
                 $pic_full = $image->getClientOriginalName();
                 $filename = Str::slug(pathinfo($pic_full, PATHINFO_FILENAME));
                 $extension = pathinfo($pic_full, PATHINFO_EXTENSION);

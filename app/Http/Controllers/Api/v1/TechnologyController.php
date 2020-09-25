@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\TechnologyRequest;
 use App\Technology;
 use App\Traits\Helpers;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -30,13 +30,8 @@ class TechnologyController extends Controller
         return Helpers::apiResponse(true, '', $tech);
     }
 
-    public function store(Request $request)
+    public function store(TechnologyRequest $request)
     {
-        $this->validate($request, [
-            'name' => 'required|string|max:255',
-            'pic' => 'required|image|max:2048',
-        ]);
-
         DB::beginTransaction();
         try {
             $pic = $request->pic;
@@ -63,13 +58,8 @@ class TechnologyController extends Controller
         }
     }
 
-    public function update(Request $request, $id)
+    public function update(TechnologyRequest $request, $id)
     {
-        $this->validate($request, [
-            'name' => 'required|string|max:255',
-            'icon' => 'sometimes|image|max:2048',
-        ]);
-
         DB::beginTransaction();
         try {
             $tech = Technology::find($id);

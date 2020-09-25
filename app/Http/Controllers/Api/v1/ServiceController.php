@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ServiceRequest;
 use App\Services;
 use App\Traits\Helpers;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -23,21 +23,11 @@ class ServiceController extends Controller
         return Helpers::apiResponse(true, '', $service);
     }
 
-    public function store(Request $request)
+    public function store(ServiceRequest $request)
     {
-        $this->validate($request, [
-            'name' => 'required|string|max:255',
-            'icon' => 'required|string|max:255',
-            'desc' => 'required|string',
-        ]);
-
         DB::beginTransaction();
         try {
-            $service = Services::create([
-                'name' => $request->name,
-                'icon' => $request->icon,
-                'desc' => $request->desc,
-            ]);
+            $service = Services::create($request->all());
 
             Cache::forget('services');
 
@@ -50,26 +40,16 @@ class ServiceController extends Controller
         }
     }
 
-    public function update(Request $request, $id)
+    public function update(ServiceRequest $request, $id)
     {
-        $service = Services::find($id);
-        $this->validate($request, [
-            'name' => 'required|string|max:255',
-            'icon' => 'required|string|max:255',
-            'desc' => 'required|string',
-        ]);
-
         DB::beginTransaction();
         try {
+            $service = Services::find($id);
             if (!$service) {
                 return Helpers::apiResponse(false, 'Service Not Found', [], 404);
             }
 
-            $service->update([
-                'name' => $request->name,
-                'icon' => $request->icon,
-                'desc' => $request->desc,
-            ]);
+            $service->update($request->all());
 
             Cache::forget('services');
 

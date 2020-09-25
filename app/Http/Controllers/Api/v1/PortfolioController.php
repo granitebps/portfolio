@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\PortfolioRequest;
 use App\Portfolio;
 use App\PortfolioPic;
 use App\Traits\Helpers;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -44,18 +44,8 @@ class PortfolioController extends Controller
         return Helpers::apiResponse(true, '', $portfolio);
     }
 
-    public function store(Request $request)
+    public function store(PortfolioRequest $request)
     {
-        $this->validate($request, [
-            'name' => 'required|string|max:255',
-            'desc' => 'required|string',
-            'type' => 'required|boolean',
-            'thumbnail' => 'required|image|max:2048',
-            'pic' => 'required',
-            'pic.*' => 'image|max:2048',
-            'url' => 'sometimes|string|max:255|url',
-        ]);
-
         DB::beginTransaction();
         try {
             $folderName = Str::slug($request->name, '-');
@@ -101,17 +91,8 @@ class PortfolioController extends Controller
         }
     }
 
-    public function update(Request $request, $id)
+    public function update(PortfolioRequest $request, $id)
     {
-        $this->validate($request, [
-            'name' => 'required|string|max:255',
-            'desc' => 'required|string',
-            'type' => 'required|boolean',
-            'url' => 'sometimes|string|max:255|url',
-            'thumbnail' => 'sometimes|image|max:2048',
-            'pic.*' => 'sometimes|image|max:2048',
-        ]);
-
         DB::beginTransaction();
         try {
             $portfolio = Portfolio::find($id);

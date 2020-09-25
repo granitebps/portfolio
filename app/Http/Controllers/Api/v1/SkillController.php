@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\SkillRequest;
 use App\Skill;
 use App\Traits\Helpers;
 use Illuminate\Http\Request;
@@ -24,21 +25,16 @@ class SkillController extends Controller
         return Helpers::apiResponse(true, '', $skills);
     }
 
-    public function store(Request $request)
+    public function store(SkillRequest $request)
     {
-        $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'percentage' => 'required|numeric|min:0|max:100'
-        ]);
-
         DB::beginTransaction();
         try {
-            Skill::create($data);
+            $skill = Skill::create($request->all());
 
             Cache::forget('skills');
 
             DB::commit();
-            return Helpers::apiResponse(true, 'Skill Created', $data);
+            return Helpers::apiResponse(true, 'Skill Created', $skill);
         } catch (\Exception $e) {
             \Sentry\captureException($e);
             DB::rollback();
@@ -46,13 +42,8 @@ class SkillController extends Controller
         }
     }
 
-    public function update(Request $request, $id)
+    public function update(SkillRequest $request, $id)
     {
-        $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'percentage' => 'required|numeric|min:0|max:100'
-        ]);
-
         DB::beginTransaction();
         try {
             $skill = Skill::find($id);
@@ -60,12 +51,12 @@ class SkillController extends Controller
                 return Helpers::apiResponse(false, 'Skill Not Found', [], 404);
             }
 
-            $skill->update($data);
+            $skill->update($request->all());
 
             Cache::forget('skills');
 
             DB::commit();
-            return Helpers::apiResponse(true, 'Skill Updated', $data);
+            return Helpers::apiResponse(true, 'Skill Updated', $skill);
         } catch (\Exception $e) {
             \Sentry\captureException($e);
             DB::rollback();
