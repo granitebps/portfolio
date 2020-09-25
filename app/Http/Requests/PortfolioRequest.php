@@ -26,7 +26,7 @@ class PortfolioRequest extends FormRequest
         $rules = [
             'name' => 'required|string|max:255',
             'desc' => 'required|string',
-            'type' => 'required|boolean',
+            'type' => 'required|numeric|in:1,2',
             'url' => 'sometimes|string|max:255|url',
         ];
         if ($this->method() === 'POST') {
@@ -54,7 +54,8 @@ class PortfolioRequest extends FormRequest
             'desc.required' => 'Description is required',
             'desc.string' => 'Description is not valid',
             'type.required' => 'Type is required',
-            'type.boolean' => 'Type is not valid',
+            'type.numeric' => 'Type is not valid',
+            'type.in' => 'Type is not valid',
             'url.string' => 'URL is not valid',
             'url.max' => 'URL is too long. Max length is :max character',
             'url.url' => 'URL is not a valid URL',
