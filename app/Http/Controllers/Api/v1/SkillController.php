@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\SkillRequest;
 use App\Skill;
 use App\Traits\Helpers;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -31,8 +30,6 @@ class SkillController extends Controller
         try {
             $skill = Skill::create($request->all());
 
-            Cache::forget('skills');
-
             DB::commit();
             return Helpers::apiResponse(true, 'Skill Created', $skill);
         } catch (\Exception $e) {
@@ -53,8 +50,6 @@ class SkillController extends Controller
 
             $skill->update($request->all());
 
-            Cache::forget('skills');
-
             DB::commit();
             return Helpers::apiResponse(true, 'Skill Updated', $skill);
         } catch (\Exception $e) {
@@ -74,8 +69,6 @@ class SkillController extends Controller
             }
 
             $skill->delete();
-
-            Cache::forget('skills');
 
             DB::commit();
             return Helpers::apiResponse(true, 'Skill Deleted', []);

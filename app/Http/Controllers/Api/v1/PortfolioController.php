@@ -80,8 +80,6 @@ class PortfolioController extends Controller
                 ]);
             }
 
-            Cache::forget('portfolio');
-
             DB::commit();
             return Helpers::apiResponse(true, 'Portfolio Created', $portfolio);
         } catch (\Exception $e) {
@@ -110,9 +108,7 @@ class PortfolioController extends Controller
                 }
 
                 $newThumb = str_replace('portfolio/' . $oldFolderName, 'portfolio/' . $folderName, $portfolio->thumbnail);
-                $portfolio->update([
-                    'thumbnail' => $newThumb
-                ]);
+                $portfolio->thumbnail = $newThumb;
 
                 foreach ($portfolio->pic as $value) {
                     $newPic = str_replace('portfolio/' . $oldFolderName, 'portfolio/' . $folderName, $value->pic);
@@ -134,17 +130,13 @@ class PortfolioController extends Controller
                 Storage::delete($oldThubmnail);
                 $aws_thumbnail = Storage::putFileAs('portfolio/' . $folderName, $thumbnail, $nama_thumbnail);
 
-                $portfolio->update([
-                    'thumbnail' => $aws_thumbnail
-                ]);
+                $portfolio->thumbnail = $aws_thumbnail;
             }
-
-            $portfolio->update([
-                'name' => $request->name,
-                'desc' => $request->desc,
-                'type' => $request->type,
-                'url' => $request->url,
-            ]);
+            $portfolio->name = $request->name;
+            $portfolio->desc = $request->desc;
+            $portfolio->type = $request->type;
+            $portfolio->url = $request->url;
+            $portfolio->save();
 
             if ($request->hasFile('pic')) {
                 $pic = $request->pic;
@@ -161,8 +153,6 @@ class PortfolioController extends Controller
                     ]);
                 }
             }
-
-            Cache::forget('portfolio');
 
             DB::commit();
             return Helpers::apiResponse(true, 'Portfolio Updated');
@@ -188,8 +178,6 @@ class PortfolioController extends Controller
 
             $portfolio->pic()->delete();
             $portfolio->delete();
-
-            Cache::forget('portfolio');
 
             DB::commit();
             return Helpers::apiResponse(true, 'Portfolio Deleted');

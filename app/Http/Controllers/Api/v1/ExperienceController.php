@@ -33,8 +33,6 @@ class ExperienceController extends Controller
         try {
             Experience::create($request->all());
 
-            Cache::forget('experiences');
-
             DB::commit();
             return Helpers::apiResponse(true, 'Experience Created');
         } catch (\Exception $e) {
@@ -54,8 +52,6 @@ class ExperienceController extends Controller
             }
             $experience->update($request->all());
 
-            Cache::forget('experiences');
-
             DB::commit();
             return Helpers::apiResponse(true, 'Experience Updated');
         } catch (\Exception $e) {
@@ -74,8 +70,6 @@ class ExperienceController extends Controller
                 return Helpers::apiResponse(false, 'Experience Not Found', [], 404);
             }
             $experience->delete();
-
-            Cache::forget('experiences');
 
             DB::commit();
             return Helpers::apiResponse(true, 'Experience Deleted');

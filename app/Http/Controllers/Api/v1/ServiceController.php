@@ -29,8 +29,6 @@ class ServiceController extends Controller
         try {
             $service = Services::create($request->all());
 
-            Cache::forget('services');
-
             DB::commit();
             return Helpers::apiResponse(true, 'Service Created', $service);
         } catch (\Exception $e) {
@@ -51,8 +49,6 @@ class ServiceController extends Controller
 
             $service->update($request->all());
 
-            Cache::forget('services');
-
             DB::commit();
             return Helpers::apiResponse(true, 'Service Updated', $service);
         } catch (\Exception $e) {
@@ -71,8 +67,6 @@ class ServiceController extends Controller
                 return Helpers::apiResponse(false, 'Service Not Found', [], 404);
             }
             $service->delete();
-
-            Cache::forget('services');
 
             DB::commit();
             return Helpers::apiResponse(true, 'Service Deleted');

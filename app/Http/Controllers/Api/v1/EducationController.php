@@ -28,8 +28,6 @@ class EducationController extends Controller
         try {
             Education::create($request->all());
 
-            Cache::forget('educations');
-
             DB::commit();
             return Helpers::apiResponse(true, 'Education Created');
         } catch (\Exception $e) {
@@ -49,8 +47,6 @@ class EducationController extends Controller
             }
             $education->update($request->all());
 
-            Cache::forget('educations');
-
             DB::commit();
             return Helpers::apiResponse(true, 'Education Updated');
         } catch (\Exception $e) {
@@ -69,8 +65,6 @@ class EducationController extends Controller
                 return Helpers::apiResponse(false, 'Education Not Found', [], 404);
             }
             $education->delete();
-
-            Cache::forget('educations');
 
             DB::commit();
             return Helpers::apiResponse(true, 'Education Deleted');

@@ -54,8 +54,6 @@ class BlogController extends Controller
                 'image' => $aws_blog,
             ]);
 
-            Cache::forget('blogs');
-
             DB::commit();
             return Helpers::apiResponse(true, 'Blog Created', $blog);
         } catch (\Exception $e) {
@@ -93,21 +91,15 @@ class BlogController extends Controller
                 $extension = pathinfo($image_full, PATHINFO_EXTENSION);
                 $nama_image = time() . '_' . $filename . '.' . $extension;
 
-                // Image upload for shared hosting
                 $aws_blog = Storage::putFileAs('blog', $image, $nama_image);
                 Storage::delete($old_foto);
 
-                $blog->update([
-                    'image' => $aws_blog,
-                ]);
+                $blog->image = $aws_blog;
             }
-            $blog->update([
-                'title' => $request->title,
-                'slug' => Str::slug($request->title),
-                'body' => $request->body,
-            ]);
-
-            Cache::forget('blogs');
+            $blog->title = $request->title;
+            $blog->slug = Str::slug($request->title);
+            $blog->body = $request->body;
+            $blog->save();
 
             DB::commit();
             return Helpers::apiResponse(true, 'Blog Updated', $blog);
@@ -130,8 +122,6 @@ class BlogController extends Controller
             Storage::delete($blog->image);
 
             $blog->delete();
-
-            Cache::forget('blogs');
 
             DB::commit();
             return Helpers::apiResponse(true, 'Blog Deleted');

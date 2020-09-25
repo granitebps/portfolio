@@ -28,8 +28,6 @@ class CertificationController extends Controller
         try {
             Certification::create($request->all());
 
-            Cache::forget('certifications');
-
             DB::commit();
             return Helpers::apiResponse(true, 'Certification Created');
         } catch (\Exception $e) {
@@ -50,8 +48,6 @@ class CertificationController extends Controller
 
             $certification->update($request->all());
 
-            Cache::forget('certifications');
-
             DB::commit();
             return Helpers::apiResponse(true, 'Certification Updated');
         } catch (\Exception $e) {
@@ -71,8 +67,6 @@ class CertificationController extends Controller
             }
 
             $certification->delete();
-
-            Cache::forget('certifications');
 
             DB::commit();
             return Helpers::apiResponse(true, 'Certification Deleted');

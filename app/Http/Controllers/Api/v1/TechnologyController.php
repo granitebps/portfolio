@@ -47,8 +47,6 @@ class TechnologyController extends Controller
                 'pic' => $aws_tech,
             ]);
 
-            Cache::forget('tech');
-
             DB::commit();
             return Helpers::apiResponse(true, 'Technology Created', $tech);
         } catch (\Exception $e) {
@@ -77,15 +75,10 @@ class TechnologyController extends Controller
 
                 Storage::delete($tech->pic);
 
-                $tech->update([
-                    'pic' => $aws_tech,
-                ]);
+                $tech->pic = $aws_tech;
             }
-            $tech->update([
-                'name' => $request->name,
-            ]);
-
-            Cache::forget('tech');
+            $tech->name = $request->name;
+            $tech->save();
 
             DB::commit();
             return Helpers::apiResponse(true, 'Technology Updated', $tech);
@@ -108,8 +101,6 @@ class TechnologyController extends Controller
             Storage::delete($tech->pic);
 
             $tech->delete();
-
-            Cache::forget('tech');
 
             DB::commit();
             return Helpers::apiResponse(true, 'Technology Deleted');
