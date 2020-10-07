@@ -63,9 +63,9 @@ class BlogController extends Controller
         }
     }
 
-    public function show($id)
+    public function show($id, $slug)
     {
-        $blog = Blog::find($id);
+        $blog = Blog::where('id', $id)->where('slug', $slug)->first();
         if (!$blog) {
             return Helpers::apiResponse(false, 'Blog Not Found', [], 404);
         }

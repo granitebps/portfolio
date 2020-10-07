@@ -35,7 +35,7 @@ class BlogTest extends TestCase
         $this->authenticate();
         $blog = $this->createBlog();
 
-        $response = $this->json('GET', '/api/v1/blog/' . $blog->id);
+        $response = $this->json('GET', '/api/v1/blog/' . $blog->id . '/' . $blog->slug);
         $response->assertStatus(200)->assertJson([
             'success' => true,
             'message' => ''

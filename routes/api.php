@@ -81,7 +81,7 @@ Route::group(['namespace' => 'Api\v1', 'prefix' => 'v1'], function () {
     Route::get('education', 'EducationController@index');
 
     Route::get('blog', 'BlogController@index');
-    Route::get('blog/{id}', 'BlogController@show');
+    Route::get('blog/{id}/{slug}', 'BlogController@show');
 
     Route::get('certification', 'CertificationController@index');
 });
