@@ -23,45 +23,27 @@ Route::group(['namespace' => 'Api\v1', 'prefix' => 'v1'], function () {
         Route::post('profile', 'ProfileController@update');
         Route::post('profile-password', 'ProfileController@password');
 
-        Route::post('skill', 'SkillController@store');
-        Route::put('skill/{id}', 'SkillController@update');
-        Route::delete('skill/{id}', 'SkillController@destroy');
+        Route::apiResource('skill', 'SkillController')->except(['index', 'show']);
 
-        Route::post('service', 'ServiceController@store');
-        Route::put('service/{id}', 'ServiceController@update');
-        Route::delete('service/{id}', 'ServiceController@destroy');
+        Route::apiResource('service', 'ServiceController')->except(['index', 'show']);
 
-        Route::post('technology', 'TechnologyController@store');
-        Route::put('technology/{id}', 'TechnologyController@update');
-        Route::delete('technology/{id}', 'TechnologyController@destroy');
+        Route::apiResource('technology', 'TechnologyController')->except(['index', 'show']);
 
         Route::get('message', 'MessageController@index');
         Route::delete('message/{id}', 'MessageController@destroy');
 
-        Route::post('portfolio', 'PortfolioController@store');
-        Route::put('portfolio/{id}', 'PortfolioController@update');
-        Route::delete('portfolio/{id}', 'PortfolioController@destroy');
+        Route::apiResource('portfolio', 'PortfolioController')->except(['index', 'show']);
         Route::get('portfolio-photo/{id}', 'PortfolioController@destroy_photo');
 
-        Route::post('experience', 'ExperienceController@store');
-        Route::put('experience/{id}', 'ExperienceController@update');
-        Route::delete('experience/{id}', 'ExperienceController@destroy');
+        Route::apiResource('experience', 'ExperienceController')->except(['index', 'show']);
 
-        Route::post('education', 'EducationController@store');
-        Route::put('education/{id}', 'EducationController@update');
-        Route::delete('education/{id}', 'EducationController@destroy');
+        Route::apiResource('education', 'EducationController')->except(['index', 'show']);
 
-        Route::post('blog', 'BlogController@store');
-        Route::put('blog/{id}', 'BlogController@update');
-        Route::delete('blog/{id}', 'BlogController@destroy');
+        Route::apiResource('blog', 'BlogController')->except(['index', 'show']);
 
-        Route::get('gallery', 'GalleryController@index');
-        Route::post('gallery', 'GalleryController@store');
-        Route::delete('gallery/{id}', 'GalleryController@destroy');
+        Route::apiResource('gallery', 'GalleryController')->except(['update', 'show']);
 
-        Route::post('certification', 'CertificationController@store');
-        Route::put('certification/{id}', 'CertificationController@update');
-        Route::delete('certification/{id}', 'CertificationController@destroy');
+        Route::apiResource('certification', 'CertificationController')->except(['index', 'show']);
     });
 
     Route::get('profile', 'ProfileController@index');
