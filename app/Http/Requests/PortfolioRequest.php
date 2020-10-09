@@ -27,15 +27,15 @@ class PortfolioRequest extends FormRequest
             'name' => 'required|string|max:255',
             'desc' => 'required|string',
             'type' => 'required|numeric|in:1,2',
-            'url' => 'sometimes|string|max:255|url',
+            'url' => 'nullable|string|max:255|url',
         ];
         if ($this->method() === 'POST') {
             $rules['thumbnail'] = 'required|image|max:2048';
             $rules['pic'] = 'required';
             $rules['pic.*'] = 'image|max:2048';
         } else if ($this->method() === 'PUT') {
-            $rules['thumbnail'] = 'sometimes|image|max:2048';
-            $rules['pic.*'] = 'sometimes|image|max:2048';
+            $rules['thumbnail'] = 'nullable|image|max:2048';
+            $rules['pic.*'] = 'nullable|image|max:2048';
         }
         return $rules;
     }
