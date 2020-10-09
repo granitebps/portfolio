@@ -8,7 +8,6 @@ use App\Http\Requests\GalleryRequest;
 use App\Traits\Helpers;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class GalleryController extends Controller
 {
@@ -31,15 +30,16 @@ class GalleryController extends Controller
         try {
             $images = $request->image;
             foreach ($images as $image) {
-                $pic_full = $image->getClientOriginalName();
-                $filename = Str::slug(pathinfo($pic_full, PATHINFO_FILENAME));
-                $extension = pathinfo($pic_full, PATHINFO_EXTENSION);
-                $nama_pic = time() . '_' . $filename . '.' . $extension;
+                $nama_pic = time() . '_' . md5(uniqid()) . '.jpg';
 
-                $aws_galery = Storage::putFileAs('galeries', $image, $nama_pic);
+                $jpg = Helpers::compressImageCloudinary($image);
+
+                // Save File
+                $awsPath = 'galeries/' . $nama_pic;
+                Storage::put($awsPath, $jpg);
 
                 Gallery::create([
-                    'image' => $aws_galery,
+                    'image' => $awsPath,
                 ]);
             }
 

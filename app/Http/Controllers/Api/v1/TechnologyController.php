@@ -9,7 +9,6 @@ use App\Traits\Helpers;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class TechnologyController extends Controller
 {
@@ -35,12 +34,12 @@ class TechnologyController extends Controller
         DB::beginTransaction();
         try {
             $pic = $request->pic;
-            $pic_full = $pic->getClientOriginalName();
-            $filename = Str::slug(pathinfo($pic_full, PATHINFO_FILENAME));
-            $extension = pathinfo($pic_full, PATHINFO_EXTENSION);
-            $nama_pic = time() . '_' . $filename . '.' . $extension;
+            $nama_pic = time() . '_' . md5(uniqid()) . '.jpg';
 
-            $aws_tech = Storage::putFileAs('tech', $pic, $nama_pic);
+            $jpg = Helpers::compressImageCloudinary($pic);
+
+            $aws_tech = 'tech/' . $nama_pic;
+            Storage::put($aws_tech, $jpg);
 
             $tech = Technology::create([
                 'name' => $request->name,
@@ -66,12 +65,12 @@ class TechnologyController extends Controller
             }
             if ($request->hasFile('pic')) {
                 $pic = $request->pic;
-                $pic_full = $pic->getClientOriginalName();
-                $filename = Str::slug(pathinfo($pic_full, PATHINFO_FILENAME));
-                $extension = pathinfo($pic_full, PATHINFO_EXTENSION);
-                $nama_pic = time() . '_' . $filename . '.' . $extension;
+                $nama_pic = time() . '_' . md5(uniqid()) . '.jpg';
 
-                $aws_tech = Storage::putFileAs('tech', $pic, $nama_pic);
+                $jpg = Helpers::compressImageCloudinary($pic);
+
+                $aws_tech = 'tech/' . $nama_pic;
+                Storage::put($aws_tech, $jpg);
 
                 Storage::delete($tech->pic);
 

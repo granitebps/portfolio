@@ -37,12 +37,12 @@ class BlogController extends Controller
         DB::beginTransaction();
         try {
             $image = $request->image;
-            $image_full = $image->getClientOriginalName();
-            $filename = Str::slug(pathinfo($image_full, PATHINFO_FILENAME));
-            $extension = pathinfo($image_full, PATHINFO_EXTENSION);
-            $nama_image = time() . '_' . $filename . '.' . $extension;
+            $nama_image = time() . '_' . md5(uniqid()) . '.jpg';
 
-            $aws_blog = Storage::putFileAs('blog', $image, $nama_image);
+            $jpg = Helpers::compressImageCloudinary($image);
+
+            $aws_blog = 'blog/' . $nama_image;
+            Storage::put($aws_blog, $jpg);
 
             $user = auth()->user();
 
@@ -86,12 +86,13 @@ class BlogController extends Controller
             if ($request->hasFile('image')) {
                 $old_foto = $blog->image;
                 $image = $request->image;
-                $image_full = $image->getClientOriginalName();
-                $filename = Str::slug(pathinfo($image_full, PATHINFO_FILENAME));
-                $extension = pathinfo($image_full, PATHINFO_EXTENSION);
-                $nama_image = time() . '_' . $filename . '.' . $extension;
+                $nama_image = time() . '_' . md5(uniqid()) . '.jpg';
 
-                $aws_blog = Storage::putFileAs('blog', $image, $nama_image);
+                $jpg = Helpers::compressImageCloudinary($image);
+
+                $aws_blog = 'blog/' . $nama_image;
+                Storage::put($aws_blog, $jpg);
+
                 Storage::delete($old_foto);
 
                 $blog->image = $aws_blog;

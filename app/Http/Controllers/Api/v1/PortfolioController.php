@@ -51,12 +51,12 @@ class PortfolioController extends Controller
             $folderName = Str::slug($request->name, '-');
 
             $thumbnail = $request->thumbnail;
-            $thumbnail_full = $thumbnail->getClientOriginalName();
-            $filename = Str::slug(pathinfo($thumbnail_full, PATHINFO_FILENAME));
-            $extension = pathinfo($thumbnail_full, PATHINFO_EXTENSION);
-            $nama_thumbnail = time() . '_thumbnail-' . $filename . '.' . $extension;
+            $nama_thumbnail = time() . '_thumbnail-' . md5(uniqid()) . '.jpg';
 
-            $aws_thumbnail = Storage::putFileAs('portfolio/' . $folderName, $thumbnail, $nama_thumbnail);
+            $jpg = Helpers::compressImageCloudinary($thumbnail);
+
+            $aws_thumbnail = 'portfolio/' . $folderName . '/' . $nama_thumbnail;
+            Storage::put($aws_thumbnail, $jpg);
 
             $portfolio = Portfolio::create([
                 'name' => $request->name,
@@ -68,12 +68,12 @@ class PortfolioController extends Controller
 
             $pic = $request->pic;
             foreach ($pic as $image) {
-                $image_full = $image->getClientOriginalName();
-                $filename = Str::slug(pathinfo($image_full, PATHINFO_FILENAME));
-                $extension = pathinfo($image_full, PATHINFO_EXTENSION);
-                $nama_image = time() . '_' . $filename . '.' . $extension;
+                $nama_image = time() . '_' . md5(uniqid()) . '.jpg';
 
-                $aws_pic = Storage::putFileAs('portfolio/' . $folderName, $image, $nama_image);
+                $jpg = Helpers::compressImageCloudinary($image);
+
+                $aws_pic = 'portfolio/' . $folderName . '/' . $nama_image;
+                Storage::put($aws_pic, $jpg);
 
                 $portfolio->pic()->create([
                     'pic' => $aws_pic
@@ -121,14 +121,15 @@ class PortfolioController extends Controller
 
             if ($request->hasFile('thumbnail')) {
                 $thumbnail = $request->thumbnail;
-                $thumbnail_full = $thumbnail->getClientOriginalName();
-                $filename = Str::slug(pathinfo($thumbnail_full, PATHINFO_FILENAME));
-                $extension = pathinfo($thumbnail_full, PATHINFO_EXTENSION);
-                $nama_thumbnail = time() . '_thumbnail-' . $filename . '.' . $extension;
+                $nama_thumbnail = time() . '_thumbnail-' . md5(uniqid()) . '.jpg';
+
+                $jpg = Helpers::compressImageCloudinary($thumbnail);
 
                 $oldThubmnail = str_replace('portfolio/' . $oldFolderName, 'portfolio/' . $folderName, $portfolio->thumbnail);
                 Storage::delete($oldThubmnail);
-                $aws_thumbnail = Storage::putFileAs('portfolio/' . $folderName, $thumbnail, $nama_thumbnail);
+
+                $aws_thumbnail = 'portfolio/' . $folderName . '/' . $nama_thumbnail;
+                Storage::put($aws_thumbnail, $jpg);
 
                 $portfolio->thumbnail = $aws_thumbnail;
             }
@@ -141,12 +142,12 @@ class PortfolioController extends Controller
             if ($request->hasFile('pic')) {
                 $pic = $request->pic;
                 foreach ($pic as $image) {
-                    $image_full = $image->getClientOriginalName();
-                    $filename = Str::slug(pathinfo($image_full, PATHINFO_FILENAME));
-                    $extension = pathinfo($image_full, PATHINFO_EXTENSION);
-                    $nama_image = time() . '_' . $filename . '.' . $extension;
+                    $nama_image = time() . '_' . md5(uniqid()) . '.jpg';
 
-                    $aws_pic = Storage::putFileAs('portfolio/' . $folderName, $image, $nama_image);
+                    $jpg = Helpers::compressImageCloudinary($image);
+
+                    $aws_pic = 'portfolio/' . $folderName . '/' . $nama_image;
+                    Storage::put($aws_pic, $jpg);
 
                     $portfolio->pic()->create([
                         'pic' => $aws_pic

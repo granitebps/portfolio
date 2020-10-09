@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class ProfileController extends Controller
 {
@@ -64,13 +63,15 @@ class ProfileController extends Controller
 
             if ($request->hasFile('avatar')) {
                 $avatar = $request->avatar;
-                $avatar_full = $avatar->getClientOriginalName();
-                $filename = Str::slug(pathinfo($avatar_full, PATHINFO_FILENAME));
-                $extension = pathinfo($avatar_full, PATHINFO_EXTENSION);
-                $nama_avatar = time() . '_' . $filename . '.' . $extension;
+                $nama_avatar = time() . '_' . md5(uniqid()) . '.jpg';
+
+                $jpg = Helpers::compressImageCloudinary($avatar);
 
                 Storage::deleteDirectory('avatar');
-                $aws_avatar = Storage::putFileAs('avatar', $avatar, $nama_avatar);
+
+                $aws_avatar = 'avatar/' . $nama_avatar;
+                Storage::put($aws_avatar, $jpg);
+
                 $user->profile->update([
                     'avatar' => $aws_avatar,
                 ]);
