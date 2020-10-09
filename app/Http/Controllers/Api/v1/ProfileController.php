@@ -39,7 +39,7 @@ class ProfileController extends Controller
             'username' => 'required|string|max:255|unique:users,username,' . $user->id,
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
             'name' => 'required|string|max:255',
-            'avatar' => 'sometimes|max:2048|image',
+            'avatar' => 'sometimes|nullable|max:2048|image',
             'about' => 'required|string',
             'age' => 'required|numeric',
             'phone' => 'required|numeric',

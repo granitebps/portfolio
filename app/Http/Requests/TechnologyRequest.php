@@ -29,7 +29,7 @@ class TechnologyRequest extends FormRequest
         if ($this->method() === 'POST') {
             $rules['pic'] = 'required|image|max:2048';
         } else if ($this->method() === 'PUT') {
-            $rules['pic'] = 'sometimes|image|max:2048';
+            $rules['pic'] = 'sometimes|nullable|image|max:2048';
         }
         return $rules;
     }

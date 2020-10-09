@@ -27,7 +27,7 @@ class ExperienceRequest extends FormRequest
             'company' => 'required|string|max:255',
             'position' => 'required|string|max:255',
             'desc' => 'required|string',
-            'current_job' => 'sometimes|boolean',
+            'current_job' => 'sometimes|nullable|boolean',
             'start_date' => 'required|string|max:255|date',
             'end_date' => 'exclude_if:current_job,1|required|string|max:255|date'
         ];

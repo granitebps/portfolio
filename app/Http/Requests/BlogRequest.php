@@ -30,7 +30,7 @@ class BlogRequest extends FormRequest
         if ($this->method() === 'POST') {
             $rules['image'] = 'required|image|max:2048';
         } else if ($this->method() === 'PUT') {
-            $rules['image'] = 'nullable|image|max:2048';
+            $rules['image'] = 'sometimes|nullable|image|max:2048';
         }
         return $rules;
     }
