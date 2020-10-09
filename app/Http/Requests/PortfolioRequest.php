@@ -35,7 +35,7 @@ class PortfolioRequest extends FormRequest
             $rules['pic.*'] = 'image|max:2048';
         } else if ($this->method() === 'PUT') {
             $rules['thumbnail'] = 'sometimes|nullable|image|max:2048';
-            $rules['pic.*'] = 'sometimes|ullable|image|max:2048';
+            $rules['pic.*'] = 'sometimes|nullable|image|max:2048';
         }
         return $rules;
     }
