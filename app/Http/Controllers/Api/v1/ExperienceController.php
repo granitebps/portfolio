@@ -17,7 +17,7 @@ class ExperienceController extends Controller
         if (Cache::has('experiences')) {
             $experience = Cache::get('experiences');
         } else {
-            $experience = Experience::orderBy('created_at', 'desc')->get();
+            $experience = Experience::orderBy('start_date', 'desc')->get();
             $experience->transform(function ($item) {
                 $item->current_job = $item->current_job ? $item->current_job : false;
                 return $item;
