@@ -173,9 +173,9 @@ class PortfolioController extends Controller
                 return Helpers::apiResponse(false, 'Portfolio Not Found', [], 404);
             }
 
-            $folderName = Str::slug($portfolio->name, '-');
+            // $folderName = Str::slug($portfolio->name, '-');
 
-            Storage::deleteDirectory('portfolio/' . $folderName);
+            // Storage::deleteDirectory('portfolio/' . $folderName);
 
             $portfolio->pic()->delete();
             $portfolio->delete();
