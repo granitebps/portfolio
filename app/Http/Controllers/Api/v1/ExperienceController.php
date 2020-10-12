@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ExperienceRequest;
 use App\Traits\Helpers;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -36,7 +37,9 @@ class ExperienceController extends Controller
             DB::commit();
             return Helpers::apiResponse(true, 'Experience Created');
         } catch (\Exception $e) {
-            \Sentry\captureException($e);
+            if (App::environment('production')) {
+                \Sentry\captureException($e);
+            }
             DB::rollback();
             return Helpers::apiResponse(false, 'Something Wrong!', $e->getMessage(), 500);
         }
@@ -55,7 +58,9 @@ class ExperienceController extends Controller
             DB::commit();
             return Helpers::apiResponse(true, 'Experience Updated');
         } catch (\Exception $e) {
-            \Sentry\captureException($e);
+            if (App::environment('production')) {
+                \Sentry\captureException($e);
+            }
             DB::rollback();
             return Helpers::apiResponse(false, 'Something Wrong!', $e->getMessage(), 500);
         }
@@ -74,7 +79,9 @@ class ExperienceController extends Controller
             DB::commit();
             return Helpers::apiResponse(true, 'Experience Deleted');
         } catch (\Exception $e) {
-            \Sentry\captureException($e);
+            if (App::environment('production')) {
+                \Sentry\captureException($e);
+            }
             DB::rollback();
             return Helpers::apiResponse(false, 'Something Wrong!', $e->getMessage(), 500);
         }
