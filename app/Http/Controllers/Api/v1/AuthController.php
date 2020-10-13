@@ -7,13 +7,25 @@ use App\Http\Requests\LoginRequest;
 use App\Traits\Helpers;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Tymon\JWTAuth\JWTAuth;
 
 class AuthController extends Controller
 {
+    protected $jwt;
+
+    public function __construct(JWTAuth $jwt)
+    {
+        $this->jwt = $jwt;
+    }
+
     public function login(LoginRequest $request)
     {
         $credentials = $request->only(['username', 'password']);
-        $token = Auth::attempt($credentials);
+        if ($request->remember_me === true) {
+            $this->jwt->factory()->setTTL(518400);
+        }
+        $token = $this->jwt->attempt($credentials, $request->remember_me);
+
         if (!$token) {
             return Helpers::apiResponse(false, 'Username or Password Is Wrong', [], 401);
         }
