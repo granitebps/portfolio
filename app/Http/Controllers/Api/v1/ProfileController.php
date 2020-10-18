@@ -35,7 +35,11 @@ class ProfileController extends Controller
 
     public function update(Request $request)
     {
-        $user = User::with('profile')->first();
+        $auth = auth()->user();
+        if (!$auth) {
+            return Helpers::apiResponse(false, 'Unauthenticated', [], 401);
+        }
+        $user = User::with('profile')->find($auth->id);
         $this->validate($request, [
             'username' => 'required|string|max:255|unique:users,username,' . $user->id,
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
@@ -111,7 +115,12 @@ class ProfileController extends Controller
 
             Cache::forget('profile');
 
-            return Helpers::apiResponse(true, 'Profile Updated', ['token' => Auth::refresh(), 'name' => $user->name, 'avatar' => Storage::url($user->profile->avatar)]);
+            return Helpers::apiResponse(true, 'Profile Updated', [
+                'token' => Auth::refresh(),
+                'name' => $user->name,
+                'avatar' => Storage::url($user->profile->avatar),
+                'expires_in' => auth()->factory()->getTTL() * 60
+            ]);
         } catch (\Exception $e) {
             if (App::environment('production')) {
                 \Sentry\captureException($e);

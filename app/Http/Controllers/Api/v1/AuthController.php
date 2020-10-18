@@ -35,6 +35,7 @@ class AuthController extends Controller
         $newAvatar = Storage::url($user->profile->avatar);
         $data['name'] = $user->name;
         $data['avatar'] = $newAvatar;
+        $data['expires_in'] = auth()->factory()->getTTL() * 60;
 
         return Helpers::apiResponse(true, '', $data);
     }
