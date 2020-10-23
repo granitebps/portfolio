@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Traits\Helpers;
 use App\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -122,11 +121,8 @@ class ProfileController extends Controller
                 'expires_in' => auth()->factory()->getTTL() * 60
             ]);
         } catch (\Exception $e) {
-            if (App::environment('production')) {
-                \Sentry\captureException($e);
-            }
             DB::rollback();
-            return Helpers::apiResponse(false, 'Something Wrong!', $e->getMessage(), 500);
+            throw $e;
         }
     }
 
@@ -149,11 +145,8 @@ class ProfileController extends Controller
                 DB::commit();
                 return Helpers::apiResponse(true, 'Password Changed');
             } catch (\Exception $e) {
-                if (App::environment('production')) {
-                    \Sentry\captureException($e);
-                }
                 DB::rollback();
-                return Helpers::apiResponse(false, 'Something Wrong!', $e->getMessage(), 500);
+                throw $e;
             }
         }
     }
