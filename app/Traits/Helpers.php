@@ -13,7 +13,7 @@ trait Helpers
      * @param string $message
      * @param array $result
      * @param integer $code
-     * @return \Illuminate\Http\UploadedFile
+     * @return \Illuminate\Http\Response
      */
     public static function apiResponse($success, $message = '', $result = [], $code = 200)
     {
