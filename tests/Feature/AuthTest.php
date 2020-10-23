@@ -59,8 +59,8 @@ class AuthTest extends TestCase
     public function test_unauthenticated()
     {
         $response = $this->json('GET', '/api/v1/auth/me');
-        $response->assertStatus(401)->assertExactJson([
-            'message' => 'Unauthenticated.',
+        $response->assertStatus(401)->assertJson([
+            'message' => 'Unauthenticated',
         ]);
     }
 }
