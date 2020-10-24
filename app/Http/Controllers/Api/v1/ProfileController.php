@@ -57,6 +57,7 @@ class ProfileController extends Controller
             'youtube' => 'required|url|string|max:255',
             'github' => 'required|url|string|max:255',
             'linkedin' => 'required|url|string|max:255',
+            'medium' => 'required|url|string|max:255',
             'cv' => 'mimes:pdf|file|max:2048'
         ]);
         DB::beginTransaction();
@@ -109,6 +110,7 @@ class ProfileController extends Controller
                 'youtube' => $request->youtube,
                 'github' => $request->github,
                 'linkedin' => $request->linkedin,
+                'medium' => $request->medium,
             ]);
             DB::commit();
 
