@@ -141,6 +141,17 @@ class AuthController extends Controller
             return back()->withErrors(['error' => 'Token Invalid!']);
         }
 
+        if (!$reset->is_valid) {
+            return view('reset_password')->with([
+                'is_valid' => false,
+            ]);
+        }
+        if (Carbon::now()->gt($reset->expired_at)) {
+            return view('reset_password')->with([
+                'is_valid' => false,
+            ]);
+        }
+
         DB::beginTransaction();
         try {
             $user->update([
