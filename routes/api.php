@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\Route;
 Route::group(['namespace' => 'Api\v1', 'prefix' => 'v1'], function () {
     Route::post('auth/login', 'AuthController@login');
 
+    Route::post('auth/request_reset_password', 'AuthController@request_reset_password');
+
     Route::group(['middleware' => 'auth:api'], function () {
         Route::get('auth/me', 'AuthController@me');
         Route::post('auth/logout', 'AuthController@logout');
