@@ -27,23 +27,23 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: supercharge/redis-github-action@1.1.0
-      - name: Laravel Setup
-        run: |
-          cp .env.example .env
-          composer install
-          php artisan key:generate
-          chmod -R 777 storage bootstrap/cache
-      - name: Generate JWT secrets
-        run: php artisan jwt:secret
-      - name: Migrate Database and Run Test
-        env:
-          DB_DATABASE: db_test
-          DB_PORT: 33306
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          CLOUDINARY_URL: ${{ secrets.CLOUDINARY_URL }}
-        run: |
-          php artisan migrate
-          vendor/phpunit/phpunit/phpunit
+      # - name: Laravel Setup
+      #   run: |
+      #     cp .env.example .env
+      #     composer install
+      #     php artisan key:generate
+      #     chmod -R 777 storage bootstrap/cache
+      # - name: Generate JWT secrets
+      #   run: php artisan jwt:secret
+      # - name: Migrate Database and Run Test
+      #   env:
+      #     DB_DATABASE: db_test
+      #     DB_PORT: 33306
+      #     DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      #     CLOUDINARY_URL: ${{ secrets.CLOUDINARY_URL }}
+      #   run: |
+      #     php artisan migrate
+      #     vendor/phpunit/phpunit/phpunit
       - name: Deploy to production
         uses: appleboy/ssh-action@master
         with:
