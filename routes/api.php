@@ -1,8 +1,5 @@
 <?php
 
-use App\Simextrack;
-use App\Traits\Helpers;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -70,21 +67,6 @@ Route::group(['namespace' => 'Api\v1', 'prefix' => 'v1'], function () {
     Route::get('blog', 'BlogController@index');
     Route::get('blog/{id}/{slug}', 'BlogController@show');
 
-    Route::get('simextrack/v1', function (Request $request) {
-        $check_ip = Simextrack::where('ip', $request->ip())->first();
-        if (!$check_ip) {
-            Simextrack::create([
-                'ip' => $request->ip(),
-                'version' => 'v1'
-            ]);
-        }
-
-        return response()->download(public_path('images/simextrack/v1/simextrack-prod-v1.apk'));
-    });
-
-    Route::any('{path}', function () {
-        return Helpers::apiResponse(false, 'Not Found', [], 404);
-    })->where('path', '.*');
     Route::get('certification', 'CertificationController@index');
 });
 Route::any('{path}', 'BaseController@not_found')->where('path', '.*');
