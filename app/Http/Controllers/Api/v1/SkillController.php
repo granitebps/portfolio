@@ -3,61 +3,57 @@
 namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\SkillRequest;
 use App\Skill;
 use App\Traits\Helpers;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class SkillController extends Controller
 {
     public function index()
     {
-        $data = Skill::all();
-        $data->makeHidden(['created_at', 'updated_at']);
+        if (Cache::has('skills')) {
+            $skills = Cache::get('skills');
+        } else {
+            $skills = Skill::all();
+            $skills->makeHidden(['created_at', 'updated_at']);
+            Cache::put('skills', $skills, now()->addDay());
+        }
 
-        return Helpers::apiResponse(true, '', $data);
+        return Helpers::apiResponse(true, '', $skills);
     }
 
-    public function store(Request $request)
+    public function store(SkillRequest $request)
     {
-        $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'percentage' => 'required|numeric|min:0|max:100'
-        ]);
-
         DB::beginTransaction();
         try {
-            Skill::create($data);
+            $skill = Skill::create($request->all());
 
             DB::commit();
-            return Helpers::apiResponse(true, 'Skill Created', $data);
+            return Helpers::apiResponse(true, 'Skill Created', $skill);
         } catch (\Exception $e) {
             DB::rollback();
-            return Helpers::apiResponse(false, 'Server Error', [], 500);
+            throw $e;
         }
     }
 
-    public function update(Request $request, $id)
+    public function update(SkillRequest $request, $id)
     {
-        $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'percentage' => 'required|numeric|min:0|max:100'
-        ]);
-
         DB::beginTransaction();
         try {
             $skill = Skill::find($id);
             if (!$skill) {
-                return Helpers::apiResponse(false, 'Skill Not Found', [], 400);
+                return Helpers::apiResponse(false, 'Skill Not Found', [], 404);
             }
 
-            $skill->update($data);
+            $skill->update($request->all());
 
             DB::commit();
-            return Helpers::apiResponse(true, 'Skill Updated', $data);
+            return Helpers::apiResponse(true, 'Skill Updated', $skill);
         } catch (\Exception $e) {
             DB::rollback();
-            return Helpers::apiResponse(false, 'Server Error', [], 500);
+            throw $e;
         }
     }
 
@@ -67,7 +63,7 @@ class SkillController extends Controller
         try {
             $skill = Skill::find($id);
             if (!$skill) {
-                return Helpers::apiResponse(false, 'Skill Not Found', [], 400);
+                return Helpers::apiResponse(false, 'Skill Not Found', [], 404);
             }
 
             $skill->delete();
@@ -76,7 +72,7 @@ class SkillController extends Controller
             return Helpers::apiResponse(true, 'Skill Deleted', []);
         } catch (\Exception $e) {
             DB::rollback();
-            return Helpers::apiResponse(false, 'Server Error', [], 500);
+            throw $e;
         }
     }
 }

@@ -16,51 +16,39 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('get-token', 'AuthController@get_token');;
-
 Route::group(['namespace' => 'Api\v1', 'prefix' => 'v1'], function () {
     Route::post('auth/login', 'AuthController@login');
 
-    Route::group(['middleware' => ['authToken']], function () {
+    Route::post('auth/request_reset_password', 'AuthController@request_reset_password');
+
+    Route::group(['middleware' => 'auth:api'], function () {
         Route::get('auth/me', 'AuthController@me');
+        Route::post('auth/logout', 'AuthController@logout');
 
         Route::post('profile', 'ProfileController@update');
         Route::post('profile-password', 'ProfileController@password');
 
-        Route::post('skill', 'SkillController@store');
-        Route::put('skill/{id}', 'SkillController@update');
-        Route::delete('skill/{id}', 'SkillController@destroy');
+        Route::apiResource('skill', 'SkillController')->except(['index', 'show']);
 
-        Route::post('service', 'ServiceController@store');
-        Route::put('service/{id}', 'ServiceController@update');
-        Route::delete('service/{id}', 'ServiceController@destroy');
+        Route::apiResource('service', 'ServiceController')->except(['index', 'show']);
 
-        Route::post('technology', 'TechnologyController@store');
-        Route::put('technology/{id}', 'TechnologyController@update');
-        Route::delete('technology/{id}', 'TechnologyController@destroy');
+        Route::apiResource('technology', 'TechnologyController')->except(['index', 'show']);
 
         Route::get('message', 'MessageController@index');
         Route::delete('message/{id}', 'MessageController@destroy');
 
-        Route::post('portfolio', 'PortfolioController@store');
-        Route::put('portfolio/{id}', 'PortfolioController@update');
-        Route::delete('portfolio/{id}', 'PortfolioController@destroy');
+        Route::apiResource('portfolio', 'PortfolioController')->except(['index', 'show']);
+        Route::get('portfolio-photo/{id}', 'PortfolioController@destroy_photo');
 
-        Route::post('experience', 'ExperienceController@store');
-        Route::put('experience/{id}', 'ExperienceController@update');
-        Route::delete('experience/{id}', 'ExperienceController@destroy');
+        Route::apiResource('experience', 'ExperienceController')->except(['index', 'show']);
 
-        Route::post('education', 'EducationController@store');
-        Route::put('education/{id}', 'EducationController@update');
-        Route::delete('education/{id}', 'EducationController@destroy');
+        Route::apiResource('education', 'EducationController')->except(['index', 'show']);
 
-        Route::post('blog', 'BlogController@store');
-        Route::put('blog/{id}', 'BlogController@update');
-        Route::delete('blog/{id}', 'BlogController@destroy');
+        Route::apiResource('blog', 'BlogController')->except(['index', 'show']);
 
-        Route::get('gallery', 'GalleryController@index');
-        Route::post('gallery', 'GalleryController@store');
-        Route::delete('gallery/{id}', 'GalleryController@destroy');
+        Route::apiResource('gallery', 'GalleryController')->except(['update', 'show']);
+
+        Route::apiResource('certification', 'CertificationController')->except(['index', 'show']);
     });
 
     Route::get('profile', 'ProfileController@index');
@@ -68,7 +56,6 @@ Route::group(['namespace' => 'Api\v1', 'prefix' => 'v1'], function () {
     Route::get('skill', 'SkillController@index');
 
     Route::get('service', 'ServiceController@index');
-
 
     Route::get('technology', 'TechnologyController@index');
 
@@ -81,7 +68,7 @@ Route::group(['namespace' => 'Api\v1', 'prefix' => 'v1'], function () {
     Route::get('education', 'EducationController@index');
 
     Route::get('blog', 'BlogController@index');
-    Route::get('blog/{id}', 'BlogController@show');
+    Route::get('blog/{id}/{slug}', 'BlogController@show');
 
     Route::get('simextrack/v1', function (Request $request) {
         $check_ip = Simextrack::where('ip', $request->ip())->first();
@@ -98,4 +85,6 @@ Route::group(['namespace' => 'Api\v1', 'prefix' => 'v1'], function () {
     Route::any('{path}', function () {
         return Helpers::apiResponse(false, 'Not Found', [], 404);
     })->where('path', '.*');
+    Route::get('certification', 'CertificationController@index');
 });
+Route::any('{path}', 'BaseController@not_found')->where('path', '.*');

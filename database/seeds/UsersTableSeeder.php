@@ -23,7 +23,8 @@ class UsersTableSeeder extends Seeder
         ]);
 
         Profile::create([
-            'user_id' => $user->id
+            'user_id' => $user->id,
+            'avatar' => ''
         ]);
     }
 }

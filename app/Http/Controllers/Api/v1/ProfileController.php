@@ -5,49 +5,59 @@ namespace App\Http\Controllers\Api\v1;
 use App\Http\Controllers\Controller;
 use App\Traits\Helpers;
 use App\User;
-use Carbon\Carbon;
-use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class ProfileController extends Controller
 {
     public function index()
     {
-        $user = User::with('profile')->first();
-        $user->makeHidden(['created_at', 'updated_at']);
-        $user->profile->makeHidden(['created_at', 'updated_at', 'id', 'user_id']);
-        $newAvatar = asset('images/avatar/' . $user->profile->avatar);
-        $user->profile->avatar = $newAvatar;
-        $newCv = asset('images/cv/' . $user->profile->cv);
-        $user->profile->cv = $newCv;
+        if (Cache::has('profile')) {
+            $user = Cache::get('profile');
+        } else {
+            $user = User::with('profile')->first();
+            $user->makeHidden(['created_at', 'updated_at']);
+            $user->profile->makeHidden(['created_at', 'updated_at', 'id', 'user_id']);
+            $newAvatar = Storage::url($user->profile->avatar);
+            $user->profile->avatar = $newAvatar;
+            $newCv = Storage::url($user->profile->cv);
+            $user->profile->cv = $newCv;
+            $user->profile->freelance = (int)$user->profile->freelance;
+            Cache::put('profile', $user, now()->addDay());
+        }
         return Helpers::apiResponse(true, '', $user);
     }
 
     public function update(Request $request)
     {
-        $user = User::with('profile')->first();
+        $auth = auth()->user();
+        if (!$auth) {
+            return Helpers::apiResponse(false, 'Unauthenticated', [], 401);
+        }
+        $user = User::with('profile')->find($auth->id);
         $this->validate($request, [
-            'username' => 'required|max:255|unique:users,username,' . $user->id,
-            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
-            'name' => 'required|max:255',
-            'avatar' => 'max:2048|image',
-            'about' => 'required',
+            'username' => 'required|string|max:255|unique:users,username,' . $user->id,
+            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'name' => 'required|string|max:255',
+            'avatar' => 'sometimes|nullable|max:2048|image',
+            'about' => 'required|string',
             'age' => 'required|numeric',
             'phone' => 'required|numeric',
-            'address' => 'required',
-            'nationality' => 'required',
-            'languages' => 'required',
-            'freelance' => 'required',
-            'instagram' => 'required|url',
-            'facebook' => 'required|url',
-            'twitter' => 'required|url',
-            'youtube' => 'required|url',
-            'github' => 'required|url',
-            'linkedin' => 'required|url',
+            'address' => 'required|string',
+            'nationality' => 'required|string|max:255',
+            'languages' => 'required|array',
+            'freelance' => 'required|boolean',
+            'instagram' => 'required|url|string|max:255',
+            'facebook' => 'required|url|string|max:255',
+            'twitter' => 'required|url|string|max:255',
+            'youtube' => 'required|url|string|max:255',
+            'github' => 'required|url|string|max:255',
+            'linkedin' => 'required|url|string|max:255',
+            'medium' => 'required|url|string|max:255',
             'cv' => 'mimes:pdf|file|max:2048'
         ]);
         DB::beginTransaction();
@@ -58,24 +68,27 @@ class ProfileController extends Controller
 
             if ($request->hasFile('avatar')) {
                 $avatar = $request->avatar;
-                $avatar_full = $avatar->getClientOriginalName();
-                $filename = Str::slug(pathinfo($avatar_full, PATHINFO_FILENAME));
-                $extension = pathinfo($avatar_full, PATHINFO_EXTENSION);
-                $nama_avatar = time() . '_' . $filename . '.' . $extension;
+                $nama_avatar = time() . '_' . md5(uniqid()) . '.jpg';
+
+                $jpg = Helpers::compressImageCloudinary($avatar);
 
                 Storage::deleteDirectory('avatar');
-                Storage::putFileAs('avatar', $avatar, $nama_avatar);
+
+                $aws_avatar = 'avatar/' . $nama_avatar;
+                Storage::put($aws_avatar, $jpg);
+
                 $user->profile->update([
-                    'avatar' => $nama_avatar,
+                    'avatar' => $aws_avatar,
                 ]);
             }
             if ($request->hasFile('cv')) {
                 $cv = $request->cv;
-                $cvName = 'cv.pdf';
+                $cvName = time() . '_' . 'cv.pdf';
 
-                Storage::putFileAs('cv', $cv, $cvName);
+                Storage::deleteDirectory('cv');
+                $aws_cv = Storage::putFileAs('cv', $cv, $cvName);
                 $user->profile->update([
-                    'cv' => $cvName,
+                    'cv' => $aws_cv,
                 ]);
             }
             $user->update([
@@ -97,33 +110,29 @@ class ProfileController extends Controller
                 'youtube' => $request->youtube,
                 'github' => $request->github,
                 'linkedin' => $request->linkedin,
+                'medium' => $request->medium,
             ]);
             DB::commit();
 
-            $secret = config('jwt.secret');
-            $payload = [
-                'iss' => 'granitebps.com',
-                'sub' => $user->email,
-                'iat' => Carbon::now()->timestamp,
-                'exp' => Carbon::now()->addHours(24)->timestamp,
-            ];
-            $jwt = JWT::encode($payload, $secret);
-            $user->token = base64_encode($jwt);
-            $user->save();
+            Cache::forget('profile');
 
-            $newAvatar = asset('images/avatar/' . $user->profile->avatar);
-            return Helpers::apiResponse(true, 'Profile Updated', ['token' => $jwt, 'name' => $user->name, 'avatar' => $newAvatar]);
+            return Helpers::apiResponse(true, 'Profile Updated', [
+                'token' => Auth::refresh(),
+                'name' => $user->name,
+                'avatar' => Storage::url($user->profile->avatar),
+                'expires_in' => auth()->factory()->getTTL() * 60
+            ]);
         } catch (\Exception $e) {
             DB::rollback();
-            return Helpers::apiResponse(false, 'Something Wrong!', $e->getMessage(), 500);
+            throw $e;
         }
     }
 
     public function password(Request $request)
     {
         $this->validate($request, [
-            'password' => 'required|confirmed|min:8|string',
-            'old_password' => 'required|min:8|string'
+            'password' => 'required|confirmed|string|min:8|max:255',
+            'old_password' => 'required|string|min:8|max:255'
         ]);
         $user = User::first();
         if (!Hash::check($request->old_password, $user->password)) {
@@ -139,7 +148,7 @@ class ProfileController extends Controller
                 return Helpers::apiResponse(true, 'Password Changed');
             } catch (\Exception $e) {
                 DB::rollback();
-                return Helpers::apiResponse(false, 'Something Wrong!', $e->getMessage(), 500);
+                throw $e;
             }
         }
     }

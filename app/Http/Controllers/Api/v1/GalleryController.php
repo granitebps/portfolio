@@ -4,11 +4,10 @@ namespace App\Http\Controllers\Api\v1;
 
 use App\Gallery;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\GalleryRequest;
 use App\Traits\Helpers;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class GalleryController extends Controller
 {
@@ -18,42 +17,37 @@ class GalleryController extends Controller
         $tech->makeHidden(['updated_at']);
         $tech->transform(function ($item) {
             $item->name = $item->image;
-            $newFoto = asset('images/galeries/' . $item->image);
+            $newFoto = Storage::url($item->image);
             $item->image = $newFoto;
             return $item;
         });
         return Helpers::apiResponse(true, '', $tech);
     }
 
-    public function store(Request $request)
+    public function store(GalleryRequest $request)
     {
-        $this->validate($request, [
-            'image' => 'required',
-            'image.*' => 'max:2048|image'
-        ]);
-
         DB::beginTransaction();
         try {
             $images = $request->image;
-            foreach ($images as $key => $image) {
-                $pic_full = $image->getClientOriginalName();
-                $filename = Str::slug(pathinfo($pic_full, PATHINFO_FILENAME));
-                $extension = pathinfo($pic_full, PATHINFO_EXTENSION);
-                $nama_pic = time() . '_' . $filename . '.' . $extension;
+            foreach ($images as $image) {
+                $nama_pic = time() . '_' . md5(uniqid()) . '.jpg';
 
-                $image->storeAs('galeries', $nama_pic, 'hosting');
+                $jpg = Helpers::compressImageCloudinary($image);
+
+                // Save File
+                $awsPath = 'galeries/' . $nama_pic;
+                Storage::put($awsPath, $jpg);
 
                 Gallery::create([
-                    'image' => $nama_pic,
+                    'image' => $awsPath,
                 ]);
             }
 
             DB::commit();
             return Helpers::apiResponse(true, 'Images Uploaded');
         } catch (\Exception $e) {
-            throw $e;
             DB::rollback();
-            return Helpers::apiResponse(false, 'Something Wrong!', $e->getMessage(), 500);
+            throw $e;
         }
     }
 
@@ -66,7 +60,7 @@ class GalleryController extends Controller
                 return Helpers::apiResponse(false, 'Image Not Found', [], 404);
             }
 
-            File::delete(public_path() . '/images/galeries/' . $gallery->image);
+            Storage::delete($gallery->image);
 
             $gallery->delete();
 
@@ -74,7 +68,7 @@ class GalleryController extends Controller
             return Helpers::apiResponse(true, 'Image Deleted');
         } catch (\Exception $e) {
             DB::rollback();
-            return Helpers::apiResponse(false, 'Something Wrong!', $e->getMessage(), 500);
+            throw $e;
         }
     }
 }

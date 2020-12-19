@@ -3,79 +3,56 @@
 namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ServiceRequest;
 use App\Services;
 use App\Traits\Helpers;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class ServiceController extends Controller
 {
     public function index()
     {
-        $service = Services::all();
-        $service->makeHidden(['created_at', 'updated_at']);
+        if (Cache::has('services')) {
+            $service = Cache::get('services');
+        } else {
+            $service = Services::all();
+            $service->makeHidden(['created_at', 'updated_at']);
+            Cache::put('services', $service, now()->addDay());
+        }
         return Helpers::apiResponse(true, '', $service);
     }
 
-    public function store(Request $request)
+    public function store(ServiceRequest $request)
     {
-        $this->validate($request, [
-            'name' => 'required|max:255',
-            'icon' => 'required|max:255',
-            'desc' => 'required',
-        ]);
-
         DB::beginTransaction();
         try {
-            $service = Services::create([
-                'name' => $request->name,
-                'icon' => $request->icon,
-                'desc' => $request->desc,
-            ]);
+            $service = Services::create($request->all());
 
             DB::commit();
             return Helpers::apiResponse(true, 'Service Created', $service);
         } catch (\Exception $e) {
             DB::rollback();
-            return Helpers::apiResponse(false, 'Something Wrong!', $e->getMessage(), 500);
+            throw $e;
         }
     }
 
-    public function show($id)
+    public function update(ServiceRequest $request, $id)
     {
-        $service = Services::findOrFail($id);
-        if (!$service) {
-            return Helpers::apiResponse(false, 'Service Not Found', [], 404);
-        }
-        return Helpers::apiResponse(true, '', $service);
-    }
-
-    public function update(Request $request, $id)
-    {
-        $service = Services::find($id);
-        $this->validate($request, [
-            'name' => 'required|max:255',
-            'icon' => 'required|max:255',
-            'desc' => 'required',
-        ]);
-
         DB::beginTransaction();
         try {
+            $service = Services::find($id);
             if (!$service) {
                 return Helpers::apiResponse(false, 'Service Not Found', [], 404);
             }
 
-            $service->update([
-                'name' => $request->name,
-                'icon' => $request->icon,
-                'desc' => $request->desc,
-            ]);
+            $service->update($request->all());
 
             DB::commit();
             return Helpers::apiResponse(true, 'Service Updated', $service);
         } catch (\Exception $e) {
             DB::rollback();
-            return Helpers::apiResponse(false, 'Something Wrong!', $e->getMessage(), 500);
+            throw $e;
         }
     }
 
@@ -93,7 +70,7 @@ class ServiceController extends Controller
             return Helpers::apiResponse(true, 'Service Deleted');
         } catch (\Exception $e) {
             DB::rollback();
-            return Helpers::apiResponse(false, 'Something Wrong!', $e->getMessage(), 500);
+            throw $e;
         }
     }
 }

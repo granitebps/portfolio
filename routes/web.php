@@ -14,6 +14,6 @@ use Illuminate\Support\Facades\Auth;
 |
 */
 
-Route::get('/', function () {
-    return 'API';
-});
+Route::get('/', 'BaseController@index');
+Route::get('reset_password/{token}', 'Api\v1\AuthController@reset_password_form');
+Route::post('reset_password', 'Api\v1\AuthController@reset_password')->name('reset_password');

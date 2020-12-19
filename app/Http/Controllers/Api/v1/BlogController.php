@@ -4,87 +4,78 @@ namespace App\Http\Controllers\Api\v1;
 
 use App\Blog;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\BlogRequest;
 use App\Traits\Helpers;
-use App\User;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class BlogController extends Controller
 {
     public function index()
     {
-        $blog = Blog::with('user')->latest('created_at')->get();
-        $blog->makeHidden(['updated_at']);
-        $blog->transform(function ($item) {
-            $newFoto = asset('images/blog/' . $item->image);
-            $item->image = $newFoto;
-            $item->user->makeHidden('token');
-            return $item;
-        });
+        if (Cache::has('blogs')) {
+            $blog = Cache::get('blogs');
+        } else {
+            $blog = Blog::with('user')->latest('created_at')->get();
+            $blog->makeHidden(['updated_at']);
+            $blog->transform(function ($item) {
+                $newFoto = asset('images/blog/' . $item->image);
+                $newFoto = Storage::url($item->image);
+                $item->image = $newFoto;
+                $item->user->makeHidden('token');
+                return $item;
+            });
+            Cache::put('blogs', $blog, now()->addDay());
+        }
         return Helpers::apiResponse(true, '', $blog);
     }
 
-    public function store(Request $request)
+    public function store(BlogRequest $request)
     {
-        $this->validate($request, [
-            'title' => 'required|max:255',
-            'body' => 'required',
-            'image' => 'required|max:2048|image',
-        ]);
-
         DB::beginTransaction();
         try {
             $image = $request->image;
-            $image_full = $image->getClientOriginalName();
-            $filename = Str::slug(pathinfo($image_full, PATHINFO_FILENAME));
-            $extension = pathinfo($image_full, PATHINFO_EXTENSION);
-            $nama_image = time() . '_' . $filename . '.' . $extension;
+            $nama_image = time() . '_' . md5(uniqid()) . '.jpg';
 
-            // Image upload for shared hosting
-            $image->storeAs('blog', $nama_image, 'hosting');
+            $jpg = Helpers::compressImageCloudinary($image);
 
-            $user = User::where('email', $request->payload->sub)->first();
+            $aws_blog = 'blog/' . $nama_image;
+            Storage::put($aws_blog, $jpg);
 
-            // Storage::putFileAs('public/images/blog', $image, $imageName);
+            $user = auth()->user();
+
             $blog = Blog::create([
                 'user_id' => $user->id,
                 'title' => $request->title,
                 'slug' => Str::slug($request->title),
                 'body' => $request->body,
-                'image' => $nama_image,
+                'image' => $aws_blog,
             ]);
 
             DB::commit();
             return Helpers::apiResponse(true, 'Blog Created', $blog);
         } catch (\Exception $e) {
-            throw $e;
             DB::rollback();
-            return Helpers::apiResponse(false, 'Something Wrong!', $e->getMessage(), 500);
+            throw $e;
         }
     }
 
-    public function show($id)
+    public function show($id, $slug)
     {
-        $blog = Blog::find($id);
+        $blog = Blog::where('id', $id)->where('slug', $slug)->first();
         if (!$blog) {
             return Helpers::apiResponse(false, 'Blog Not Found', [], 404);
         }
-        $newFoto = asset('images/blog/' . $blog->image);
+        $newFoto = Storage::url($blog->image);
         $blog->image = $newFoto;
         $blog->user->makeHidden('token');
         return Helpers::apiResponse(true, '', $blog);
     }
 
-    public function update(Request $request, $id)
+    public function update(BlogRequest $request, $id)
     {
-        $this->validate($request, [
-            'title' => 'required|max:255',
-            'body' => 'required|',
-            'image' => 'nullable|max:2048|image',
-        ]);
-
         DB::beginTransaction();
         try {
             $blog = Blog::find($id);
@@ -94,32 +85,27 @@ class BlogController extends Controller
             if ($request->hasFile('image')) {
                 $old_foto = $blog->image;
                 $image = $request->image;
-                $image_full = $image->getClientOriginalName();
-                $filename = Str::slug(pathinfo($image_full, PATHINFO_FILENAME));
-                $extension = pathinfo($image_full, PATHINFO_EXTENSION);
-                $nama_image = time() . '_' . $filename . '.' . $extension;
+                $nama_image = time() . '_' . md5(uniqid()) . '.jpg';
 
-                // Image upload for shared hosting
-                $image->storeAs('blog', $nama_image, 'hosting');
-                File::delete(public_path() . '/images/blog/' . $old_foto);
+                $jpg = Helpers::compressImageCloudinary($image);
 
-                // Storage::delete('public/images/blog/' . $blog->image);
-                // Storage::putFileAs('public/images/blog', $image, $imageName);
-                $blog->update([
-                    'image' => $nama_image,
-                ]);
+                $aws_blog = 'blog/' . $nama_image;
+                Storage::put($aws_blog, $jpg);
+
+                Storage::delete($old_foto);
+
+                $blog->image = $aws_blog;
             }
-            $blog->update([
-                'title' => $request->title,
-                'slug' => Str::slug($request->title),
-                'body' => $request->body,
-            ]);
+            $blog->title = $request->title;
+            $blog->slug = Str::slug($request->title);
+            $blog->body = $request->body;
+            $blog->save();
 
             DB::commit();
             return Helpers::apiResponse(true, 'Blog Updated', $blog);
         } catch (\Exception $e) {
             DB::rollback();
-            return Helpers::apiResponse(false, 'Something Wrong!', $e->getMessage(), 500);
+            throw $e;
         }
     }
 
@@ -131,17 +117,16 @@ class BlogController extends Controller
             if (!$blog) {
                 return Helpers::apiResponse(false, 'Blog Not Found', [], 404);
             }
-            // Hosting
-            File::delete(public_path() . '/images/blog/' . $blog->image);
 
-            // Storage::delete('public/images/blog/' . $blog->image);
+            Storage::delete($blog->image);
+
             $blog->delete();
 
             DB::commit();
             return Helpers::apiResponse(true, 'Blog Deleted');
         } catch (\Exception $e) {
             DB::rollback();
-            return Helpers::apiResponse(false, 'Something Wrong!', $e->getMessage(), 500);
+            throw $e;
         }
     }
 }

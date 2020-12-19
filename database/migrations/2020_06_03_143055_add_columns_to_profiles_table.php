@@ -14,9 +14,9 @@ class AddColumnsToProfilesTable extends Migration
     public function up()
     {
         Schema::table('profiles', function (Blueprint $table) {
-            $table->integer('age');
-            $table->string('nationality');
-            $table->text('languages');
+            $table->integer('age')->nullable();
+            $table->string('nationality')->nullable();
+            $table->text('languages')->nullable();
             $table->boolean('freelance')->default(false);
         });
     }

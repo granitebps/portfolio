@@ -3,71 +3,171 @@
 namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\LoginRequest;
+use App\Notifications\ResetPasswordNotification;
+use App\ResetPassword;
 use App\Traits\Helpers;
 use App\User;
 use Carbon\Carbon;
-use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
+use Tymon\JWTAuth\JWTAuth;
 
 class AuthController extends Controller
 {
-    public function get_token()
+    protected $jwt;
+
+    public function __construct(JWTAuth $jwt)
     {
-        $secret = config('jwt.secret');
-        $payload = [
-            'sub' => 'admin',
-            'iat' => Carbon::now()->timestamp,
-            'exp' => Carbon::now()->addHours(24)->timestamp,
-        ];
-        $jwt = JWT::encode($payload, $secret);
-        return Helpers::apiResponse(true, '', $jwt);
+        $this->jwt = $jwt;
     }
 
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
-        $this->validate($request, [
-            'username' => 'required|string',
-            'password' => 'required|string|min:8'
-        ]);
+        $credentials = $request->only(['username', 'password']);
+        if ($request->remember_me === true) {
+            $this->jwt->factory()->setTTL(518400);
+        }
+        $token = $this->jwt->attempt($credentials, $request->remember_me);
 
-        $user = User::where('username', $request->username)->first();
-        if (!$user) {
+        if (!$token) {
             return Helpers::apiResponse(false, 'Username or Password Is Wrong', [], 401);
         }
 
-        if (!Hash::check($request->password, $user->password)) {
-            return Helpers::apiResponse(false, 'Username or Password Is Wrong', [], 401);
-        }
-
-        $secret = config('jwt.secret');
-        $payload = [
-            'iss' => 'granitebps.com',
-            'sub' => $user->email,
-            'iat' => Carbon::now()->timestamp,
-            'exp' => Carbon::now()->addHours(24)->timestamp,
-        ];
-        $jwt = JWT::encode($payload, $secret);
-        $data['token'] = $jwt;
-        $newAvatar = asset('images/avatar/' . $user->profile->avatar);
+        $user = Auth::user();
+        $data['token'] = $token;
+        $newAvatar = Storage::url($user->profile->avatar);
         $data['name'] = $user->name;
         $data['avatar'] = $newAvatar;
-
-        $user->token = base64_encode($jwt);
-        $user->save();
+        $data['expires_in'] = auth()->factory()->getTTL() * 60;
 
         return Helpers::apiResponse(true, '', $data);
     }
 
-    public function me(Request $request)
+    public function me()
     {
-        $email = $request->payload->sub;
-        $user = User::with('profile')->where('email', $email)->first();
+        $user = Auth::user();
         if (!$user) {
-            return Helpers::apiResponse(false, 'Email or Password Is Wrong', [], 401);
+            return Helpers::apiResponse(false, 'Unauthorized', [], 401);
         }
-        $newAvatar = asset('images/avatar/' . $user->profile->avatar);
+        $newAvatar = Storage::url($user->profile->avatar);
         $user->profile->avatar = $newAvatar;
         return Helpers::apiResponse(true, '', $user);
+    }
+
+    public function logout()
+    {
+        $user = Auth::user();
+        if (!$user) {
+            return Helpers::apiResponse(false, 'Unauthorized', [], 401);
+        }
+        Auth::logout();
+        return Helpers::apiResponse(true, 'User Logged Out');
+    }
+
+    public function request_reset_password(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|string|email|max:255|exists:users,email'
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $user = User::where('email', $request->email)->first();
+            if (!$user) {
+                return Helpers::apiResponse(false, 'User Not Found', [], 400);
+            }
+
+            $token = bin2hex(random_bytes(50));
+            ResetPassword::create([
+                'user_id' => $user->id,
+                'token' => $token,
+                'is_valid' => true,
+                'expired_at' => now()->addHour()
+            ]);
+
+            $user->notify(new ResetPasswordNotification($user, $token));
+
+            DB::commit();
+
+            return Helpers::apiResponse(true, 'Send Reset Password Request Email');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+    }
+
+    public function reset_password_form($token)
+    {
+        $is_valid = false;
+
+        $reset = ResetPassword::where('token', $token)->first();
+        if ($reset) {
+            if ($reset->is_valid === true) {
+                if (!Carbon::now()->gt($reset->expired_at)) {
+                    $is_valid = true;
+                }
+            }
+        }
+
+        return view('reset_password')->with([
+            'is_valid' => $is_valid,
+            'token' => $token,
+            'reset' => $reset
+        ]);
+    }
+
+    public function reset_password(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'token' => 'required',
+            'password' => 'required|confirmed|string|min:8|max:255',
+        ]);
+        if($validator->fails()) {
+            return back()->withErrors($validator);
+        }
+
+        $reset = ResetPassword::where('token', $request->token)->first();
+        if (!$reset) {
+            return back()->withErrors(['error' => 'Token Invalid!']);
+        }
+
+        $user = User::where('id', $reset->user_id)->first();
+        if (!$user) {
+            return back()->withErrors(['error' => 'Token Invalid!']);
+        }
+
+        if (!$reset->is_valid) {
+            return view('reset_password')->with([
+                'is_valid' => false,
+            ]);
+        }
+        if (Carbon::now()->gt($reset->expired_at)) {
+            return view('reset_password')->with([
+                'is_valid' => false,
+            ]);
+        }
+
+        DB::beginTransaction();
+        try {
+            $user->update([
+                'password' => Hash::make($request->password)
+            ]);
+            $reset->update([
+                'is_valid' => false
+            ]);
+
+            DB::commit();
+            return view('reset_password')->with([
+                'success' => true,
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->withErrors(['error' => 'Something Wrong!']);
+        }
     }
 }

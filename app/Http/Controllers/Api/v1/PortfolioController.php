@@ -3,11 +3,12 @@
 namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\PortfolioRequest;
 use App\Portfolio;
+use App\PortfolioPic;
 use App\Traits\Helpers;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -15,74 +16,67 @@ class PortfolioController extends Controller
 {
     public function index()
     {
-        $portfolio = Portfolio::with('pic')->orderBy('created_at', 'desc')->get();
-        $portfolio->transform(function ($item) {
-            $folderName = Str::slug($item->name, '-');
-            $newThumb = asset('images/portfolio/' . $folderName . '/' . $item->thumbnail);
-            $item->thumbnail = $newThumb;
+        if (Cache::has('portfolio')) {
+            $portfolio = Cache::get('portfolio');
+        } else {
+            $portfolio = Portfolio::with('pic')->orderBy('created_at', 'desc')->get();
+            $portfolio->transform(function ($item) {
+                $newThumb = Storage::url($item->thumbnail);
+                $item->thumbnail = $newThumb;
 
-            $item->pic->transform(function ($pic) use ($folderName) {
-                $newPic = asset('images/portfolio/' . $folderName . '/' . $pic->pic);
-                return $newPic;
+                $item->type = (int)$item->type;
+
+                if (is_null($item->url)) {
+                    $item->url = '';
+                }
+
+                $item->pic->transform(function ($pic) {
+                    $newPic = Storage::url($pic->pic);
+                    $pic->pic = $newPic;
+                    $pic->makeHidden(['portfolio_id', 'created_at', 'updated_at']);
+                    return $pic;
+                });
+
+                return $item;
             });
-
-            return $item;
-        });
+            Cache::put('portfolio', $portfolio, now()->addDay());
+        }
         return Helpers::apiResponse(true, '', $portfolio);
     }
 
-    public function store(Request $request)
+    public function store(PortfolioRequest $request)
     {
-        $this->validate($request, [
-            'name' => 'required|string|max:255',
-            'desc' => 'required|string',
-            'type' => 'required',
-            'thumbnail' => 'required|image|max:2048',
-            'pic' => 'required',
-            'pic.*' => 'image|max:2048',
-        ]);
-        if ($request->filled('url')) {
-            $this->validate($request, [
-                'url' => 'url',
-            ]);
-        }
-
         DB::beginTransaction();
         try {
             $folderName = Str::slug($request->name, '-');
 
             $thumbnail = $request->thumbnail;
-            $thumbnail_full = $thumbnail->getClientOriginalName();
-            $filename = Str::slug(pathinfo($thumbnail_full, PATHINFO_FILENAME));
-            $extension = pathinfo($thumbnail_full, PATHINFO_EXTENSION);
-            $nama_thumbnail = time() . '_thumbnail-' . $filename . '.' . $extension;
+            $nama_thumbnail = time() . '_thumbnail-' . md5(uniqid()) . '.jpg';
 
-            // Storage::putFileAs('public/images/portfolio/' . $folderName, $thumbnail, $thumbnailName);
+            $jpg = Helpers::compressImageCloudinary($thumbnail);
 
-            // Hosting
-            $thumbnail->storeAs('portfolio/' . $folderName, $nama_thumbnail, 'hosting');
+            $aws_thumbnail = 'portfolio/' . $folderName . '/' . $nama_thumbnail;
+            Storage::put($aws_thumbnail, $jpg);
 
             $portfolio = Portfolio::create([
                 'name' => $request->name,
                 'desc' => $request->desc,
                 'type' => $request->type,
                 'url' => $request->url,
-                'thumbnail' => $nama_thumbnail
+                'thumbnail' => $aws_thumbnail
             ]);
 
             $pic = $request->pic;
             foreach ($pic as $image) {
-                $image_full = $image->getClientOriginalName();
-                $filename = Str::slug(pathinfo($image_full, PATHINFO_FILENAME));
-                $extension = pathinfo($image_full, PATHINFO_EXTENSION);
-                $nama_image = time() . '_' . $filename . '.' . $extension;
+                $nama_image = time() . '_' . md5(uniqid()) . '.jpg';
 
-                // Hosting
-                $image->storeAs('portfolio/' . $folderName, $nama_image, 'hosting');
+                $jpg = Helpers::compressImageCloudinary($image);
 
-                // Storage::putFileAs('public/images/portfolio/' . $folderName, $image, $imageName);
+                $aws_pic = 'portfolio/' . $folderName . '/' . $nama_image;
+                Storage::put($aws_pic, $jpg);
+
                 $portfolio->pic()->create([
-                    'pic' => $nama_image
+                    'pic' => $aws_pic
                 ]);
             }
 
@@ -90,23 +84,12 @@ class PortfolioController extends Controller
             return Helpers::apiResponse(true, 'Portfolio Created', $portfolio);
         } catch (\Exception $e) {
             DB::rollback();
-            return Helpers::apiResponse(false, 'Something Wrong!', $e->getMessage(), 500);
+            throw $e;
         }
     }
 
-    public function update(Request $request, $id)
+    public function update(PortfolioRequest $request, $id)
     {
-        $this->validate($request, [
-            'name' => 'required|string|max:255',
-            'desc' => 'required|string',
-            'type' => 'required',
-        ]);
-        if (!empty($request->url)) {
-            $this->validate($request, [
-                'url' => 'url',
-            ]);
-        }
-
         DB::beginTransaction();
         try {
             $portfolio = Portfolio::find($id);
@@ -116,89 +99,57 @@ class PortfolioController extends Controller
 
             $oldFolderName = Str::slug($portfolio->name, '-');
             $folderName = Str::slug($request->name, '-');
-            if ($request->name != $portfolio->name) {
-                // Storage::move('public/images/portfolio/' . $oldFolderName, 'public/images/portfolio/' . $folderName);
-                // Storage::deleteDirectory('public/images/portfolio/' . $oldFolderName);
+            if ($request->name !== $portfolio->name) {
+                $oldImages = Storage::allFiles('portfolio/' . $oldFolderName);
+                foreach ($oldImages as $oldImage) {
+                    $newLoc = str_replace('portfolio/' . $oldFolderName, 'portfolio/' . $folderName, $oldImage);
+                    Storage::copy($oldImage, $newLoc);
+                }
 
-                // Hosting
-                Storage::disk('hosting')->move('portfolio/' . $oldFolderName, 'portfolio/' . $folderName);
-                Storage::disk('hosting')->deleteDirectory('portfolio/' . $oldFolderName);
+                $newThumb = str_replace('portfolio/' . $oldFolderName, 'portfolio/' . $folderName, $portfolio->thumbnail);
+                $portfolio->thumbnail = $newThumb;
+
+                foreach ($portfolio->pic as $value) {
+                    $newPic = str_replace('portfolio/' . $oldFolderName, 'portfolio/' . $folderName, $value->pic);
+                    $value->pic = $newPic;
+                    $value->save();
+                }
+
+                Storage::deleteDirectory('portfolio/' . $oldFolderName);
             }
 
             if ($request->hasFile('thumbnail')) {
-                $this->validate($request, [
-                    'thumbnail' => 'image|max:2048',
-                ]);
                 $thumbnail = $request->thumbnail;
-                $thumbnail_full = $thumbnail->getClientOriginalName();
-                $filename = Str::slug(pathinfo($thumbnail_full, PATHINFO_FILENAME));
-                $extension = pathinfo($thumbnail_full, PATHINFO_EXTENSION);
-                $nama_thumbnail = time() . '_thumbnail-' . $filename . '.' . $extension;
-                // if (File::exists(public_path() . '/storage/images/portfolio/' . $oldFolderName)) {
+                $nama_thumbnail = time() . '_thumbnail-' . md5(uniqid()) . '.jpg';
 
-                // Hosting
-                if (File::exists(public_path() . '/images/portfolio/' . $oldFolderName)) {
-                    Storage::disk('hosting')->delete('portfolio/' . $oldFolderName . '/' . $portfolio->thumbnail);
+                $jpg = Helpers::compressImageCloudinary($thumbnail);
 
-                    // Storage::delete('public/images/portfolio/' . $oldFolderName . '/' . $portfolio->thumbnail);
-                } else {
+                $oldThubmnail = str_replace('portfolio/' . $oldFolderName, 'portfolio/' . $folderName, $portfolio->thumbnail);
+                Storage::delete($oldThubmnail);
 
-                    // Hosting
-                    Storage::disk('hosting')->delete('portfolio/' . $folderName . '/' . $portfolio->thumbnail);
+                $aws_thumbnail = 'portfolio/' . $folderName . '/' . $nama_thumbnail;
+                Storage::put($aws_thumbnail, $jpg);
 
-                    // Storage::delete('public/images/portfolio/' . $folderName . '/' . $portfolio->thumbnail);
-                }
-
-                // Hosting
-                $thumbnail->storeAs('portfolio/' . $folderName, $nama_thumbnail, 'hosting');
-
-                // Storage::putFileAs('public/images/portfolio/' . $folderName, $thumbnail, $nama_thumbnail);
-                $portfolio->update([
-                    'thumbnail' => $nama_thumbnail
-                ]);
+                $portfolio->thumbnail = $aws_thumbnail;
             }
-
-            $portfolio->update([
-                'name' => $request->name,
-                'desc' => $request->desc,
-                'type' => $request->type,
-                'url' => $request->url,
-            ]);
+            $portfolio->name = $request->name;
+            $portfolio->desc = $request->desc;
+            $portfolio->type = $request->type;
+            $portfolio->url = $request->url;
+            $portfolio->save();
 
             if ($request->hasFile('pic')) {
-                $this->validate($request, [
-                    'pic' => 'required',
-                    'pic.*' => 'image|max:2048',
-                ]);
                 $pic = $request->pic;
-                foreach ($portfolio->pic as $value) {
-                    // if (File::exists(public_path() . '/storage/images/portfolio/' . $oldFolderName)) {
-
-                    // // Hosting
-                    if (File::exists(public_path() . '/images/portfolio/' . $oldFolderName)) {
-                        Storage::disk('hosting')->delete('portfolio/' . $oldFolderName . '/' . $value->pic);
-
-                        // Storage::delete('public/images/portfolio/' . $oldFolderName . '/' . $value->pic);
-                    } else {
-                        // Storage::delete('public/images/portfolio/' . $folderName . '/' . $value->pic);
-
-                        // Hosting
-                        Storage::disk('hosting')->delete('portfolio/' . $folderName . '/' . $value->pic);
-                    }
-                    $value->delete();
-                }
                 foreach ($pic as $image) {
-                    $image_full = $image->getClientOriginalName();
-                    $filename = Str::slug(pathinfo($image_full, PATHINFO_FILENAME));
-                    $extension = pathinfo($image_full, PATHINFO_EXTENSION);
-                    $nama_image = time() . '_' . $filename . '.' . $extension;
-                    // Storage::putFileAs('public/images/portfolio/' . $folderName, $image, $imageName);
+                    $nama_image = time() . '_' . md5(uniqid()) . '.jpg';
 
-                    // Hosting
-                    $image->storeAs('portfolio/' . $folderName, $nama_image, 'hosting');
+                    $jpg = Helpers::compressImageCloudinary($image);
+
+                    $aws_pic = 'portfolio/' . $folderName . '/' . $nama_image;
+                    Storage::put($aws_pic, $jpg);
 
                     $portfolio->pic()->create([
-                        'pic' => $nama_image
+                        'pic' => $aws_pic
                     ]);
                 }
             }
@@ -207,7 +158,7 @@ class PortfolioController extends Controller
             return Helpers::apiResponse(true, 'Portfolio Updated');
         } catch (\Exception $e) {
             DB::rollback();
-            return Helpers::apiResponse(false, 'Something Wrong!', $e->getMessage(), 500);
+            throw $e;
         }
     }
 
@@ -220,11 +171,9 @@ class PortfolioController extends Controller
                 return Helpers::apiResponse(false, 'Portfolio Not Found', [], 404);
             }
 
-            $folderName = Str::slug($portfolio->name, '-');
-            // Storage::deleteDirectory('public/images/portfolio/' . $folderName);
+            // $folderName = Str::slug($portfolio->name, '-');
 
-            // Hosting
-            Storage::disk('hosting')->deleteDirectory('portfolio/' . $folderName);
+            // Storage::deleteDirectory('portfolio/' . $folderName);
 
             $portfolio->pic()->delete();
             $portfolio->delete();
@@ -233,7 +182,30 @@ class PortfolioController extends Controller
             return Helpers::apiResponse(true, 'Portfolio Deleted');
         } catch (\Exception $e) {
             DB::rollback();
-            return Helpers::apiResponse(false, 'Something Wrong!', $e->getMessage(), 500);
+            throw $e;
+        }
+    }
+
+    public function destroy_photo($id)
+    {
+        DB::beginTransaction();
+        try {
+            $portfolio = PortfolioPic::find($id);
+            if (!$portfolio) {
+                return Helpers::apiResponse(false, 'Portfolio Picture Not Found', [], 404);
+            }
+
+            Storage::delete($portfolio->pic);
+
+            $portfolio->delete();
+
+            Cache::forget('portfolio');
+
+            DB::commit();
+            return Helpers::apiResponse(true, 'Portfolio Picture Deleted');
+        } catch (\Exception $e) {
+            DB::rollback();
+            throw $e;
         }
     }
 }
