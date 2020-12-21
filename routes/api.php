@@ -68,5 +68,15 @@ Route::group(['namespace' => 'Api\v1', 'prefix' => 'v1'], function () {
     Route::get('blog/{id}/{slug}', 'BlogController@show');
 
     Route::get('certification', 'CertificationController@index');
+
+    // SIMEXTRACK ROUTE
+    Route::group(['namespace' => 'Simextrack', 'prefix' => 'simextrack'], function () {
+        Route::post('register', 'AuthController@register');
+        Route::post('login', 'AuthController@login');
+
+        Route::group(['middleware' => ['simextrack']], function () {
+            Route::get('me', 'AuthController@me');
+        });
+    });
 });
 Route::any('{path}', 'BaseController@not_found')->where('path', '.*');
