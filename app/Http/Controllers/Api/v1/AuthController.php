@@ -4,10 +4,10 @@ namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
+use App\Models\ResetPassword;
+use App\Models\User;
 use App\Notifications\ResetPasswordNotification;
-use App\ResetPassword;
 use App\Traits\Helpers;
-use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -127,7 +127,7 @@ class AuthController extends Controller
             'token' => 'required',
             'password' => 'required|confirmed|string|min:8|max:255',
         ]);
-        if($validator->fails()) {
+        if ($validator->fails()) {
             return back()->withErrors($validator);
         }
 

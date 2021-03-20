@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Api\v1;
 
-use App\Certification;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CertificationRequest;
+use App\Models\Certification;
 use App\Traits\Helpers;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;

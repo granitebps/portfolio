@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Experience;
+use App\Models\Experience;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Foundation\Testing\RefreshDatabase;

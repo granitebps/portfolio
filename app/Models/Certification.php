@@ -1,16 +1,16 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Cache;
 
-class Blog extends Model
+class Certification extends Model
 {
     use SoftDeletes;
 
-    protected $table = 'blogs';
+    protected $table = 'certifications';
     protected $guarded = ['created_at', 'updated_at'];
 
     /**
@@ -20,16 +20,11 @@ class Blog extends Model
      */
     protected static function booted()
     {
-        static::saved(function ($blog) {
-            Cache::forget('blogs');
+        static::saved(function ($certification) {
+            Cache::forget('certifications');
         });
-        static::deleted(function ($blog) {
-            Cache::forget('blogs');
+        static::deleted(function ($certification) {
+            Cache::forget('certifications');
         });
-    }
-
-    public function user()
-    {
-        return $this->belongsTo('App\User', 'user_id', 'id');
     }
 }

@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Api\v1;
 
-use App\Gallery;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\GalleryRequest;
+use App\Models\Gallery;
 use App\Traits\Helpers;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;

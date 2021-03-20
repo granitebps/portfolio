@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Api\v1;
 
-use App\Experience;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ExperienceRequest;
+use App\Models\Experience;
 use App\Traits\Helpers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;

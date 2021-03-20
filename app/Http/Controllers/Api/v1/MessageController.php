@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\MessageRequest;
-use App\Message;
+use App\Models\Message;
 use App\Traits\Helpers;
 use Illuminate\Support\Facades\DB;
 

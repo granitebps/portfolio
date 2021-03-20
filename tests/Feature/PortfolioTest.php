@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Portfolio;
-use App\PortfolioPic;
+use App\Models\Portfolio;
+use App\Models\PortfolioPic;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;

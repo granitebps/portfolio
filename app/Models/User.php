@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Notifications\Notifiable;
@@ -60,6 +60,6 @@ class User extends Authenticatable implements JWTSubject
 
     public function profile()
     {
-        return $this->hasOne('App\Profile', 'user_id', 'id');
+        return $this->hasOne(Profile::class, 'user_id', 'id');
     }
 }

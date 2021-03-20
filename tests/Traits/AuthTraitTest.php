@@ -2,8 +2,8 @@
 
 namespace Tests\Traits;
 
-use App\Profile;
-use App\User;
+use App\Models\User;
+use App\Models\Profile;
 use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Facades\JWTAuth;
 

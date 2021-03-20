@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Blog;
-use App\User;
+use App\Models\Blog;
+use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;

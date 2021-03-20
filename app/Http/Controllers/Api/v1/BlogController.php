@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Api\v1;
 
-use App\Blog;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\BlogRequest;
+use App\Models\Blog;
 use App\Traits\Helpers;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;

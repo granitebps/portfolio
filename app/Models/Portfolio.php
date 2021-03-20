@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -25,6 +25,6 @@ class Portfolio extends Model
 
     public function pic()
     {
-        return $this->hasMany('App\PortfolioPic', 'portfolio_id', 'id');
+        return $this->hasMany(PortfolioPic::class, 'portfolio_id', 'id');
     }
 }

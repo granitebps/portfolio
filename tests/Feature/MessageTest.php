@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Message;
+use App\Models\Message;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
