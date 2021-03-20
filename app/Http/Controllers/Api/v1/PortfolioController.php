@@ -53,7 +53,7 @@ class PortfolioController extends Controller
             $thumbnail = $request->thumbnail;
             $nama_thumbnail = time() . '_thumbnail-' . md5(uniqid()) . '.jpg';
 
-            $jpg = Helpers::compressImageCloudinary($thumbnail);
+            $jpg = Helpers::compressImageIntervention($thumbnail);
 
             $aws_thumbnail = 'portfolio/' . $folderName . '/' . $nama_thumbnail;
             Storage::put($aws_thumbnail, $jpg);
@@ -70,7 +70,7 @@ class PortfolioController extends Controller
             foreach ($pic as $image) {
                 $nama_image = time() . '_' . md5(uniqid()) . '.jpg';
 
-                $jpg = Helpers::compressImageCloudinary($image);
+                $jpg = Helpers::compressImageIntervention($image);
 
                 $aws_pic = 'portfolio/' . $folderName . '/' . $nama_image;
                 Storage::put($aws_pic, $jpg);
@@ -122,7 +122,7 @@ class PortfolioController extends Controller
                 $thumbnail = $request->thumbnail;
                 $nama_thumbnail = time() . '_thumbnail-' . md5(uniqid()) . '.jpg';
 
-                $jpg = Helpers::compressImageCloudinary($thumbnail);
+                $jpg = Helpers::compressImageIntervention($thumbnail);
 
                 $oldThubmnail = str_replace('portfolio/' . $oldFolderName, 'portfolio/' . $folderName, $portfolio->thumbnail);
                 Storage::delete($oldThubmnail);
@@ -143,7 +143,7 @@ class PortfolioController extends Controller
                 foreach ($pic as $image) {
                     $nama_image = time() . '_' . md5(uniqid()) . '.jpg';
 
-                    $jpg = Helpers::compressImageCloudinary($image);
+                    $jpg = Helpers::compressImageIntervention($image);
 
                     $aws_pic = 'portfolio/' . $folderName . '/' . $nama_image;
                     Storage::put($aws_pic, $jpg);

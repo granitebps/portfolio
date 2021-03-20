@@ -36,7 +36,7 @@ class TechnologyController extends Controller
             $pic = $request->pic;
             $nama_pic = time() . '_' . md5(uniqid()) . '.jpg';
 
-            $jpg = Helpers::compressImageCloudinary($pic);
+            $jpg = Helpers::compressImageIntervention($pic);
 
             $aws_tech = 'tech/' . $nama_pic;
             Storage::put($aws_tech, $jpg);
@@ -66,7 +66,7 @@ class TechnologyController extends Controller
                 $pic = $request->pic;
                 $nama_pic = time() . '_' . md5(uniqid()) . '.jpg';
 
-                $jpg = Helpers::compressImageCloudinary($pic);
+                $jpg = Helpers::compressImageIntervention($pic);
 
                 $aws_tech = 'tech/' . $nama_pic;
                 Storage::put($aws_tech, $jpg);

@@ -32,7 +32,7 @@ class GalleryController extends Controller
             foreach ($images as $image) {
                 $nama_pic = time() . '_' . md5(uniqid()) . '.jpg';
 
-                $jpg = Helpers::compressImageCloudinary($image);
+                $jpg = Helpers::compressImageIntervention($image);
 
                 // Save File
                 $awsPath = 'galeries/' . $nama_pic;

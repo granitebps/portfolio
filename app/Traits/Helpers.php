@@ -26,35 +26,7 @@ trait Helpers
     }
 
     /**
-     * Compress Image Using Cloudinary
-     *
-     * @param \Illuminate\Http\UploadedFile $image
-     * @return string
-     */
-    public static function compressImageCloudinary($image)
-    {
-        // Compress image using Cloudinary
-        $compressedImage = cloudinary()->upload($image->getRealPath(), [
-            'folder' => 'temps',
-            'transformation' => [
-                'quality' => 'auto',
-                'fetch_format' => 'auto'
-            ]
-        ]);
-
-        // Get Image URL, Image PublicID, and Image File from Cloudinary
-        $url = $compressedImage->getPath();
-        $publicId = $compressedImage->getPublicId();
-        $jpg = file_get_contents($url);
-
-        // Remove File from Cloudinary
-        cloudinary()->destroy($publicId);
-
-        return $jpg;
-    }
-
-    /**
-     * Compress image using Cloudinary
+     * Compress image using Image Intervention
      *
      * @param \Illuminate\Http\UploadedFile $image
      * @return \Intervention\Image\Image

@@ -70,7 +70,7 @@ class ProfileController extends Controller
                 $avatar = $request->avatar;
                 $nama_avatar = time() . '_' . md5(uniqid()) . '.jpg';
 
-                $jpg = Helpers::compressImageCloudinary($avatar);
+                $jpg = Helpers::compressImageIntervention($avatar);
 
                 Storage::deleteDirectory('avatar');
 

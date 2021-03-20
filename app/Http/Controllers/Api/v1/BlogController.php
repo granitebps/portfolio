@@ -39,7 +39,7 @@ class BlogController extends Controller
             $image = $request->image;
             $nama_image = time() . '_' . md5(uniqid()) . '.jpg';
 
-            $jpg = Helpers::compressImageCloudinary($image);
+            $jpg = Helpers::compressImageIntervention($image);
 
             $aws_blog = 'blog/' . $nama_image;
             Storage::put($aws_blog, $jpg);
@@ -87,7 +87,7 @@ class BlogController extends Controller
                 $image = $request->image;
                 $nama_image = time() . '_' . md5(uniqid()) . '.jpg';
 
-                $jpg = Helpers::compressImageCloudinary($image);
+                $jpg = Helpers::compressImageIntervention($image);
 
                 $aws_blog = 'blog/' . $nama_image;
                 Storage::put($aws_blog, $jpg);
