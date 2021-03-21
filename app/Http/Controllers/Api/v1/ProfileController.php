@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Propaganistas\LaravelPhone\PhoneNumber;
 
 class ProfileController extends Controller
 {
@@ -46,7 +47,7 @@ class ProfileController extends Controller
             'avatar' => 'sometimes|nullable|max:2048|image',
             'about' => 'required|string',
             'age' => 'required|numeric',
-            'phone' => 'required|numeric',
+            'phone' => 'required|phone:ID,ID,mobile',
             'address' => 'required|string',
             'nationality' => 'required|string|max:255',
             'languages' => 'required|array',
@@ -96,10 +97,11 @@ class ProfileController extends Controller
                 'email' => $request->email,
                 'name' => $request->name,
             ]);
+            $phone = (string) PhoneNumber::make($request->phone, 'ID');
             $user->profile->update([
                 'about' => $request->about,
                 'age' => $request->age,
-                'phone' => $request->phone,
+                'phone' => $phone,
                 'address' => $request->address,
                 'nationality' => $request->nationality,
                 'languages' => $request->languages,
