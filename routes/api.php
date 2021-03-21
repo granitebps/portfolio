@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::group(['namespace' => 'Api\v1', 'prefix' => 'v1'], function () {
+Route::group(['namespace' => 'Api\v1', 'prefix' => 'v1', 'middleware' => 'cacheResponse'], function () {
     Route::post('auth/login', 'AuthController@login');
 
     Route::post('auth/request_reset_password', 'AuthController@request_reset_password');
