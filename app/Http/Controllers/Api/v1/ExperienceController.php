@@ -7,23 +7,17 @@ use App\Http\Requests\ExperienceRequest;
 use App\Models\Experience;
 use App\Traits\Helpers;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class ExperienceController extends Controller
 {
     public function index()
     {
-        if (Cache::has('experiences')) {
-            $experience = Cache::get('experiences');
-        } else {
-            $experience = Experience::orderBy('start_date', 'desc')->get();
-            $experience->transform(function ($item) {
-                $item->current_job = $item->current_job ? $item->current_job : false;
-                return $item;
-            });
-            Cache::put('experiences', $experience, now()->addDay());
-        }
+        $experience = Experience::orderBy('start_date', 'desc')->get();
+        $experience->transform(function ($item) {
+            $item->current_job = $item->current_job ? $item->current_job : false;
+            return $item;
+        });
         return Helpers::apiResponse(true, '', $experience);
     }
 

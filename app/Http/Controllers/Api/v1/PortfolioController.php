@@ -7,7 +7,6 @@ use App\Http\Requests\PortfolioRequest;
 use App\Models\Portfolio;
 use App\Models\PortfolioPic;
 use App\Traits\Helpers;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -16,31 +15,26 @@ class PortfolioController extends Controller
 {
     public function index()
     {
-        if (Cache::has('portfolio')) {
-            $portfolio = Cache::get('portfolio');
-        } else {
-            $portfolio = Portfolio::with('pic')->orderBy('created_at', 'desc')->get();
-            $portfolio->transform(function ($item) {
-                $newThumb = Storage::url($item->thumbnail);
-                $item->thumbnail = $newThumb;
+        $portfolio = Portfolio::with('pic')->orderBy('created_at', 'desc')->get();
+        $portfolio->transform(function ($item) {
+            $newThumb = Storage::url($item->thumbnail);
+            $item->thumbnail = $newThumb;
 
-                $item->type = (int)$item->type;
+            $item->type = (int)$item->type;
 
-                if (is_null($item->url)) {
-                    $item->url = '';
-                }
+            if (is_null($item->url)) {
+                $item->url = '';
+            }
 
-                $item->pic->transform(function ($pic) {
-                    $newPic = Storage::url($pic->pic);
-                    $pic->pic = $newPic;
-                    $pic->makeHidden(['portfolio_id', 'created_at', 'updated_at']);
-                    return $pic;
-                });
-
-                return $item;
+            $item->pic->transform(function ($pic) {
+                $newPic = Storage::url($pic->pic);
+                $pic->pic = $newPic;
+                $pic->makeHidden(['portfolio_id', 'created_at', 'updated_at']);
+                return $pic;
             });
-            Cache::put('portfolio', $portfolio, now()->addDay());
-        }
+
+            return $item;
+        });
         return Helpers::apiResponse(true, '', $portfolio);
     }
 
@@ -198,8 +192,6 @@ class PortfolioController extends Controller
             Storage::delete($portfolio->pic);
 
             $portfolio->delete();
-
-            Cache::forget('portfolio');
 
             DB::commit();
             return Helpers::apiResponse(true, 'Portfolio Picture Deleted');

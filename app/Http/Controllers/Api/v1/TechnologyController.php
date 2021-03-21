@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\TechnologyRequest;
 use App\Models\Technology;
 use App\Traits\Helpers;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
@@ -14,18 +13,13 @@ class TechnologyController extends Controller
 {
     public function index()
     {
-        if (Cache::has('tech')) {
-            $tech = Cache::get('tech');
-        } else {
-            $tech = Technology::all();
-            $tech->makeHidden(['created_at', 'updated_at']);
-            $tech->transform(function ($item) {
-                $newFoto = Storage::url($item->pic);
-                $item->pic = $newFoto;
-                return $item;
-            });
-            Cache::put('tech', $tech, now()->addDay());
-        }
+        $tech = Technology::all();
+        $tech->makeHidden(['created_at', 'updated_at']);
+        $tech->transform(function ($item) {
+            $newFoto = Storage::url($item->pic);
+            $item->pic = $newFoto;
+            return $item;
+        });
         return Helpers::apiResponse(true, '', $tech);
     }
 

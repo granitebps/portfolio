@@ -6,20 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ServiceRequest;
 use App\Models\Services;
 use App\Traits\Helpers;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class ServiceController extends Controller
 {
     public function index()
     {
-        if (Cache::has('services')) {
-            $service = Cache::get('services');
-        } else {
-            $service = Services::all();
-            $service->makeHidden(['created_at', 'updated_at']);
-            Cache::put('services', $service, now()->addDay());
-        }
+        $service = Services::all();
+        $service->makeHidden(['created_at', 'updated_at']);
         return Helpers::apiResponse(true, '', $service);
     }
 

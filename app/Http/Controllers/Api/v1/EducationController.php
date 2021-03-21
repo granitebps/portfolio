@@ -13,12 +13,7 @@ class EducationController extends Controller
 {
     public function index()
     {
-        if (Cache::has('educations')) {
-            $education = Cache::get('educations');
-        } else {
-            $education = Education::orderBy('start_year', 'desc')->get();
-            Cache::put('educations', $education, now()->addDay());
-        }
+        $education = Education::orderBy('start_year', 'desc')->get();
         return Helpers::apiResponse(true, '', $education);
     }
 

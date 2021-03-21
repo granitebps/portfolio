@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\BlogRequest;
 use App\Models\Blog;
 use App\Traits\Helpers;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -15,20 +14,15 @@ class BlogController extends Controller
 {
     public function index()
     {
-        if (Cache::has('blogs')) {
-            $blog = Cache::get('blogs');
-        } else {
-            $blog = Blog::with('user')->latest('created_at')->get();
-            $blog->makeHidden(['updated_at']);
-            $blog->transform(function ($item) {
-                $newFoto = asset('images/blog/' . $item->image);
-                $newFoto = Storage::url($item->image);
-                $item->image = $newFoto;
-                $item->user->makeHidden('token');
-                return $item;
-            });
-            Cache::put('blogs', $blog, now()->addDay());
-        }
+        $blog = Blog::with('user')->latest('created_at')->get();
+        $blog->makeHidden(['updated_at']);
+        $blog->transform(function ($item) {
+            $newFoto = asset('images/blog/' . $item->image);
+            $newFoto = Storage::url($item->image);
+            $item->image = $newFoto;
+            $item->user->makeHidden('token');
+            return $item;
+        });
         return Helpers::apiResponse(true, '', $blog);
     }
 
