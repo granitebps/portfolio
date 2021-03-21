@@ -33,6 +33,7 @@ Route::group(['namespace' => 'Api\v1', 'prefix' => 'v1', 'middleware' => 'cacheR
 
         Route::get('message', 'MessageController@index');
         Route::delete('message/{id}', 'MessageController@destroy');
+        Route::get('message/read/{id}', 'MessageController@markRead');
 
         Route::apiResource('portfolio', 'PortfolioController')->except(['index', 'show']);
         Route::get('portfolio-photo/{id}', 'PortfolioController@destroy_photo');

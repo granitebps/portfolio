@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\MessageRequest;
 use App\Models\Message;
 use App\Traits\Helpers;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class MessageController extends Controller
@@ -44,6 +45,25 @@ class MessageController extends Controller
 
             DB::commit();
             return Helpers::apiResponse(true, 'Message Deleted', []);
+        } catch (\Exception $e) {
+            DB::rollback();
+            throw $e;
+        }
+    }
+
+    public function markRead(Request $request, $id)
+    {
+        DB::beginTransaction();
+        try {
+            $message = Message::find($id);
+            if (!$message) {
+                return Helpers::apiResponse(false, 'Message Not Found', [], 404);
+            }
+
+            $message->update(['is_read' => true]);
+
+            DB::commit();
+            return Helpers::apiResponse(true, 'Message Mark As Read', []);
         } catch (\Exception $e) {
             DB::rollback();
             throw $e;

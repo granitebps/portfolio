@@ -61,6 +61,28 @@ class MessageTest extends TestCase
         ]);
     }
 
+    /** @test */
+    public function test_mark_message_as_read()
+    {
+        $response = $this->json('GET', '/api/v1/message/read/99');
+        $response->assertStatus(401);
+
+        $token = $this->authenticate();
+        $response = $this->withHeaders([
+            'Authorization' => "Bearer $token",
+        ])->json('GET', '/api/v1/message/read/99');
+        $response->assertStatus(404);
+
+        $message = $this->createMessage();
+        $response = $this->withHeaders([
+            'Authorization' => "Bearer $token",
+        ])->json('GET', '/api/v1/message/read/' . $message->id);
+        $response->assertStatus(200)->assertJson([
+            'success' => true,
+            'message' => 'Message Mark As Read'
+        ]);
+    }
+
     public function messageData()
     {
         return [
