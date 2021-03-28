@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::group(['namespace' => 'Api\v1', 'prefix' => 'v1', 'middleware' => 'cacheResponse'], function () {
+Route::group(['namespace' => 'Api\v1', 'prefix' => 'v1', 'middleware' => ['cacheResponse']], function () {
     Route::post('auth/login', 'AuthController@login');
 
     Route::post('auth/request_reset_password', 'AuthController@request_reset_password');
@@ -49,25 +49,27 @@ Route::group(['namespace' => 'Api\v1', 'prefix' => 'v1', 'middleware' => 'cacheR
         Route::apiResource('certification', 'CertificationController')->except(['index', 'show']);
     });
 
-    Route::get('profile', 'ProfileController@index');
+    Route::middleware(['logApi'])->group(function () {
+        Route::get('profile', 'ProfileController@index');
 
-    Route::get('skill', 'SkillController@index');
+        Route::get('skill', 'SkillController@index');
 
-    Route::get('service', 'ServiceController@index');
+        Route::get('service', 'ServiceController@index');
 
-    Route::get('technology', 'TechnologyController@index');
+        Route::get('technology', 'TechnologyController@index');
 
-    Route::post('message', 'MessageController@store');
+        Route::post('message', 'MessageController@store');
 
-    Route::get('portfolio', 'PortfolioController@index');
+        Route::get('portfolio', 'PortfolioController@index');
 
-    Route::get('experience', 'ExperienceController@index');
+        Route::get('experience', 'ExperienceController@index');
 
-    Route::get('education', 'EducationController@index');
+        Route::get('education', 'EducationController@index');
 
-    Route::get('blog', 'BlogController@index');
-    Route::get('blog/{id}/{slug}', 'BlogController@show');
+        Route::get('blog', 'BlogController@index');
+        Route::get('blog/{id}/{slug}', 'BlogController@show');
 
-    Route::get('certification', 'CertificationController@index');
+        Route::get('certification', 'CertificationController@index');
+    });
 });
 Route::any('{path}', 'BaseController@not_found')->where('path', '.*');
