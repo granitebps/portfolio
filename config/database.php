@@ -54,7 +54,7 @@ return [
             'dump' => [
                 'useSingleTransaction',
                 'doNotCreateTables',
-                'exclude_tables' => ['migrations'],
+                'exclude_tables' => ['stored_events'],
             ],
             'unix_socket' => env('DB_SOCKET', ''),
             'charset' => 'utf8mb4',
