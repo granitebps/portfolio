@@ -40,7 +40,7 @@ class ProfileController extends Controller
             'name' => 'required|string|max:255',
             'avatar' => 'sometimes|nullable|max:2048|image',
             'about' => 'required|string',
-            'age' => 'required|numeric',
+            'birth' => 'required|string|max:255',
             'phone' => 'required|phone:ID,ID,mobile',
             'address' => 'required|string',
             'nationality' => 'required|string|max:255',
@@ -94,7 +94,7 @@ class ProfileController extends Controller
             $phone = (string) PhoneNumber::make($request->phone, 'ID');
             $user->profile->update([
                 'about' => $request->about,
-                'age' => $request->age,
+                'birth' => $request->birth,
                 'phone' => $phone,
                 'address' => $request->address,
                 'nationality' => $request->nationality,
