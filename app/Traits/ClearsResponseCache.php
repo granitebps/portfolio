@@ -8,6 +8,10 @@ trait ClearsResponseCache
 {
     public static function bootClearsResponseCache()
     {
+        self::saved(function () {
+            Cache::flush();
+        });
+
         self::created(function () {
             Cache::flush();
         });

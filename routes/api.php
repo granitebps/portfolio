@@ -47,6 +47,8 @@ Route::group(['namespace' => 'Api\v1', 'prefix' => 'v1', 'middleware' => ['cache
         Route::apiResource('gallery', 'GalleryController')->except(['update', 'show']);
 
         Route::apiResource('certification', 'CertificationController')->except(['index', 'show']);
+
+        Route::get('dashboard', 'DashboardController@dashboard');
     });
 
     Route::middleware(['logApi'])->group(function () {
