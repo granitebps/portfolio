@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use App\StorableEvents\LogApiEvent;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class LogMiddleware
 {
@@ -29,14 +30,16 @@ class LogMiddleware
      */
     public function terminate($request, $response)
     {
-        event(new LogApiEvent(
-            now(),
-            $request->fullUrl(),
-            $request->method(),
-            json_decode($request->getContent(), true),
-            $request->header(),
-            $request->ip(),
-            $response->getStatusCode()
-        ));
+        if (!auth()->check()) {
+            event(new LogApiEvent(
+                now(),
+                $request->fullUrl(),
+                $request->method(),
+                json_decode($request->getContent(), true),
+                $request->header(),
+                $request->ip(),
+                $response->getStatusCode()
+            ));
+        }
     }
 }
