@@ -4,28 +4,48 @@ on:
   push:
     branches:
       - master
+      - dev
+  pull_request:
+    branches: [master]
 
 jobs:
-  app-tests:
+  ci:
     runs-on: ubuntu-latest
+
     services:
       mysql:
         image: mysql:5.7
         env:
-          MYSQL_ALLOW_EMPTY_PASSWORD: yes
-          MYSQL_DATABASE: laravel
+          MYSQL_ROOT_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          MYSQL_DATABASE: db_test
         ports:
-          - 3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+          - 33306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
     steps:
       - uses: actions/checkout@v1
-      - name: Copy .env
-        run: php -r "file_exists('.env') || copy('.env.example', '.env');"
-      - name: Install Composer Dependencies
-        run: composer install -q --no-ansi --no-interaction --no-scripts --no-suggest --no-progress --prefer-dist
-      - name: Generate Key
-        run: php artisan key:generate
-      - name: Execute tests (Unit and Feature tests) via PHPUnit
+      - uses: supercharge/redis-github-action@1.1.0
+      - name: Setup PHP with PECL extension
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "7.4"
+      - name: Laravel Setup
+        run: |
+          cp .env.example .env
+          composer install -q --no-ansi --no-interaction --no-scripts --no-suggest --no-progress --prefer-dist
+          php artisan key:generate
+          chmod -R 777 storage bootstrap/cache
+      - name: Generate JWT secrets
+        run: php artisan jwt:secret
+      - name: Migrate Database and Run Test
         env:
-          DB_PORT: ${{ job.services.mysql.ports[3306] }}
-        run: vendor/bin/phpunit
+          DB_DATABASE: db_test
+          DB_PORT: 33306
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        run: |
+          php artisan migrate
+          vendor/phpunit/phpunit/phpunit
