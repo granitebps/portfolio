@@ -26,12 +26,14 @@ jobs:
           php-version: "7.4"
       - name: Copy .env
         run: php -r "file_exists('.env') || copy('.env.example', '.env');"
-      - name: Update Dependencies
-        run: composer update
       - name: Install Composer Dependencies
         run: composer install -q --no-ansi --no-interaction --no-scripts --no-suggest --no-progress --prefer-dist
       - name: Generate Key
         run: php artisan key:generate
+      - name: Setup Database
+        run: php artisan migrate
+      - name: Run Seeder
+        run: php artisan db:seed
       - name: Execute tests (Unit and Feature tests) via PHPUnit
         env:
           DB_PORT: ${{ job.services.mysql.ports[3306] }}
