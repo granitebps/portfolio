@@ -8,7 +8,8 @@
   <br>
 </h1>
 
-[![Actions Status](https://github.com/granitebps/portfolio/workflows/CI/CD/badge.svg)](https://github.com/granitebps/portfolio/actions)
+![Build Status](https://app.chipperci.com/projects/0d4c08c5-7e81-4f04-a001-d9d1573e4cea/status/master)
+[![Actions Status](https://github.com/granitebps/portfolio/workflows/CD/badge.svg)](https://github.com/granitebps/portfolio/actions)
 ![License](https://img.shields.io/github/license/granitebps/portfolio)
 
 ## Link
