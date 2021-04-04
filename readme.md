@@ -8,6 +8,7 @@
   <br>
 </h1>
 
+[![Actions Status](https://github.com/granitebps/portfolio/workflows/CI/badge.svg)](https://github.com/granitebps/portfolio/actions)
 [![Actions Status](https://github.com/granitebps/portfolio/workflows/CD/badge.svg)](https://github.com/granitebps/portfolio/actions)
 ![License](https://img.shields.io/github/license/granitebps/portfolio)
 

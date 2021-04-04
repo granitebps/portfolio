@@ -49,16 +49,3 @@ jobs:
         run: |
           php artisan migrate
           vendor/phpunit/phpunit/phpunit
-      # - name: Deploy to production
-      #   uses: appleboy/ssh-action@master
-      #   with:
-      #     username: ${{ secrets.SSH_USERNAME }}
-      #     host: ${{ secrets.SSH_HOST }}
-      #     key: ${{ secrets.SSH_KEY }}
-      #     script: "cd portfolio && chmod +x deploy.sh && ./deploy.sh"
-      - name: Upload artifacts
-        uses: actions/upload-artifact@master
-        if: failure()
-        with:
-          name: Logs
-          path: ./storage/logs
