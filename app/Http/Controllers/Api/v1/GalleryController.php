@@ -14,11 +14,10 @@ class GalleryController extends Controller
     public function index()
     {
         $tech = Gallery::latest('created_at')->get();
-        $tech->makeHidden(['updated_at']);
         $tech->transform(function ($item) {
-            $item->name = $item->image;
-            $newFoto = Storage::url($item->image);
-            $item->image = $newFoto;
+            $item->file = Storage::url($item->name);
+            $path = explode('/', $item->name);
+            $item->name = $path[1];
             return $item;
         });
         return Helpers::apiResponse(true, '', $tech);
@@ -28,23 +27,29 @@ class GalleryController extends Controller
     {
         DB::beginTransaction();
         try {
-            $images = $request->image;
-            foreach ($images as $image) {
-                $nama_pic = time() . '_' . md5(uniqid()) . '.jpg';
+            $files = $request->file;
+            foreach ($files as $file) {
+                $ext = $file->extension();
+                $size = $file->getSize();
+                if (in_array($ext, Gallery::IMAGE_EXT)) {
+                    $jpg = Helpers::compressImageIntervention($file);
+                }
 
-                $jpg = Helpers::compressImageIntervention($image);
+                $nama_file = time() . '_' . md5(uniqid()) . '.' . $ext;
 
                 // Save File
-                $awsPath = 'galeries/' . $nama_pic;
+                $awsPath = 'galeries/' . $nama_file;
                 Storage::put($awsPath, $jpg);
 
-                Gallery::create([
-                    'image' => $awsPath,
+                $data = Gallery::create([
+                    'name' => $awsPath,
+                    'ext' => $ext,
+                    'size' => $size
                 ]);
             }
 
             DB::commit();
-            return Helpers::apiResponse(true, 'Images Uploaded');
+            return Helpers::apiResponse(true, 'Files Uploaded', $data);
         } catch (\Exception $e) {
             DB::rollback();
             throw $e;
@@ -57,7 +62,7 @@ class GalleryController extends Controller
         try {
             $gallery = Gallery::find($id);
             if (!$gallery) {
-                return Helpers::apiResponse(false, 'Image Not Found', [], 404);
+                return Helpers::apiResponse(false, 'File Not Found', [], 404);
             }
 
             Storage::delete($gallery->image);
@@ -65,7 +70,7 @@ class GalleryController extends Controller
             $gallery->delete();
 
             DB::commit();
-            return Helpers::apiResponse(true, 'Image Deleted');
+            return Helpers::apiResponse(true, 'File Deleted');
         } catch (\Exception $e) {
             DB::rollback();
             throw $e;

@@ -9,6 +9,9 @@ class Gallery extends Model
 {
     use ClearsResponseCache;
 
+    const IMAGE_EXT = ['png', 'jpg', 'jpeg'];
+
     protected $table = 'galeries';
-    protected $fillable = ['image'];
+    protected $fillable = ['name', 'ext', 'size'];
+    protected $hidden = ['updated_at'];
 }

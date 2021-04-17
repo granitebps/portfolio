@@ -24,8 +24,8 @@ class GalleryRequest extends FormRequest
     public function rules()
     {
         return [
-            'image' => 'required',
-            'image.*' => 'image|max:2048'
+            'file' => 'required',
+            'file.*' => 'file|max:2048'
         ];
     }
 
@@ -37,9 +37,9 @@ class GalleryRequest extends FormRequest
     public function messages()
     {
         return [
-            'image.required' => 'Image is required',
-            'image.*.image' => 'Image is not valid',
-            'image.*.max' => 'Image is too big. Max size is :max kilobytes',
+            'file.required' => 'File is required',
+            'file.*.file' => 'File is not valid',
+            'file.*.max' => 'File is too big. Max size is :max kilobytes',
         ];
     }
 }
