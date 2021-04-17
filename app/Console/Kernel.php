@@ -26,6 +26,7 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('backup:clean')->weeklyOn(1, '8:00');
         $schedule->command('backup:run --only-db')->weeklyOn(1, '8:00');
+        $schedule->command('backup:event')->weeklyOn(1, '8:00');
     }
 
     /**

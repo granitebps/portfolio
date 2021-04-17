@@ -52,8 +52,6 @@ return [
             'username' => env('DB_USERNAME', 'forge'),
             'password' => env('DB_PASSWORD', ''),
             'dump' => [
-                'useSingleTransaction',
-                'doNotCreateTables',
                 'exclude_tables' => ['stored_events'],
             ],
             'unix_socket' => env('DB_SOCKET', ''),
