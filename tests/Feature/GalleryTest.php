@@ -46,7 +46,7 @@ class GalleryTest extends TestCase
         ])->json('POST', '/api/v1/gallery', $this->galleryData());
         $response->assertStatus(200)->assertJson([
             'success' => true,
-            'message' => 'Images Uploaded'
+            'message' => 'File Uploaded'
         ]);
     }
 
@@ -68,7 +68,7 @@ class GalleryTest extends TestCase
         ])->json('DELETE', '/api/v1/gallery/' . $gallery->id);
         $response->assertStatus(200)->assertJson([
             'success' => true,
-            'message' => 'Image Deleted'
+            'message' => 'File Deleted'
         ]);
     }
 
@@ -77,9 +77,7 @@ class GalleryTest extends TestCase
         $file = UploadedFile::fake()->image('gallery.jpg')->size(512);
 
         return [
-            'image' => [
-                $file
-            ]
+            'file' => $file
         ];
     }
 
@@ -90,7 +88,7 @@ class GalleryTest extends TestCase
         $file = UploadedFile::fake()->image('gallery.jpg');
 
         $gallery = Gallery::create([
-            'image' => $file,
+            'name' => $file,
         ]);
         return $gallery;
     }

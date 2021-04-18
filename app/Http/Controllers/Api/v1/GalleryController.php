@@ -47,7 +47,7 @@ class GalleryController extends Controller
             ]);
 
             DB::commit();
-            return Helpers::apiResponse(true, 'Files Uploaded', $data);
+            return Helpers::apiResponse(true, 'File Uploaded', $data);
         } catch (\Exception $e) {
             DB::rollback();
             throw $e;
