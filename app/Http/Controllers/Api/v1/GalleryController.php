@@ -8,6 +8,7 @@ use App\Models\Gallery;
 use App\Traits\Helpers;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class GalleryController extends Controller
 {
@@ -27,26 +28,23 @@ class GalleryController extends Controller
     {
         DB::beginTransaction();
         try {
-            $files = $request->file;
-            foreach ($files as $file) {
-                $ext = $file->extension();
-                $size = $file->getSize();
-                if (in_array($ext, Gallery::IMAGE_EXT)) {
-                    $jpg = Helpers::compressImageIntervention($file);
-                }
+            $file = $request->file;
+            $fileFullname = $file->getClientOriginalName();
+            $filename = Str::slug(pathinfo($fileFullname, PATHINFO_FILENAME));
+            $ext = pathinfo($fileFullname, PATHINFO_EXTENSION);
+            $size = $file->getSize();
 
-                $nama_file = time() . '_' . md5(uniqid()) . '.' . $ext;
+            $nama_file = time() . '_' . $filename . '.' . $ext;
 
-                // Save File
-                $awsPath = 'galeries/' . $nama_file;
-                Storage::put($awsPath, $jpg);
+            // Save File
+            $awsPath = 'galeries/' . $nama_file;
+            Storage::putFileAs('galeries', $file, $nama_file);
 
-                $data = Gallery::create([
-                    'name' => $awsPath,
-                    'ext' => $ext,
-                    'size' => $size
-                ]);
-            }
+            $data = Gallery::create([
+                'name' => $awsPath,
+                'ext' => $ext,
+                'size' => $size
+            ]);
 
             DB::commit();
             return Helpers::apiResponse(true, 'Files Uploaded', $data);

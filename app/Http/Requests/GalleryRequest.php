@@ -24,8 +24,7 @@ class GalleryRequest extends FormRequest
     public function rules()
     {
         return [
-            'file' => 'required',
-            'file.*' => 'file|max:2048'
+            'file' => 'required|file|max:102400',
         ];
     }
 
@@ -38,8 +37,8 @@ class GalleryRequest extends FormRequest
     {
         return [
             'file.required' => 'File is required',
-            'file.*.file' => 'File is not valid',
-            'file.*.max' => 'File is too big. Max size is :max kilobytes',
+            'file.file' => 'File is not valid',
+            'file.max' => 'File is too big. Max size is :max kilobytes',
         ];
     }
 }
