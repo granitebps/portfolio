@@ -25,7 +25,9 @@ class CacheMiddleware
             if (Cache::has($key)) {
                 $timestamp = Cache::get($key_timestamp);
                 $response = Cache::get($key);
-                return $response->header('cache-timestamp', $timestamp);
+                if ($response) {
+                    return $response->header('cache-timestamp', $timestamp);
+                }
             }
         }
 
