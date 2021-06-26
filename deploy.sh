@@ -16,9 +16,6 @@ php artisan migrate --force
 # Note: If you're using queue workers, this is the place to restart them.
 # ...
 
-# Run test
-php artisan test
-
 # Clear cache
 php artisan optimize
 php artisan cache:clear
