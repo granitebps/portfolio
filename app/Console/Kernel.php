@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Jobs\DeleteUnusedToken;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -27,6 +28,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('backup:clean')->weeklyOn(1, '8:00');
         $schedule->command('backup:run --only-db')->weeklyOn(1, '8:00');
         $schedule->command('backup:event')->weeklyOn(1, '8:00');
+        $schedule->job(new DeleteUnusedToken())->daily()->timezone('Asia/Jakarta');
     }
 
     /**

@@ -23,6 +23,6 @@ trait AuthTraitTest
             'avatar' => '/'
         ]);
 
-        // return $token;
+        return $user->createToken('test')->plainTextToken;
     }
 }

@@ -21,21 +21,24 @@ class AuthController extends Controller
     public function login(LoginRequest $request)
     {
         $credentials = $request->only(['username', 'password']);
-        if ($request->remember_me === true) {
-            $this->jwt->factory()->setTTL(518400);
-        }
-        $token = $this->jwt->attempt($credentials, $request->remember_me);
 
-        if (!$token) {
+        $user = User::where('username', $credentials['username'])->first();
+
+        if (!$user || !Hash::check($credentials['password'], $user->password)) {
             return Helpers::apiResponse(false, 'Username or Password Is Wrong', [], 401);
         }
 
-        $user = Auth::user();
-        $data['token'] = $token;
+        $token = $user->createToken(config('app.name'));
+
+        if (!$token) {
+            return Helpers::apiResponse(false, 'Unauthorized', [], 401);
+        }
+
+        $user = $user;
+        $data['token'] = $token->plainTextToken;
         $newAvatar = Storage::url($user->profile->avatar);
         $data['name'] = $user->name;
         $data['avatar'] = $newAvatar;
-        $data['expires_in'] = auth()->factory()->getTTL() * 60;
 
         return Helpers::apiResponse(true, '', $data);
     }
@@ -51,13 +54,13 @@ class AuthController extends Controller
         return Helpers::apiResponse(true, '', $user);
     }
 
-    public function logout()
+    public function logout(Request $request)
     {
         $user = Auth::user();
         if (!$user) {
             return Helpers::apiResponse(false, 'Unauthorized', [], 401);
         }
-        Auth::logout();
+        $request->user()->currentAccessToken()->delete();
         return Helpers::apiResponse(true, 'User Logged Out');
     }
 
