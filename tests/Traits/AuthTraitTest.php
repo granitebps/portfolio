@@ -5,7 +5,6 @@ namespace Tests\Traits;
 use App\Models\User;
 use App\Models\Profile;
 use Illuminate\Support\Facades\Hash;
-use Tymon\JWTAuth\Facades\JWTAuth;
 
 trait AuthTraitTest
 {
@@ -24,7 +23,6 @@ trait AuthTraitTest
             'avatar' => '/'
         ]);
 
-        $token = JWTAuth::fromUser($user);
-        return $token;
+        // return $token;
     }
 }

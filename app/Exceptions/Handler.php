@@ -12,8 +12,6 @@ use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Tymon\JWTAuth\Exceptions\TokenExpiredException;
-use Tymon\JWTAuth\Exceptions\TokenInvalidException;
 
 class Handler extends ExceptionHandler
 {
@@ -62,14 +60,6 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
-        if ($exception instanceof TokenExpiredException) {
-            return Helpers::apiResponse(false, 'Token Expired', [], 401);
-        }
-
-        if ($exception instanceof TokenInvalidException) {
-            return Helpers::apiResponse(false, 'Invalid Token', [], 401);
-        }
-
         if ($exception instanceof NotFoundHttpException) {
             return Helpers::apiResponse(false, 'Endpoint Not Found', [], 404);
         }

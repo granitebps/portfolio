@@ -15,17 +15,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-use Tymon\JWTAuth\JWTAuth;
 
 class AuthController extends Controller
 {
-    protected $jwt;
-
-    public function __construct(JWTAuth $jwt)
-    {
-        $this->jwt = $jwt;
-    }
-
     public function login(LoginRequest $request)
     {
         $credentials = $request->only(['username', 'password']);

@@ -39,8 +39,6 @@ jobs:
           composer install -q --no-ansi --no-interaction --no-scripts --no-suggest --no-progress --prefer-dist
           php artisan key:generate
           chmod -R 777 storage bootstrap/cache
-      - name: Generate JWT secrets
-        run: php artisan jwt:secret
       - name: Migrate Database and Run Test
         env:
           DB_DATABASE: db_test
