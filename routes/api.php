@@ -51,7 +51,7 @@ Route::group(['namespace' => 'Api\v1', 'prefix' => 'v1', 'middleware' => ['cache
         Route::get('dashboard', 'DashboardController@dashboard');
     });
 
-    Route::middleware(['logApi'])->group(function () {
+    Route::middleware([])->group(function () {
         Route::get('profile', 'ProfileController@index');
 
         Route::get('skill', 'SkillController@index');
