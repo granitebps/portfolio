@@ -63,7 +63,7 @@ class ProfileController extends Controller
 
             if ($request->hasFile('avatar')) {
                 $avatar = $request->avatar;
-                $nama_avatar = time() . '_' . md5(uniqid()) . '.jpg';
+                $nama_avatar = 'avatar.jpg';
 
                 $jpg = Helpers::compressImageIntervention($avatar);
 
@@ -111,10 +111,8 @@ class ProfileController extends Controller
             DB::commit();
 
             return Helpers::apiResponse(true, 'Profile Updated', [
-                'token' => Auth::refresh(),
                 'name' => $user->name,
                 'avatar' => Storage::url($user->profile->avatar),
-                'expires_in' => auth()->factory()->getTTL() * 60
             ]);
         } catch (\Exception $e) {
             DB::rollback();

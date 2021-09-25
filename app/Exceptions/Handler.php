@@ -6,12 +6,14 @@ use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Support\Facades\App;
 use Throwable;
 use App\Traits\Helpers;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 class Handler extends ExceptionHandler
 {
@@ -82,6 +84,14 @@ class Handler extends ExceptionHandler
 
         if ($exception instanceof AuthenticationException) {
             return Helpers::apiResponse(false, 'Unauthenticated', [], 401);
+        }
+
+        if ($exception instanceof AuthorizationException) {
+            return Helpers::apiResponse(false, 'Unauthenticated', [], 401);
+        }
+
+        if ($exception instanceof HttpExceptionInterface) {
+            return Helpers::apiResponse(false, $exception->getMessage(), [], $exception->getStatusCode());
         }
 
         if ($exception) {
