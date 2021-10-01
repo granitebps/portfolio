@@ -49,6 +49,7 @@ jobs:
           vendor/phpunit/phpunit/phpunit
 
   deploy:
+    needs: ci
     runs-on: ubuntu-latest
 
     steps:
