@@ -35,9 +35,8 @@ class AuthController extends Controller
 
         $user = $user;
         $data['token'] = $token->plainTextToken;
-        $newAvatar = $user->profile->avatar;
         $data['name'] = $user->name;
-        $data['avatar'] = $newAvatar;
+        $data['avatar'] = $user->profile->avatar;
 
         return Helpers::apiResponse(true, '', $data);
     }
@@ -48,8 +47,6 @@ class AuthController extends Controller
         if (!$user) {
             return Helpers::apiResponse(false, 'Unauthorized', [], 401);
         }
-        $newAvatar = $user->profile->avatar;
-        $user->profile->avatar = $newAvatar;
         return Helpers::apiResponse(true, '', $user);
     }
 

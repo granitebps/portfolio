@@ -13,7 +13,6 @@ class ServiceController extends Controller
     public function index()
     {
         $service = Services::all();
-        $service->makeHidden(['created_at', 'updated_at']);
         return Helpers::apiResponse(true, '', $service);
     }
 

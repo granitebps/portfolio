@@ -14,7 +14,9 @@ class BlogController extends Controller
 {
     public function index()
     {
-        $blog = Blog::with('user')->latest('created_at')->get();
+        $blog = Blog::with('user')
+            ->latest('created_at')
+            ->get();
         return Helpers::apiResponse(true, '', $blog);
     }
 

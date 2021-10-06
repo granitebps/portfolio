@@ -16,8 +16,6 @@ class ProfileController extends Controller
     public function index()
     {
         $user = User::with('profile')->first();
-        $user->makeHidden(['created_at', 'updated_at']);
-        $user->profile->makeHidden(['created_at', 'updated_at', 'id', 'user_id']);
         return Helpers::apiResponse(true, '', $user);
     }
 

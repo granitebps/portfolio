@@ -18,4 +18,8 @@ class Experience extends Model
         'current_job',
         'desc'
     ];
+
+    protected $casts = [
+        'current_job' => 'boolean',
+    ];
 }

@@ -13,7 +13,6 @@ class SkillController extends Controller
     public function index()
     {
         $skills = Skill::all();
-        $skills->makeHidden(['created_at', 'updated_at']);
 
         return Helpers::apiResponse(true, '', $skills);
     }

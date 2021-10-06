@@ -14,7 +14,6 @@ class MessageController extends Controller
     public function index()
     {
         $message = Message::orderBy('created_at', 'desc')->get();
-        $message->makeHidden(['updated_at']);
         return Helpers::apiResponse(true, '', $message);
     }
 

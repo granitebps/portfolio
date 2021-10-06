@@ -14,7 +14,6 @@ class TechnologyController extends Controller
     public function index()
     {
         $tech = Technology::all();
-        $tech->makeHidden(['created_at', 'updated_at']);
         return Helpers::apiResponse(true, '', $tech);
     }
 
