@@ -13,10 +13,10 @@ class Gallery extends Model
     const IMAGE_EXT = ['png', 'jpg', 'jpeg'];
 
     protected $table = 'galeries';
-    protected $fillable = ['name', 'ext', 'size'];
+    protected $fillable = ['name', 'ext', 'size', 'file'];
     protected $hidden = ['updated_at'];
 
-    public function getNameAttribute($value)
+    public function getFileAttribute($value)
     {
         if ($value) {
             return Storage::url($value);

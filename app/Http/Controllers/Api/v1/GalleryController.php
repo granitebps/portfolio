@@ -14,14 +14,8 @@ class GalleryController extends Controller
 {
     public function index()
     {
-        $tech = Gallery::latest('created_at')->get();
-        $tech->transform(function ($item) {
-            $item->file = $item->name;
-            $path = explode('/', $item->name);
-            $item->name = $path[1];
-            return $item;
-        });
-        return Helpers::apiResponse(true, '', $tech);
+        $galeries = Gallery::latest('created_at')->get();
+        return Helpers::apiResponse(true, '', $galeries);
     }
 
     public function store(GalleryRequest $request)
@@ -41,7 +35,8 @@ class GalleryController extends Controller
             Storage::putFileAs('galeries', $file, $nama_file);
 
             $data = Gallery::create([
-                'name' => $awsPath,
+                'name' => $nama_file,
+                'file' => $awsPath,
                 'ext' => $ext,
                 'size' => $size
             ]);

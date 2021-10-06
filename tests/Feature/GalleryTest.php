@@ -88,7 +88,8 @@ class GalleryTest extends TestCase
         $file = UploadedFile::fake()->image('gallery.jpg');
 
         $gallery = Gallery::create([
-            'name' => $file,
+            'file' => $file,
+            'name' => 'test'
         ]);
         return $gallery;
     }
