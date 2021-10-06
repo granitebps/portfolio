@@ -13,7 +13,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
@@ -36,7 +35,7 @@ class AuthController extends Controller
 
         $user = $user;
         $data['token'] = $token->plainTextToken;
-        $newAvatar = Storage::url($user->profile->avatar);
+        $newAvatar = $user->profile->avatar;
         $data['name'] = $user->name;
         $data['avatar'] = $newAvatar;
 
@@ -49,7 +48,7 @@ class AuthController extends Controller
         if (!$user) {
             return Helpers::apiResponse(false, 'Unauthorized', [], 401);
         }
-        $newAvatar = Storage::url($user->profile->avatar);
+        $newAvatar = $user->profile->avatar;
         $user->profile->avatar = $newAvatar;
         return Helpers::apiResponse(true, '', $user);
     }

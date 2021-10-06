@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Traits\ClearsResponseCache;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Gallery extends Model
 {
@@ -14,4 +15,12 @@ class Gallery extends Model
     protected $table = 'galeries';
     protected $fillable = ['name', 'ext', 'size'];
     protected $hidden = ['updated_at'];
+
+    public function getNameAttribute($value)
+    {
+        if ($value) {
+            return Storage::url($value);
+        }
+        return null;
+    }
 }

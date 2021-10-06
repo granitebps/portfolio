@@ -10,5 +10,9 @@ class Services extends Model
     use ClearsResponseCache;
 
     protected $table = 'services';
-    protected $guarded = ['created_at', 'updated_at'];
+    protected $fillable = [
+        'name',
+        'icon',
+        'desc'
+    ];
 }

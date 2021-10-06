@@ -9,5 +9,16 @@ class Message extends Model
 {
     use ClearsResponseCache;
 
-    protected $guarded = ['created_at', 'updated_at'];
+    protected $fillable = [
+        'first_name',
+        'last_name',
+        'email',
+        'phone',
+        'message',
+        'is_read',
+    ];
+
+    protected $casts = [
+        'is_read' => 'boolean',
+    ];
 }

@@ -15,11 +15,6 @@ class TechnologyController extends Controller
     {
         $tech = Technology::all();
         $tech->makeHidden(['created_at', 'updated_at']);
-        $tech->transform(function ($item) {
-            $newFoto = Storage::url($item->pic);
-            $item->pic = $newFoto;
-            return $item;
-        });
         return Helpers::apiResponse(true, '', $tech);
     }
 

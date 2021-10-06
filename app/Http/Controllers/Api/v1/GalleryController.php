@@ -16,7 +16,7 @@ class GalleryController extends Controller
     {
         $tech = Gallery::latest('created_at')->get();
         $tech->transform(function ($item) {
-            $item->file = Storage::url($item->name);
+            $item->file = $item->name;
             $path = explode('/', $item->name);
             $item->name = $path[1];
             return $item;

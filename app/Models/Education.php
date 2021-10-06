@@ -9,6 +9,11 @@ class Education extends Model
 {
     use ClearsResponseCache;
 
-    protected $guarded = ['created_at', 'updated_at'];
     protected $table = 'educations';
+    protected $fillable = [
+        'name',
+        'institute',
+        'start_year',
+        'end_year',
+    ];
 }

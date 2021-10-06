@@ -10,5 +10,12 @@ class Experience extends Model
     use ClearsResponseCache;
 
     protected $table = 'experiences';
-    protected $guarded = ['created_at', 'updated_at'];
+    protected $fillable = [
+        'company',
+        'position',
+        'start_date',
+        'end_date',
+        'current_job',
+        'desc'
+    ];
 }

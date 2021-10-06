@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\EducationRequest;
 use App\Models\Education;
 use App\Traits\Helpers;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class EducationController extends Controller

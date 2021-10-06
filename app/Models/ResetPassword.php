@@ -10,7 +10,12 @@ class ResetPassword extends Model
     use ClearsResponseCache;
 
     protected $table = 'reset_passwords';
-    protected $guarded = ['created_at', 'updated_at'];
+    protected $fillable = [
+        'user_id',
+        'token',
+        'is_valid',
+        'expired_at'
+    ];
 
     protected $casts = [
         'is_valid' => 'boolean',

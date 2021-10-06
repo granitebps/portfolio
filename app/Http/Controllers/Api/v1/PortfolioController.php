@@ -15,26 +15,9 @@ class PortfolioController extends Controller
 {
     public function index()
     {
-        $portfolio = Portfolio::with('pic')->orderBy('created_at', 'desc')->get();
-        $portfolio->transform(function ($item) {
-            $newThumb = Storage::url($item->thumbnail);
-            $item->thumbnail = $newThumb;
-
-            $item->type = (int)$item->type;
-
-            if (is_null($item->url)) {
-                $item->url = '';
-            }
-
-            $item->pic->transform(function ($pic) {
-                $newPic = Storage::url($pic->pic);
-                $pic->pic = $newPic;
-                $pic->makeHidden(['portfolio_id', 'created_at', 'updated_at']);
-                return $pic;
-            });
-
-            return $item;
-        });
+        $portfolio = Portfolio::with('pic')
+            ->orderBy('created_at', 'desc')
+            ->get();
         return Helpers::apiResponse(true, '', $portfolio);
     }
 

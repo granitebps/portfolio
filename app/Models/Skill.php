@@ -10,5 +10,8 @@ class Skill extends Model
     use ClearsResponseCache;
 
     protected $table = 'skills';
-    protected $guarded = ['created_at', 'updated_at'];
+    protected $fillable = [
+        'name',
+        'percentage'
+    ];
 }

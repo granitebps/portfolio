@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Traits\Helpers;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -19,11 +18,6 @@ class ProfileController extends Controller
         $user = User::with('profile')->first();
         $user->makeHidden(['created_at', 'updated_at']);
         $user->profile->makeHidden(['created_at', 'updated_at', 'id', 'user_id']);
-        $newAvatar = Storage::url($user->profile->avatar);
-        $user->profile->avatar = $newAvatar;
-        $newCv = Storage::url($user->profile->cv);
-        $user->profile->cv = $newCv;
-        $user->profile->freelance = (int)$user->profile->freelance;
         return Helpers::apiResponse(true, '', $user);
     }
 
@@ -112,7 +106,7 @@ class ProfileController extends Controller
 
             return Helpers::apiResponse(true, 'Profile Updated', [
                 'name' => $user->name,
-                'avatar' => Storage::url($user->profile->avatar),
+                'avatar' => $user->profile->avatar,
             ]);
         } catch (\Exception $e) {
             DB::rollback();

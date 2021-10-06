@@ -11,5 +11,10 @@ class Certification extends Model
     use SoftDeletes, ClearsResponseCache;
 
     protected $table = 'certifications';
-    protected $guarded = ['created_at', 'updated_at'];
+    protected $fillable = [
+        'name',
+        'institution',
+        'link',
+        'published'
+    ];
 }

@@ -15,14 +15,6 @@ class BlogController extends Controller
     public function index()
     {
         $blog = Blog::with('user')->latest('created_at')->get();
-        $blog->makeHidden(['updated_at']);
-        $blog->transform(function ($item) {
-            $newFoto = asset('images/blog/' . $item->image);
-            $newFoto = Storage::url($item->image);
-            $item->image = $newFoto;
-            $item->user->makeHidden('token');
-            return $item;
-        });
         return Helpers::apiResponse(true, '', $blog);
     }
 
@@ -62,9 +54,6 @@ class BlogController extends Controller
         if (!$blog) {
             return Helpers::apiResponse(false, 'Blog Not Found', [], 404);
         }
-        $newFoto = Storage::url($blog->image);
-        $blog->image = $newFoto;
-        $blog->user->makeHidden('token');
         return Helpers::apiResponse(true, '', $blog);
     }
 
