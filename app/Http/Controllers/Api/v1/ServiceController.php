@@ -20,7 +20,7 @@ class ServiceController extends Controller
     {
         DB::beginTransaction();
         try {
-            $service = Services::create($request->all());
+            $service = Services::create($request->validated());
 
             DB::commit();
             return Helpers::apiResponse(true, 'Service Created', $service);
@@ -39,7 +39,7 @@ class ServiceController extends Controller
                 return Helpers::apiResponse(false, 'Service Not Found', [], 404);
             }
 
-            $service->update($request->all());
+            $service->update($request->validated());
 
             DB::commit();
             return Helpers::apiResponse(true, 'Service Updated', $service);

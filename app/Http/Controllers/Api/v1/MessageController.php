@@ -21,7 +21,7 @@ class MessageController extends Controller
     {
         DB::beginTransaction();
         try {
-            $message = Message::create($request->all());
+            $message = Message::create($request->validated());
 
             DB::commit();
             return Helpers::apiResponse(true, 'Message Created', $message);

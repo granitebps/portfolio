@@ -20,7 +20,7 @@ class CertificationController extends Controller
     {
         DB::beginTransaction();
         try {
-            Certification::create($request->all());
+            Certification::create($request->validated());
 
             DB::commit();
             return Helpers::apiResponse(true, 'Certification Created');
@@ -39,7 +39,7 @@ class CertificationController extends Controller
                 return Helpers::apiResponse(false, 'Certification Not Found', [], 404);
             }
 
-            $certification->update($request->all());
+            $certification->update($request->validated());
 
             DB::commit();
             return Helpers::apiResponse(true, 'Certification Updated');

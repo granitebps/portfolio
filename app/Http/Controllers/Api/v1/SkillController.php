@@ -21,7 +21,7 @@ class SkillController extends Controller
     {
         DB::beginTransaction();
         try {
-            $skill = Skill::create($request->all());
+            $skill = Skill::create($request->validated());
 
             DB::commit();
             return Helpers::apiResponse(true, 'Skill Created', $skill);
@@ -40,7 +40,7 @@ class SkillController extends Controller
                 return Helpers::apiResponse(false, 'Skill Not Found', [], 404);
             }
 
-            $skill->update($request->all());
+            $skill->update($request->validated());
 
             DB::commit();
             return Helpers::apiResponse(true, 'Skill Updated', $skill);

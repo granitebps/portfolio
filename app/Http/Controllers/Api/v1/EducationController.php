@@ -20,7 +20,7 @@ class EducationController extends Controller
     {
         DB::beginTransaction();
         try {
-            Education::create($request->all());
+            Education::create($request->validated());
 
             DB::commit();
             return Helpers::apiResponse(true, 'Education Created');
@@ -38,7 +38,7 @@ class EducationController extends Controller
             if (!$education) {
                 return Helpers::apiResponse(false, 'Education Not Found', [], 404);
             }
-            $education->update($request->all());
+            $education->update($request->validated());
 
             DB::commit();
             return Helpers::apiResponse(true, 'Education Updated');

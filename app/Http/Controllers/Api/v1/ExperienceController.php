@@ -21,7 +21,7 @@ class ExperienceController extends Controller
     {
         DB::beginTransaction();
         try {
-            Experience::create($request->all());
+            Experience::create($request->validated());
 
             DB::commit();
             return Helpers::apiResponse(true, 'Experience Created');
@@ -31,7 +31,7 @@ class ExperienceController extends Controller
         }
     }
 
-    public function update(Request $request, $id)
+    public function update(ExperienceRequest $request, $id)
     {
         DB::beginTransaction();
         try {
@@ -39,7 +39,7 @@ class ExperienceController extends Controller
             if (!$experience) {
                 return Helpers::apiResponse(false, 'Experience Not Found', [], 404);
             }
-            $experience->update($request->all());
+            $experience->update($request->validated());
 
             DB::commit();
             return Helpers::apiResponse(true, 'Experience Updated');
