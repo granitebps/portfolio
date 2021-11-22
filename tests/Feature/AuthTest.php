@@ -1,66 +1,52 @@
 <?php
 
-namespace Tests\Feature;
+use App\Models\Profile;
 
-use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Tests\TestCase;
-use Tests\Traits\AuthTraitTest;
+use function Pest\Laravel\get;
+use function Pest\Laravel\post;
 
-class AuthTest extends TestCase
-{
-    use DatabaseTransactions, AuthTraitTest;
+it('can login', function () {
+    $profile = Profile::factory()->create();
 
-    public function test_success_login()
-    {
-        $this->authenticate();
-
-        $response = $this->json('POST', '/api/v1/auth/login', [
-            'username' => 'admin',
-            'password' => '12345678'
+    post('/api/v1/auth/login', [
+        'username' => $profile->user->username,
+        'password' => '12345678'
+    ])
+        ->assertStatus(200)
+        ->assertJson([
+            'data' => [
+                'name' => $profile->user->name,
+                'avatar' => $profile->avatar
+            ],
         ]);
+});
 
-        $response->assertStatus(200)->assertJson([
-            'success' => true,
-            'message' => '',
+it('cannot login using wrong password', function () {
+    $profile = Profile::factory()->create();
+
+    post('/api/v1/auth/login', [
+        'username' => $profile->user->username,
+        'password' => '1234567890'
+    ])
+        ->assertStatus(401);
+});
+
+it('can return user data with token', function () {
+    $profile = Profile::factory()->create();
+    $user = $profile->user;
+
+    $token = $user->createToken(config('app.name'))->plainTextToken;
+
+    get('/api/v1/auth/me', [
+        'Authorization' => "Bearer $token",
+    ])
+        ->assertStatus(200)
+        ->assertJson([
+            'data' => $user->toArray()
         ]);
-    }
+});
 
-    public function test_failed_login()
-    {
-        $this->authenticate();
-
-        $response = $this->json('POST', '/api/v1/auth/login', [
-            'username' => 'granitebps',
-            'password' => 'passwordsalah'
-        ]);
-
-        $response->assertStatus(401)->assertExactJson([
-            'success' => false,
-            'message' => 'Username or Password Is Wrong',
-            'data' => []
-        ]);
-    }
-
-    public function test_authenticated()
-    {
-        $token = $this->authenticate();
-
-        $response = $this->withHeaders([
-            'Authorization' => "Bearer $token",
-        ])->json('GET', '/api/v1/auth/me');
-        $response->assertStatus(200)->assertJson([
-            'success' => true,
-            'message' => ''
-        ]);
-    }
-
-    public function test_unauthenticated()
-    {
-        $response = $this->json('GET', '/api/v1/auth/me');
-        $response->assertStatus(401)->assertJson([
-            'message' => 'Unauthenticated',
-        ]);
-    }
-}
+it('cannot get user data if not authenticated', function () {
+    get('/api/v1/auth/me')
+        ->assertStatus(401);
+});
