@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Traits\ClearsResponseCache;
+use Database\Factories\PortfolioPicFactory;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;
@@ -17,12 +19,22 @@ class PortfolioPic extends Model
         'pic'
     ];
 
-    public function getPicAttribute($value)
+    public function getPicAttribute($value): string
     {
         if ($value) {
             return Storage::url($value);
         }
 
-        return null;
+        return '';
+    }
+
+    /**
+     * Create a new factory instance for the model.
+     *
+     * @return Factory
+     */
+    protected static function newFactory(): Factory
+    {
+        return PortfolioPicFactory::new();
     }
 }

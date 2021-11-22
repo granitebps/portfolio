@@ -3,9 +3,8 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Facades\Hash;
 
-class UserFactory extends Factory
+class EducationFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -14,11 +13,13 @@ class UserFactory extends Factory
      */
     public function definition()
     {
+        $startYear = $this->faker->year;
+
         return [
             'name' => $this->faker->name,
-            'username' => $this->faker->userName,
-            'email' => $this->faker->email,
-            'password' => Hash::make(12345678),
+            'institute' => $this->faker->paragraph(5),
+            'start_year' => $startYear,
+            'end_year' => $this->faker->year + 4,
         ];
     }
 }
