@@ -5,11 +5,12 @@ namespace App\Models;
 use App\Traits\ClearsResponseCache;
 use Database\Factories\MessageFactory;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Message extends Model
 {
-    use ClearsResponseCache;
+    use ClearsResponseCache, HasFactory;
 
     protected $fillable = [
         'first_name',

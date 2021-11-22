@@ -5,12 +5,13 @@ namespace App\Models;
 use App\Traits\ClearsResponseCache;
 use Database\Factories\TechnologyFactory;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
 class Technology extends Model
 {
-    use ClearsResponseCache;
+    use ClearsResponseCache, HasFactory;
 
     protected $table = 'technologies';
     protected $fillable = [

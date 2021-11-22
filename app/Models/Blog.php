@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Traits\ClearsResponseCache;
 use Database\Factories\BlogFactory;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -12,7 +13,7 @@ use Illuminate\Support\Facades\Storage;
 
 class Blog extends Model
 {
-    use SoftDeletes, ClearsResponseCache;
+    use SoftDeletes, ClearsResponseCache, HasFactory;
 
     protected $table = 'blogs';
     protected $fillable = [

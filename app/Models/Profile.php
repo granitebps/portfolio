@@ -5,13 +5,14 @@ namespace App\Models;
 use App\Traits\ClearsResponseCache;
 use Database\Factories\ProfileFactory;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\Storage;
 
 class Profile extends Model
 {
-    use ClearsResponseCache;
+    use ClearsResponseCache, HasFactory;
 
     protected $fillable = [
         'user_id',
