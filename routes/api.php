@@ -14,13 +14,13 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::group(['namespace' => 'Api\v1', 'prefix' => 'v1', 'middleware' => ['cacheResponse']], function () {
-    Route::post('auth/login', 'AuthController@login');
+    Route::post('auth/login', 'AuthController@login')->name('auth:login');
 
     Route::post('auth/request_reset_password', 'AuthController@request_reset_password');
 
     Route::group(['middleware' => 'auth:api'], function () {
-        Route::get('auth/me', 'AuthController@me');
-        Route::post('auth/logout', 'AuthController@logout');
+        Route::get('auth/me', 'AuthController@me')->name('auth:me');
+        Route::post('auth/logout', 'AuthController@logout')->name('auth:logout');
 
         Route::post('profile', 'ProfileController@update');
         Route::post('profile-password', 'ProfileController@password');
