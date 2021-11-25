@@ -1,135 +1,148 @@
 <?php
 
-namespace Tests\Feature;
-
 use App\Models\Blog;
-use App\Models\User;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
+use App\Models\Profile;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
-use Tests\TestCase;
-use Tests\Traits\AuthTraitTest;
+use Illuminate\Testing\Fluent\AssertableJson;
 
-class BlogTest extends TestCase
-{
-    use DatabaseTransactions, AuthTraitTest;
+use function Pest\Laravel\delete;
+use function Pest\Laravel\get;
+use function Pest\Laravel\post;
+use function Pest\Laravel\put;
 
-    /** @test */
-    public function test_get_blogs()
-    {
-        $response = $this->json('GET', '/api/v1/blog');
-        $response->assertStatus(200)->assertJson([
-            'success' => true,
-            'message' => ''
+it('can get list of blog', function () {
+    get(
+        uri: route('blog.index')
+    )->assertStatus(200)
+        ->assertJson(
+            fn (AssertableJson $json) =>
+            $json->has('data', 1)
+                ->etc()
+        );
+})->with('blog');
+
+it('can get a blog by id and slug', function (Blog $blog) {
+    get(
+        uri: route('blog.show', [
+            'id' => $blog,
+            'slug' => $blog->slug
+        ])
+    )->assertStatus(200)
+        ->assertJson([
+            'data' => [
+                'id' => $blog->id,
+                'slug' => $blog->slug,
+            ]
         ]);
-    }
+})->with('blog');
 
-    /** @test */
-    public function test_get_blog()
-    {
-        $response = $this->json('GET', '/api/v1/blog/99');
-        $response->assertStatus(404);
+it('can store a blog with authenticated user', function (Profile $profile) {
+    $blog = Blog::factory()->make();
+    $token = $profile->user->createToken(config('app.name'))->plainTextToken;
+    $file = UploadedFile::fake()->image('blog.jpg');
 
-        $this->authenticate();
-        $blog = $this->createBlog();
+    $this->assertDatabaseCount('blogs', 0);
 
-        $response = $this->json('GET', '/api/v1/blog/' . $blog->id . '/' . $blog->slug);
-        $response->assertStatus(200)->assertJson([
-            'success' => true,
-            'message' => ''
-        ]);
-    }
+    post(
+        uri: route('blog.store'),
+        data: [
+            'title' => $blog->title,
+            'body' => $blog->body,
+        ],
+    )->assertStatus(401);
 
-    /** @test */
-    public function test_create_blog()
-    {
-        Storage::fake('public');
-
-        $response = $this->json('POST', '/api/v1/blog', $this->blogData());
-        $response->assertStatus(401);
-
-        $token = $this->authenticate();
-        $response = $this->withHeaders([
+    $response = post(
+        uri: route('blog.store'),
+        data: [
+            'title' => $blog->title,
+            'body' => $blog->body,
+            'image' => $file
+        ],
+        headers: [
             'Authorization' => "Bearer $token",
-        ])->json('POST', '/api/v1/blog', $this->blogData());
-        $response->assertStatus(200)->assertJson([
-            'success' => true,
-            'message' => 'Blog Created'
-        ]);
-    }
+        ]
+    )->assertStatus(200)->json();
 
-    /** @test */
-    public function test_update_blog()
-    {
-        $response = $this->json('PUT', '/api/v1/blog/99', $this->blogData());
-        $response->assertStatus(401);
+    expect(Blog::find($response['data']['id']))->toBeTruthy();
+})->with('profile');
 
-        $token = $this->authenticate();
-        $response = $this->withHeaders([
+it('can update a blog with authenticated user', function (Profile $profile, Blog $blog) {
+    $newBlog = Blog::factory()->make();
+    $token = $profile->user->createToken(config('app.name'))->plainTextToken;
+    $file = UploadedFile::fake()->image('blog.jpg');
+
+    expect(Blog::find($blog->id))->toBeTruthy();
+
+    put(
+        uri: route('blog.update', [
+            'blog' => 0
+        ]),
+        data: [
+            'title' => $blog->title,
+            'body' => $blog->body,
+        ],
+    )->assertStatus(401);
+
+    put(
+        uri: route('blog.update', [
+            'blog' => 0
+        ]),
+        data: [
+            'title' => $blog->title,
+            'body' => $blog->body,
+        ],
+        headers: [
             'Authorization' => "Bearer $token",
-        ])->json('PUT', '/api/v1/blog/99', $this->blogData());
-        $response->assertStatus(404);
+        ]
+    )->assertStatus(404);
 
-        $blog = $this->createBlog();
-        $response = $this->withHeaders([
+    $response = put(
+        uri: route('blog.update', [
+            'blog' => $blog->id
+        ]),
+        data: [
+            'title' => $newBlog->title,
+            'body' => $newBlog->body,
+            'image' => $file
+        ],
+        headers: [
             'Authorization' => "Bearer $token",
-        ])->json('PUT', '/api/v1/blog/' . $blog->id, $this->blogData());
-        $response->assertStatus(200)->assertJson([
-            'success' => true,
-            'message' => 'Blog Updated'
-        ]);
-    }
+        ]
+    )->assertStatus(200)->json();
 
-    /** @test */
-    public function test_delete_blog()
-    {
-        $response = $this->json('DELETE', '/api/v1/blog/99');
-        $response->assertStatus(401);
+    expect($response['data']['id'])->toEqual($blog->id);
+    expect(Blog::find($blog->id))->toBeTruthy();
+    expect(Blog::find($blog->id))->title->toEqual($newBlog->title);
+})->with('profile', 'blog');
 
-        $token = $this->authenticate();
-        $response = $this->withHeaders([
+it('can delete a blog with authenticated user', function (Profile $profile, Blog $blog) {
+    $token = $profile->user->createToken(config('app.name'))->plainTextToken;
+
+    expect(Blog::find($blog->id))->toBeTruthy();
+
+    delete(
+        uri: route('blog.destroy', [
+            'blog' => 0
+        ]),
+    )->assertStatus(401);
+
+    delete(
+        uri: route('blog.destroy', [
+            'blog' => 0
+        ]),
+        headers: [
             'Authorization' => "Bearer $token",
-        ])->json('DELETE', '/api/v1/blog/99');
-        $response->assertStatus(404);
+        ]
+    )->assertStatus(404);
 
-        $blog = $this->createBlog();
-        $response = $this->withHeaders([
+    delete(
+        uri: route('blog.destroy', [
+            'blog' => $blog->id
+        ]),
+        headers: [
             'Authorization' => "Bearer $token",
-        ])->json('DELETE', '/api/v1/blog/' . $blog->id);
-        $response->assertStatus(200)->assertJson([
-            'success' => true,
-            'message' => 'Blog Deleted'
-        ]);
-    }
+        ]
+    )->assertStatus(200)->json();
 
-    public function blogData()
-    {
-        $file = UploadedFile::fake()->image('blog.jpg')->size(512);
-
-        return [
-            'title' => 'Test Blog Title',
-            'body' => 'Test Blog Body',
-            'image' => $file,
-        ];
-    }
-
-    public function createBlog()
-    {
-        Storage::fake('public');
-
-        $file = UploadedFile::fake()->image('blog.jpg');
-
-        $user = User::first();
-
-        $blog = Blog::create([
-            'user_id' => $user->id,
-            'title' => 'Test Blog Title',
-            'slug' => 'test-blog-title',
-            'body' => 'Test Blog Body',
-            'image' => $file,
-        ]);
-        return $blog;
-    }
-}
+    expect(Blog::find($blog->id))->toBeNull();
+})->with('profile', 'blog');
