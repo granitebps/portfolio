@@ -1,101 +1,138 @@
 <?php
 
-namespace Tests\Feature;
-
 use App\Models\Certification;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Tests\TestCase;
-use Tests\Traits\AuthTraitTest;
+use App\Models\Profile;
+use Illuminate\Testing\Fluent\AssertableJson;
 
-class CertificationTest extends TestCase
-{
-    use DatabaseTransactions, AuthTraitTest;
+use function Pest\Laravel\delete;
+use function Pest\Laravel\get;
+use function Pest\Laravel\post;
+use function Pest\Laravel\put;
 
-    /** @test */
-    public function test_get_certifications()
-    {
-        $response = $this->json('GET', '/api/v1/certification');
-        $response->assertStatus(200)->assertJson([
-            'success' => true,
-            'message' => ''
-        ]);
-    }
+it('can get list of certification', function () {
+    get(
+        uri: route('certification.index')
+    )->assertStatus(200)
+        ->assertJson(
+            fn (AssertableJson $json) =>
+            $json->has('data', 1)
+                ->etc()
+        );
+})->with('certification');
 
-    /** @test */
-    public function test_create_certification()
-    {
-        $response = $this->json('POST', '/api/v1/certification', $this->certificationData());
-        $response->assertStatus(401);
+it('can store a certification with authenticated user', function (Profile $profile) {
+    $certification = Certification::factory()->make();
+    $token = $profile->user->createToken(config('app.name'))->plainTextToken;
 
-        $token = $this->authenticate();
-        $response = $this->withHeaders([
+    $this->assertDatabaseCount('certifications', 0);
+
+    post(
+        uri: route('certification.store'),
+        data: [
+            'name' => $certification->name,
+            'institution' => $certification->institution,
+            'link' => $certification->link,
+            'published' => $certification->published
+        ],
+    )->assertStatus(401);
+
+    $response = post(
+        uri: route('certification.store'),
+        data: [
+            'name' => $certification->name,
+            'institution' => $certification->institution,
+            'link' => $certification->link,
+            'published' => $certification->published
+        ],
+        headers: [
             'Authorization' => "Bearer $token",
-        ])->json('POST', '/api/v1/certification', $this->certificationData());
-        $response->assertStatus(200)->assertJson([
-            'success' => true,
-            'message' => 'Certification Created'
-        ]);
-    }
+        ]
+    )->assertStatus(200)->json();
 
-    /** @test */
-    public function test_update_certification()
-    {
-        $response = $this->json('PUT', '/api/v1/certification/99', $this->certificationData());
-        $response->assertStatus(401);
+    expect(Certification::find($response['data']['id']))->toBeTruthy();
+})->with('profile');
 
-        $token = $this->authenticate();
-        $response = $this->withHeaders([
+it('can update a certification with authenticated user', function (Profile $profile, Certification $certification) {
+    $newCertification = certification::factory()->make();
+    $token = $profile->user->createToken(config('app.name'))->plainTextToken;
+
+    expect(Certification::find($certification->id))->toBeTruthy();
+
+    put(
+        uri: route('certification.update', [
+            'certification' => 0
+        ]),
+        data: [
+            'name' => $newCertification->name,
+            'institution' => $newCertification->institution,
+            'link' => $newCertification->link,
+            'published' => $newCertification->published
+        ],
+    )->assertStatus(401);
+
+    put(
+        uri: route('certification.update', [
+            'certification' => 0
+        ]),
+        data: [
+            'name' => $newCertification->name,
+            'institution' => $newCertification->institution,
+            'link' => $newCertification->link,
+            'published' => $newCertification->published
+        ],
+        headers: [
             'Authorization' => "Bearer $token",
-        ])->json('PUT', '/api/v1/certification/99', $this->certificationData());
-        $response->assertStatus(404);
+        ]
+    )->assertStatus(404);
 
-        $certification = $this->createCertification();
-        $response = $this->withHeaders([
+    $response = put(
+        uri: route('certification.update', [
+            'certification' => $certification->id
+        ]),
+        data: [
+            'name' => $newCertification->name,
+            'institution' => $newCertification->institution,
+            'link' => $newCertification->link,
+            'published' => $newCertification->published
+        ],
+        headers: [
             'Authorization' => "Bearer $token",
-        ])->json('PUT', '/api/v1/certification/' . $certification->id, $this->certificationData());
-        $response->assertStatus(200)->assertJson([
-            'success' => true,
-            'message' => 'Certification Updated'
-        ]);
-    }
+        ]
+    )->assertStatus(200)->json();
 
-    /** @test */
-    public function test_delete_certification()
-    {
-        $response = $this->json('DELETE', '/api/v1/certification/99');
-        $response->assertStatus(401);
+    expect($response['data']['id'])->toEqual($certification->id);
+    expect(Certification::find($certification->id))->toBeTruthy();
+    expect(Certification::find($certification->id))->name->toEqual($newCertification->name);
+})->with('profile', 'certification');
 
-        $token = $this->authenticate();
-        $response = $this->withHeaders([
+it('can delete a certification with authenticated user', function (Profile $profile, Certification $certification) {
+    $token = $profile->user->createToken(config('app.name'))->plainTextToken;
+
+    expect(Certification::find($certification->id))->toBeTruthy();
+
+    delete(
+        uri: route('certification.destroy', [
+            'certification' => 0
+        ]),
+    )->assertStatus(401);
+
+    delete(
+        uri: route('certification.destroy', [
+            'certification' => 0
+        ]),
+        headers: [
             'Authorization' => "Bearer $token",
-        ])->json('DELETE', '/api/v1/certification/99');
-        $response->assertStatus(404);
+        ]
+    )->assertStatus(404);
 
-        $certification = $this->createCertification();
-        $response = $this->withHeaders([
+    delete(
+        uri: route('certification.destroy', [
+            'certification' => $certification->id
+        ]),
+        headers: [
             'Authorization' => "Bearer $token",
-        ])->json('DELETE', '/api/v1/certification/' . $certification->id);
-        $response->assertStatus(200)->assertJson([
-            'success' => true,
-            'message' => 'Certification Deleted'
-        ]);
-    }
+        ]
+    )->assertStatus(200)->json();
 
-    public function certificationData()
-    {
-        return [
-            'name' => 'Test Certification',
-            'institution' => 'Test Institution',
-            'link' => 'https://granitebps.com',
-            'published' => '2019-05-28T17:00:00.000Z',
-        ];
-    }
-
-    public function createCertification()
-    {
-        $certification = Certification::create($this->certificationData());
-        return $certification;
-    }
-}
+    expect(Certification::find($certification->id))->toBeNull();
+})->with('profile', 'certification');

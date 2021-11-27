@@ -71,7 +71,7 @@ Route::group(['namespace' => 'Api\v1', 'prefix' => 'v1', 'middleware' => ['cache
         Route::get('blog', 'BlogController@index')->name('blog.index');
         Route::get('blog/{id}/{slug}', 'BlogController@show')->name('blog.show');
 
-        Route::get('certification', 'CertificationController@index');
+        Route::get('certification', 'CertificationController@index')->name('certification.index');
     });
 });
 Route::any('{path}', 'BaseController@not_found')->where('path', '.*');

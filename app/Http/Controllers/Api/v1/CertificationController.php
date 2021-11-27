@@ -20,10 +20,10 @@ class CertificationController extends Controller
     {
         DB::beginTransaction();
         try {
-            Certification::create($request->validated());
+            $certification = Certification::create($request->validated());
 
             DB::commit();
-            return Helpers::apiResponse(true, 'Certification Created');
+            return Helpers::apiResponse(true, 'Certification Created', $certification);
         } catch (\Exception $e) {
             DB::rollback();
             throw $e;
@@ -42,7 +42,7 @@ class CertificationController extends Controller
             $certification->update($request->validated());
 
             DB::commit();
-            return Helpers::apiResponse(true, 'Certification Updated');
+            return Helpers::apiResponse(true, 'Certification Updated', $certification);
         } catch (\Exception $e) {
             DB::rollback();
             throw $e;
