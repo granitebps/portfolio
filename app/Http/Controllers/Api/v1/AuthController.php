@@ -29,10 +29,6 @@ class AuthController extends Controller
 
         $token = $user->createToken(config('app.name'));
 
-        if (!$token) {
-            return Helpers::apiResponse(false, 'Unauthorized', [], 401);
-        }
-
         $user = $user;
         $data['token'] = $token->plainTextToken;
         $data['name'] = $user->name;

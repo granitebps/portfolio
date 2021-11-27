@@ -20,7 +20,7 @@ class Handler extends ExceptionHandler
     /**
      * A list of the exception types that are not reported.
      *
-     * @var array
+     * @var string[]
      */
     protected $dontReport = [
         //
@@ -29,7 +29,7 @@ class Handler extends ExceptionHandler
     /**
      * A list of the inputs that are never flashed for validation exceptions.
      *
-     * @var array
+     * @var string[]
      */
     protected $dontFlash = [
         'password',
@@ -94,11 +94,7 @@ class Handler extends ExceptionHandler
             return Helpers::apiResponse(false, $exception->getMessage(), [], $exception->getStatusCode());
         }
 
-        if ($exception) {
-            return Helpers::apiResponse(false, $exception->getMessage(), [], 500);
-        }
-
-        return parent::render($request, $exception);
+        return Helpers::apiResponse(false, $exception->getMessage(), [], 500);
     }
 
     protected function unauthenticated($request, AuthenticationException $exception)

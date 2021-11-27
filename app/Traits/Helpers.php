@@ -11,7 +11,7 @@ trait Helpers
      *
      * @param bool $success
      * @param string $message
-     * @param array $result
+     * @param mixed $result
      * @param integer $code
      * @return \Illuminate\Http\Response
      */

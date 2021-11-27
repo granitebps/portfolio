@@ -51,7 +51,7 @@ class ServiceController extends Controller
 
     public function destroy($id)
     {
-        $service = Services::findOrFail($id);
+        $service = Services::find($id);
         DB::beginTransaction();
         try {
             if (!$service) {

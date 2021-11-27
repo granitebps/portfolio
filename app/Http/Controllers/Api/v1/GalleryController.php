@@ -58,7 +58,7 @@ class GalleryController extends Controller
                 return Helpers::apiResponse(false, 'File Not Found', [], 404);
             }
 
-            Storage::delete($gallery->image);
+            Storage::delete($gallery->file);
 
             $gallery->delete();
 

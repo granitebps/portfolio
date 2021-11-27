@@ -49,7 +49,7 @@ class MessageRequest extends FormRequest
             'email.required' => 'Email is required',
             'email.string' => 'Email is not valid',
             'email.max' => 'Email is too long. Max length is :max character',
-            'email.string' => 'Email is not a valid email',
+            'email.email' => 'Email is not a valid email',
         ];
     }
 }

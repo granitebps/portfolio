@@ -44,5 +44,7 @@ class UpdateFileGallery extends Command
             $gallery->name = explode('/', $gallery->name)[1];
             $gallery->save();
         }
+
+        return Command::SUCCESS;
     }
 }
