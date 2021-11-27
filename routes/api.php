@@ -64,7 +64,7 @@ Route::group(['namespace' => 'Api\v1', 'prefix' => 'v1', 'middleware' => ['cache
 
         Route::get('portfolio', 'PortfolioController@index');
 
-        Route::get('experience', 'ExperienceController@index');
+        Route::get('experience', 'ExperienceController@index')->name('experience.index');
 
         Route::get('education', 'EducationController@index')->name('education.index');
 

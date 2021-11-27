@@ -29,7 +29,7 @@ class ExperienceRequest extends FormRequest
             'desc' => 'required|string',
             'current_job' => 'sometimes|nullable|boolean',
             'start_date' => 'required|string|max:255|date',
-            'end_date' => 'exclude_if:current_job,1|required|string|max:255|date'
+            'end_date' => 'exclude_if:current_job,true|required|string|max:255|date'
         ];
     }
 

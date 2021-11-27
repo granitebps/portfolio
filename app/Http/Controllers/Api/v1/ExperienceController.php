@@ -21,10 +21,10 @@ class ExperienceController extends Controller
     {
         DB::beginTransaction();
         try {
-            Experience::create($request->validated());
+            $experience = Experience::create($request->validated());
 
             DB::commit();
-            return Helpers::apiResponse(true, 'Experience Created');
+            return Helpers::apiResponse(true, 'Experience Created', $experience);
         } catch (\Exception $e) {
             DB::rollback();
             throw $e;
@@ -42,7 +42,7 @@ class ExperienceController extends Controller
             $experience->update($request->validated());
 
             DB::commit();
-            return Helpers::apiResponse(true, 'Experience Updated');
+            return Helpers::apiResponse(true, 'Experience Updated', $experience);
         } catch (\Exception $e) {
             DB::rollback();
             throw $e;
