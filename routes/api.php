@@ -36,7 +36,7 @@ Route::group(['namespace' => 'Api\v1', 'prefix' => 'v1', 'middleware' => ['cache
         Route::get('message/read/{id}', 'MessageController@markRead')->name('message.read');
 
         Route::apiResource('portfolio', 'PortfolioController')->except(['index', 'show']);
-        Route::get('portfolio-photo/{id}', 'PortfolioController@destroy_photo');
+        Route::get('portfolio-photo/{id}', 'PortfolioController@destroy_photo')->name('portfolio.photo');
 
         Route::apiResource('experience', 'ExperienceController')->except(['index', 'show']);
 
@@ -62,7 +62,7 @@ Route::group(['namespace' => 'Api\v1', 'prefix' => 'v1', 'middleware' => ['cache
 
         Route::post('message', 'MessageController@store')->name('message.store');
 
-        Route::get('portfolio', 'PortfolioController@index');
+        Route::get('portfolio', 'PortfolioController@index')->name('portfolio.index');
 
         Route::get('experience', 'ExperienceController@index')->name('experience.index');
 

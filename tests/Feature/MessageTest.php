@@ -9,7 +9,6 @@ use Illuminate\Testing\Fluent\AssertableJson;
 use function Pest\Laravel\delete;
 use function Pest\Laravel\get;
 use function Pest\Laravel\post;
-use function Pest\Laravel\put;
 
 it('can get list of message when authenticated', function (Profile $profile, Message $message) {
     $token = $profile->user->createToken(config('app.name'))->plainTextToken;

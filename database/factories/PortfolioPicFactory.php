@@ -15,7 +15,6 @@ class PortfolioPicFactory extends Factory
     public function definition()
     {
         return [
-            'portfolio_id' => Portfolio::factory()->create(),
             'pic' => $this->faker->filePath()
         ];
     }

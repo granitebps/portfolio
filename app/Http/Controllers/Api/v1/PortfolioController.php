@@ -133,7 +133,7 @@ class PortfolioController extends Controller
             }
 
             DB::commit();
-            return Helpers::apiResponse(true, 'Portfolio Updated');
+            return Helpers::apiResponse(true, 'Portfolio Updated', $portfolio);
         } catch (\Exception $e) {
             DB::rollback();
             throw $e;
