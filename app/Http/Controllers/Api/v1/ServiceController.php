@@ -6,17 +6,18 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ServiceRequest;
 use App\Models\Services;
 use App\Traits\Helpers;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 
 class ServiceController extends Controller
 {
-    public function index()
+    public function index(): JsonResponse
     {
         $service = Services::all();
         return Helpers::apiResponse(true, '', $service);
     }
 
-    public function store(ServiceRequest $request)
+    public function store(ServiceRequest $request): JsonResponse
     {
         DB::beginTransaction();
         try {
@@ -30,7 +31,7 @@ class ServiceController extends Controller
         }
     }
 
-    public function update(ServiceRequest $request, $id)
+    public function update(ServiceRequest $request, int $id): JsonResponse
     {
         DB::beginTransaction();
         try {
@@ -49,7 +50,7 @@ class ServiceController extends Controller
         }
     }
 
-    public function destroy($id)
+    public function destroy(int $id): JsonResponse
     {
         $service = Services::find($id);
         DB::beginTransaction();

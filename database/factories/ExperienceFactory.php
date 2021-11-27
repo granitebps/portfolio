@@ -22,7 +22,7 @@ class ExperienceFactory extends Factory
             'start_date' => $startDate,
             'end_date' => $currentJob ? null : $this->faker->date,
             'current_job' => $currentJob,
-            'desc' => $this->faker->paragraph(10)
+            'desc' => $this->faker->words(10, true)
         ];
     }
 }

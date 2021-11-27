@@ -9,6 +9,10 @@ use App\Models\User;
 use App\Notifications\ResetPasswordNotification;
 use App\Traits\Helpers;
 use Carbon\Carbon;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -17,7 +21,7 @@ use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
-    public function login(LoginRequest $request)
+    public function login(LoginRequest $request): JsonResponse
     {
         $credentials = $request->only(['username', 'password']);
 
@@ -37,7 +41,7 @@ class AuthController extends Controller
         return Helpers::apiResponse(true, '', $data);
     }
 
-    public function me()
+    public function me(): JsonResponse
     {
         $user = Auth::user();
         if (!$user) {
@@ -46,7 +50,7 @@ class AuthController extends Controller
         return Helpers::apiResponse(true, '', $user);
     }
 
-    public function logout(Request $request)
+    public function logout(Request $request): JsonResponse
     {
         $user = Auth::user();
         if (!$user) {
@@ -56,7 +60,7 @@ class AuthController extends Controller
         return Helpers::apiResponse(true, 'User Logged Out');
     }
 
-    public function request_reset_password(Request $request)
+    public function request_reset_password(Request $request): JsonResponse
     {
         $request->validate([
             'email' => 'required|string|email|max:255|exists:users,email'
@@ -88,7 +92,7 @@ class AuthController extends Controller
         }
     }
 
-    public function reset_password_form($token)
+    public function reset_password_form(string $token): View|Factory
     {
         $is_valid = false;
 
@@ -108,7 +112,7 @@ class AuthController extends Controller
         ]);
     }
 
-    public function reset_password(Request $request)
+    public function reset_password(Request $request): RedirectResponse|View|Factory
     {
         $validator = Validator::make($request->all(), [
             'token' => 'required',

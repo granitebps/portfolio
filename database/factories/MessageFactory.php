@@ -17,7 +17,7 @@ class MessageFactory extends Factory
             'first_name' => $this->faker->firstName,
             'last_name' => $this->faker->lastName,
             'email' => $this->faker->email,
-            'message' => $this->faker->paragraph(5),
+            'message' => $this->faker->words(10, true),
         ];
     }
 }

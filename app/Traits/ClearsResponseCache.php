@@ -6,6 +6,11 @@ use Illuminate\Support\Facades\Cache;
 
 trait ClearsResponseCache
 {
+    /**
+     * Clear cache after saved, created, updated, deleted
+     *
+     * @return void
+     */
     public static function bootClearsResponseCache()
     {
         self::saved(function () {

@@ -6,18 +6,19 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\TechnologyRequest;
 use App\Models\Technology;
 use App\Traits\Helpers;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class TechnologyController extends Controller
 {
-    public function index()
+    public function index(): JsonResponse
     {
         $tech = Technology::all();
         return Helpers::apiResponse(true, '', $tech);
     }
 
-    public function store(TechnologyRequest $request)
+    public function store(TechnologyRequest $request): JsonResponse
     {
         DB::beginTransaction();
         try {
@@ -42,7 +43,7 @@ class TechnologyController extends Controller
         }
     }
 
-    public function update(TechnologyRequest $request, $id)
+    public function update(TechnologyRequest $request, int $id): JsonResponse
     {
         DB::beginTransaction();
         try {
@@ -74,7 +75,7 @@ class TechnologyController extends Controller
         }
     }
 
-    public function destroy($id)
+    public function destroy(int $id): JsonResponse
     {
         DB::beginTransaction();
         try {

@@ -58,7 +58,7 @@ class Handler extends ExceptionHandler
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Throwable  $exception
-     * @return \Illuminate\Http\Response
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function render($request, Throwable $exception)
     {
@@ -71,7 +71,7 @@ class Handler extends ExceptionHandler
         }
 
         if ($exception instanceof ValidationException) {
-            return Helpers::apiResponse(false, $this->transformErrors($exception), [], $exception->status);
+            return Helpers::apiResponse(false, 'Validation Error', $this->transformErrors($exception), $exception->status);
         }
 
         if ($exception instanceof MethodNotAllowedHttpException) {
@@ -102,7 +102,7 @@ class Handler extends ExceptionHandler
         return Helpers::apiResponse(false, 'Unauthenticated', [], 401);
     }
 
-    private function transformErrors(ValidationException $exception)
+    private function transformErrors(ValidationException $exception): array
     {
         $errors = [];
         if (is_array($exception->errors())) {

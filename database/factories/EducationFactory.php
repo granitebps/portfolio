@@ -17,7 +17,7 @@ class EducationFactory extends Factory
 
         return [
             'name' => $this->faker->name,
-            'institute' => $this->faker->paragraph(5),
+            'institute' => $this->faker->words(5, true),
             'start_year' => $startYear,
             'end_year' => $this->faker->year + 4,
         ];

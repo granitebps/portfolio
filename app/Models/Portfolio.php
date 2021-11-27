@@ -33,20 +33,12 @@ class Portfolio extends Model
         return $this->hasMany(PortfolioPic::class, 'portfolio_id', 'id');
     }
 
-    public function getThumbnailAttribute($value): string
+    public function getThumbnailAttribute(string|null $value): string
     {
         if ($value) {
             return Storage::url($value);
         }
         return '';
-    }
-
-    public function getUrlAttribute($value): string
-    {
-        if (is_null($value)) {
-            return '';
-        }
-        return $value;
     }
 
     /**

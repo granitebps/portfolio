@@ -29,7 +29,7 @@ class Blog extends Model
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
-    public function getImageAttribute($value): string
+    public function getImageAttribute(string|null $value): string
     {
         if ($value) {
             return Storage::url($value);

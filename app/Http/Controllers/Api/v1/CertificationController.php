@@ -6,17 +6,18 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\CertificationRequest;
 use App\Models\Certification;
 use App\Traits\Helpers;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 
 class CertificationController extends Controller
 {
-    public function index()
+    public function index(): JsonResponse
     {
         $certifications = Certification::latest('published')->get();
         return Helpers::apiResponse(true, '', $certifications);
     }
 
-    public function store(CertificationRequest $request)
+    public function store(CertificationRequest $request): JsonResponse
     {
         DB::beginTransaction();
         try {
@@ -30,7 +31,7 @@ class CertificationController extends Controller
         }
     }
 
-    public function update(CertificationRequest $request, $id)
+    public function update(CertificationRequest $request, int $id): JsonResponse
     {
         DB::beginTransaction();
         try {
@@ -49,7 +50,7 @@ class CertificationController extends Controller
         }
     }
 
-    public function destroy($id)
+    public function destroy(int $id): JsonResponse
     {
         DB::beginTransaction();
         try {

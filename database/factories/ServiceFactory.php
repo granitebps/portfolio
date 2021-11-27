@@ -15,7 +15,7 @@ class ServiceFactory extends Factory
     {
         return [
             'name' => $this->faker->word,
-            'desc' => $this->faker->paragraph(5),
+            'desc' => $this->faker->words(5, true),
             'icon' => $this->faker->word,
         ];
     }

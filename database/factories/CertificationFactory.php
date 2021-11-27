@@ -15,7 +15,7 @@ class CertificationFactory extends Factory
     {
         return [
             'name' => $this->faker->name,
-            'institution' => $this->faker->paragraph(),
+            'institution' => $this->faker->words(5, true),
             'link' => $this->faker->url,
             'published' => $this->faker->date
         ];

@@ -19,7 +19,7 @@ class Technology extends Model
         'pic'
     ];
 
-    public function getPicAttribute($value): string
+    public function getPicAttribute(string|null $value): string
     {
         if ($value) {
             return Storage::url($value);

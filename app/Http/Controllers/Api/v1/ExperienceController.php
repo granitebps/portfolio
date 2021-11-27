@@ -6,18 +6,18 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ExperienceRequest;
 use App\Models\Experience;
 use App\Traits\Helpers;
-use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 
 class ExperienceController extends Controller
 {
-    public function index()
+    public function index(): JsonResponse
     {
         $experience = Experience::orderBy('start_date', 'desc')->get();
         return Helpers::apiResponse(true, '', $experience);
     }
 
-    public function store(ExperienceRequest $request)
+    public function store(ExperienceRequest $request): JsonResponse
     {
         DB::beginTransaction();
         try {
@@ -31,7 +31,7 @@ class ExperienceController extends Controller
         }
     }
 
-    public function update(ExperienceRequest $request, $id)
+    public function update(ExperienceRequest $request, int $id): JsonResponse
     {
         DB::beginTransaction();
         try {
@@ -49,7 +49,7 @@ class ExperienceController extends Controller
         }
     }
 
-    public function destroy($id)
+    public function destroy(int $id): JsonResponse
     {
         DB::beginTransaction();
         try {

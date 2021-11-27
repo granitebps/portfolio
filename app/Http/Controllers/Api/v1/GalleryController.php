@@ -6,19 +6,20 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\GalleryRequest;
 use App\Models\Gallery;
 use App\Traits\Helpers;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class GalleryController extends Controller
 {
-    public function index()
+    public function index(): JsonResponse
     {
         $galeries = Gallery::latest('created_at')->get();
         return Helpers::apiResponse(true, '', $galeries);
     }
 
-    public function store(GalleryRequest $request)
+    public function store(GalleryRequest $request): JsonResponse
     {
         DB::beginTransaction();
         try {
@@ -49,7 +50,7 @@ class GalleryController extends Controller
         }
     }
 
-    public function destroy($id)
+    public function destroy(int $id): JsonResponse
     {
         DB::beginTransaction();
         try {

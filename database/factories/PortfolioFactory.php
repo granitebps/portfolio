@@ -15,7 +15,7 @@ class PortfolioFactory extends Factory
     {
         return [
             'name' => $this->faker->name,
-            'desc' => $this->faker->paragraphs(5),
+            'desc' => $this->faker->words(10, true),
             'thumbnail' => $this->faker->filePath(),
             'type' => $this->faker->numberBetween(1, 2),
             'url' => $this->faker->url,

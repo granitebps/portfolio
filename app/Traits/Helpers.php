@@ -2,6 +2,7 @@
 
 namespace App\Traits;
 
+use Illuminate\Http\JsonResponse;
 use Intervention\Image\Facades\Image;
 
 trait Helpers
@@ -13,7 +14,7 @@ trait Helpers
      * @param string $message
      * @param mixed $result
      * @param integer $code
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
     public static function apiResponse($success, $message = '', $result = [], $code = 200)
     {

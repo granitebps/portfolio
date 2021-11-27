@@ -6,18 +6,19 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\SkillRequest;
 use App\Models\Skill;
 use App\Traits\Helpers;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 
 class SkillController extends Controller
 {
-    public function index()
+    public function index(): JsonResponse
     {
         $skills = Skill::all();
 
         return Helpers::apiResponse(true, '', $skills);
     }
 
-    public function store(SkillRequest $request)
+    public function store(SkillRequest $request): JsonResponse
     {
         DB::beginTransaction();
         try {
@@ -31,7 +32,7 @@ class SkillController extends Controller
         }
     }
 
-    public function update(SkillRequest $request, $id)
+    public function update(SkillRequest $request, int $id): JsonResponse
     {
         DB::beginTransaction();
         try {
@@ -50,7 +51,7 @@ class SkillController extends Controller
         }
     }
 
-    public function destroy($id)
+    public function destroy(int $id): JsonResponse
     {
         DB::beginTransaction();
         try {

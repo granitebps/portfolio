@@ -44,7 +44,7 @@ class Profile extends Model
         return $this->hasOne(User::class, 'id', 'user_id');
     }
 
-    public function getAvatarAttribute($value): string
+    public function getAvatarAttribute(string|null $value): string
     {
         if ($value) {
             return Storage::url($value);
@@ -53,7 +53,7 @@ class Profile extends Model
         return '';
     }
 
-    public function getCvAttribute($value): string
+    public function getCvAttribute(string|null $value): string
     {
         if ($value) {
             return Storage::url($value);

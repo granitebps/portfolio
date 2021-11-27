@@ -19,7 +19,7 @@ class Gallery extends Model
     protected $fillable = ['name', 'ext', 'size', 'file'];
     protected $hidden = ['updated_at'];
 
-    public function getFileAttribute($value): string
+    public function getFileAttribute(string|null $value): string
     {
         if ($value) {
             return Storage::url($value);

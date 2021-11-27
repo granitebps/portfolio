@@ -7,13 +7,14 @@ use App\Http\Requests\PortfolioRequest;
 use App\Models\Portfolio;
 use App\Models\PortfolioPic;
 use App\Traits\Helpers;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class PortfolioController extends Controller
 {
-    public function index()
+    public function index(): JsonResponse
     {
         $portfolio = Portfolio::with('pic')
             ->orderBy('created_at', 'desc')
@@ -21,7 +22,7 @@ class PortfolioController extends Controller
         return Helpers::apiResponse(true, '', $portfolio);
     }
 
-    public function store(PortfolioRequest $request)
+    public function store(PortfolioRequest $request): JsonResponse
     {
         DB::beginTransaction();
         try {
@@ -65,7 +66,7 @@ class PortfolioController extends Controller
         }
     }
 
-    public function update(PortfolioRequest $request, $id)
+    public function update(PortfolioRequest $request, int $id): JsonResponse
     {
         DB::beginTransaction();
         try {
@@ -139,7 +140,7 @@ class PortfolioController extends Controller
         }
     }
 
-    public function destroy($id)
+    public function destroy(int $id): JsonResponse
     {
         DB::beginTransaction();
         try {
@@ -163,7 +164,7 @@ class PortfolioController extends Controller
         }
     }
 
-    public function destroy_photo($id)
+    public function destroy_photo(int $id): JsonResponse
     {
         DB::beginTransaction();
         try {

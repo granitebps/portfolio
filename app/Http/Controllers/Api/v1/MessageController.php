@@ -6,18 +6,19 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\MessageRequest;
 use App\Models\Message;
 use App\Traits\Helpers;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class MessageController extends Controller
 {
-    public function index()
+    public function index(): JsonResponse
     {
         $message = Message::orderBy('created_at', 'desc')->get();
         return Helpers::apiResponse(true, '', $message);
     }
 
-    public function store(MessageRequest $request)
+    public function store(MessageRequest $request): JsonResponse
     {
         DB::beginTransaction();
         try {
@@ -31,7 +32,7 @@ class MessageController extends Controller
         }
     }
 
-    public function destroy($id)
+    public function destroy(int $id): JsonResponse
     {
         DB::beginTransaction();
         try {
@@ -50,7 +51,7 @@ class MessageController extends Controller
         }
     }
 
-    public function markRead(Request $request, $id)
+    public function markRead(Request $request, int $id): JsonResponse
     {
         DB::beginTransaction();
         try {

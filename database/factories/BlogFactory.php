@@ -20,7 +20,7 @@ class BlogFactory extends Factory
             'user_id' => User::factory()->create(),
             'title' => $title,
             'slug' => Str::slug($title),
-            'body' => $this->faker->paragraph(10),
+            'body' => $this->faker->words(10, true),
             'image' => $this->faker->filePath(),
         ];
     }

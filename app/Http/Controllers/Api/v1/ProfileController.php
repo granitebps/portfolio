@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\v1;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Traits\Helpers;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -13,13 +14,13 @@ use Propaganistas\LaravelPhone\PhoneNumber;
 
 class ProfileController extends Controller
 {
-    public function index()
+    public function index(): JsonResponse
     {
         $user = User::with('profile')->first();
         return Helpers::apiResponse(true, '', $user);
     }
 
-    public function update(Request $request)
+    public function update(Request $request): JsonResponse
     {
         $auth = auth()->user();
         if (!$auth) {
@@ -112,7 +113,7 @@ class ProfileController extends Controller
         }
     }
 
-    public function password(Request $request)
+    public function password(Request $request): JsonResponse
     {
         $this->validate($request, [
             'password' => 'required|confirmed|string|min:8|max:255',

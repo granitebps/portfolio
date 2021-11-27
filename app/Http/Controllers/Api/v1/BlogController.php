@@ -6,13 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\BlogRequest;
 use App\Models\Blog;
 use App\Traits\Helpers;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class BlogController extends Controller
 {
-    public function index()
+    public function index(): JsonResponse
     {
         $blog = Blog::with('user')
             ->latest('created_at')
@@ -20,7 +21,7 @@ class BlogController extends Controller
         return Helpers::apiResponse(true, '', $blog);
     }
 
-    public function store(BlogRequest $request)
+    public function store(BlogRequest $request): JsonResponse
     {
         DB::beginTransaction();
         try {
@@ -50,7 +51,7 @@ class BlogController extends Controller
         }
     }
 
-    public function show($id, $slug)
+    public function show(int $id, string $slug): JsonResponse
     {
         $blog = Blog::where('id', $id)->where('slug', $slug)->first();
         if (!$blog) {
@@ -59,7 +60,7 @@ class BlogController extends Controller
         return Helpers::apiResponse(true, '', $blog);
     }
 
-    public function update(BlogRequest $request, $id)
+    public function update(BlogRequest $request, int $id): JsonResponse
     {
         DB::beginTransaction();
         try {
@@ -94,7 +95,7 @@ class BlogController extends Controller
         }
     }
 
-    public function destroy($id)
+    public function destroy(int $id): JsonResponse
     {
         DB::beginTransaction();
         try {
