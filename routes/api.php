@@ -22,8 +22,8 @@ Route::group(['namespace' => 'Api\v1', 'prefix' => 'v1', 'middleware' => ['cache
         Route::get('auth/me', 'AuthController@me')->name('auth:me');
         Route::post('auth/logout', 'AuthController@logout')->name('auth:logout');
 
-        Route::post('profile', 'ProfileController@update');
-        Route::post('profile-password', 'ProfileController@password');
+        Route::post('profile', 'ProfileController@update')->name('profile.update');
+        Route::post('profile-password', 'ProfileController@password')->name('profile.password');
 
         Route::apiResource('skill', 'SkillController')->except(['index', 'show']);
 
@@ -52,13 +52,13 @@ Route::group(['namespace' => 'Api\v1', 'prefix' => 'v1', 'middleware' => ['cache
     });
 
     Route::middleware([])->group(function () {
-        Route::get('profile', 'ProfileController@index');
+        Route::get('profile', 'ProfileController@index')->name('profile.index');
 
-        Route::get('skill', 'SkillController@index');
+        Route::get('skill', 'SkillController@index')->name('skill.index');
 
-        Route::get('service', 'ServiceController@index');
+        Route::get('service', 'ServiceController@index')->name('service.index');
 
-        Route::get('technology', 'TechnologyController@index');
+        Route::get('technology', 'TechnologyController@index')->name('technology.index');
 
         Route::post('message', 'MessageController@store')->name('message.store');
 
