@@ -9,7 +9,7 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use Tests\Traits\AuthTraitTest;
 
-class SkillTest extends TestCase
+class SkillTestOld extends TestCase
 {
     use DatabaseTransactions, AuthTraitTest;
 

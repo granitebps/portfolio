@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 use Tests\Traits\AuthTraitTest;
 
-class GalleryTest extends TestCase
+class GalleryTestOld extends TestCase
 {
     use DatabaseTransactions, AuthTraitTest;
 

@@ -2,21 +2,23 @@
 
 namespace Tests\Feature;
 
-use App\Models\Education;
+use App\Models\Technology;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 use Tests\Traits\AuthTraitTest;
 
-class EducationTest extends TestCase
+class TechnologyTestOld extends TestCase
 {
     use DatabaseTransactions, AuthTraitTest;
 
     /** @test */
-    public function test_get_educations()
+    public function test_get_technology()
     {
-        $response = $this->json('GET', '/api/v1/education');
+        $response = $this->json('GET', '/api/v1/technology');
         $response->assertStatus(200)->assertJson([
             'success' => true,
             'message' => ''
@@ -24,78 +26,82 @@ class EducationTest extends TestCase
     }
 
     /** @test */
-    public function test_create_education()
+    public function test_create_technology()
     {
-        $response = $this->json('POST', '/api/v1/education', $this->educationData());
+        Storage::fake('public');
+
+        $response = $this->json('POST', '/api/v1/technology', $this->technologyData());
         $response->assertStatus(401);
 
         $token = $this->authenticate();
         $response = $this->withHeaders([
             'Authorization' => "Bearer $token",
-        ])->json('POST', '/api/v1/education', $this->educationData());
+        ])->json('POST', '/api/v1/technology', $this->technologyData());
         $response->assertStatus(200)->assertJson([
             'success' => true,
-            'message' => 'Education Created'
+            'message' => 'Technology Created'
         ]);
     }
 
     /** @test */
-    public function test_update_education()
+    public function test_update_technology()
     {
-        $response = $this->json('PUT', '/api/v1/education/99', $this->educationData());
+        $response = $this->json('PUT', '/api/v1/technology/99', $this->technologyData());
         $response->assertStatus(401);
 
         $token = $this->authenticate();
         $response = $this->withHeaders([
             'Authorization' => "Bearer $token",
-        ])->json('PUT', '/api/v1/education/99', $this->educationData());
+        ])->json('PUT', '/api/v1/technology/99', $this->technologyData());
         $response->assertStatus(404);
 
-        $education = $this->createEducation();
+        $technology = $this->createTechnology();
         $response = $this->withHeaders([
             'Authorization' => "Bearer $token",
-        ])->json('PUT', '/api/v1/education/' . $education->id, $this->educationData());
+        ])->json('PUT', '/api/v1/technology/' . $technology->id, $this->technologyData());
         $response->assertStatus(200)->assertJson([
             'success' => true,
-            'message' => 'Education Updated'
+            'message' => 'Technology Updated'
         ]);
     }
 
     /** @test */
-    public function test_delete_education()
+    public function test_delete_technology()
     {
-        $response = $this->json('DELETE', '/api/v1/education/99');
+        $response = $this->json('DELETE', '/api/v1/technology/99');
         $response->assertStatus(401);
 
         $token = $this->authenticate();
         $response = $this->withHeaders([
             'Authorization' => "Bearer $token",
-        ])->json('DELETE', '/api/v1/education/99');
+        ])->json('DELETE', '/api/v1/technology/99');
         $response->assertStatus(404);
 
-        $education = $this->createEducation();
+        $technology = $this->createTechnology();
         $response = $this->withHeaders([
             'Authorization' => "Bearer $token",
-        ])->json('DELETE', '/api/v1/education/' . $education->id);
+        ])->json('DELETE', '/api/v1/technology/' . $technology->id);
         $response->assertStatus(200)->assertJson([
             'success' => true,
-            'message' => 'Education Deleted'
+            'message' => 'Technology Deleted'
         ]);
     }
 
-    public function educationData()
+    public function technologyData()
     {
+        $file = UploadedFile::fake()->image('tech.jpg')->size(512);
+
         return [
-            'name' => 'Test Education Name',
-            'institute' => 'Test Education Institute',
-            'start_year' => '2000',
-            'end_year' => '2020'
+            'name' => 'Test Technology Test',
+            'pic' => $file,
         ];
     }
 
-    public function createEducation()
+    public function createTechnology()
     {
-        $education = Education::create($this->educationData());
-        return $education;
+        Storage::fake('public');
+
+        $technology = Technology::create($this->technologyData());
+        return $technology;
     }
 }

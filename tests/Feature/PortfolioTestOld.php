@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 use Tests\Traits\AuthTraitTest;
 
-class PortfolioTest extends TestCase
+class PortfolioTestOld extends TestCase
 {
     use DatabaseTransactions, AuthTraitTest;
 
