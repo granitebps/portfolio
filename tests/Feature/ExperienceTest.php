@@ -112,7 +112,7 @@ it('can update a experience with authenticated user', function (Profile $profile
 
     expect($response['data']['id'])->toEqual($experience->id);
     expect(Experience::find($experience->id))->toBeTruthy();
-    expect(Experience::find($experience->id))->name->toEqual($newExperience->name);
+    expect(Experience::find($experience->id))->company->toEqual($newExperience->company);
 })->with('profile', 'experience');
 
 it('can delete a experience with authenticated user', function (Profile $profile, Experience $experience) {
