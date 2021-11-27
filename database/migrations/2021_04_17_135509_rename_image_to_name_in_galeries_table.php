@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddExtAndSizeToGaleriesTable extends Migration
+class RenameImageToNameInGaleriesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,8 +14,6 @@ class AddExtAndSizeToGaleriesTable extends Migration
     public function up()
     {
         Schema::table('galeries', function (Blueprint $table) {
-            $table->string('ext')->nullable();
-            $table->bigInteger('size')->nullable();
             $table->renameColumn('image', 'name');
         });
     }
@@ -28,7 +26,6 @@ class AddExtAndSizeToGaleriesTable extends Migration
     public function down()
     {
         Schema::table('galeries', function (Blueprint $table) {
-            $table->dropColumn(['ext', 'size']);
             $table->renameColumn('name', 'image');
         });
     }
