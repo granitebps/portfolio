@@ -31,9 +31,9 @@ Route::group(['namespace' => 'Api\v1', 'prefix' => 'v1', 'middleware' => ['cache
 
         Route::apiResource('technology', 'TechnologyController')->except(['index', 'show']);
 
-        Route::get('message', 'MessageController@index');
-        Route::delete('message/{id}', 'MessageController@destroy');
-        Route::get('message/read/{id}', 'MessageController@markRead');
+        Route::get('message', 'MessageController@index')->name('message.index');
+        Route::delete('message/{id}', 'MessageController@destroy')->name('message.destroy');
+        Route::get('message/read/{id}', 'MessageController@markRead')->name('message.read');
 
         Route::apiResource('portfolio', 'PortfolioController')->except(['index', 'show']);
         Route::get('portfolio-photo/{id}', 'PortfolioController@destroy_photo');
@@ -60,7 +60,7 @@ Route::group(['namespace' => 'Api\v1', 'prefix' => 'v1', 'middleware' => ['cache
 
         Route::get('technology', 'TechnologyController@index');
 
-        Route::post('message', 'MessageController@store');
+        Route::post('message', 'MessageController@store')->name('message.store');
 
         Route::get('portfolio', 'PortfolioController@index');
 

@@ -18,6 +18,7 @@ class MessageFactory extends Factory
             'last_name' => $this->faker->lastName,
             'email' => $this->faker->email,
             'message' => $this->faker->words(10, true),
+            'phone' => $this->faker->e164PhoneNumber()
         ];
     }
 }
