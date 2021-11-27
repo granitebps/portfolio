@@ -45,8 +45,7 @@ jobs:
           DB_PORT: 33306
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         run: |
-          php artisan migrate
-          vendor/phpunit/phpunit/phpunit
+          php artisan migrate && php artisan test
 
   deploy:
     needs: ci
