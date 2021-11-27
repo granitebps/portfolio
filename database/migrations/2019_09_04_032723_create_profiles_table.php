@@ -26,6 +26,7 @@ class CreateProfilesTable extends Migration
             $table->string('linkedin')->nullable();
             $table->string('github')->nullable();
             $table->string('youtube')->nullable();
+            $table->string('birth')->nullable();
             $table->timestamps();
         });
     }

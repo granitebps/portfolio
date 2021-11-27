@@ -14,7 +14,6 @@ class ChangeAgeToYearInProfilesTable extends Migration
     public function up()
     {
         Schema::table('profiles', function (Blueprint $table) {
-            $table->string('birth')->nullable();
             $table->dropColumn(['age']);
         });
     }
@@ -27,7 +26,6 @@ class ChangeAgeToYearInProfilesTable extends Migration
     public function down()
     {
         Schema::table('profiles', function (Blueprint $table) {
-            $table->dropColumn(['birth']);
             $table->integer('age')->nullable();
         });
     }
