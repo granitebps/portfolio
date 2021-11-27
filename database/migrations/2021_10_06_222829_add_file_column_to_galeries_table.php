@@ -14,7 +14,7 @@ class AddFileColumnToGaleriesTable extends Migration
     public function up()
     {
         Schema::table('galeries', function (Blueprint $table) {
-            $table->string('file');
+            $table->string('file')->nullable();
         });
     }
 
