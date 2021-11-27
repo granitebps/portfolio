@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ServiceRequest;
-use App\Models\Services;
+use App\Models\Service;
 use App\Traits\Helpers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -13,7 +13,7 @@ class ServiceController extends Controller
 {
     public function index(): JsonResponse
     {
-        $service = Services::all();
+        $service = Service::all();
         return Helpers::apiResponse(true, '', $service);
     }
 
@@ -21,7 +21,7 @@ class ServiceController extends Controller
     {
         DB::beginTransaction();
         try {
-            $service = Services::create($request->validated());
+            $service = Service::create($request->validated());
 
             DB::commit();
             return Helpers::apiResponse(true, 'Service Created', $service);
@@ -35,7 +35,7 @@ class ServiceController extends Controller
     {
         DB::beginTransaction();
         try {
-            $service = Services::find($id);
+            $service = Service::find($id);
             if (!$service) {
                 return Helpers::apiResponse(false, 'Service Not Found', [], 404);
             }
@@ -52,7 +52,7 @@ class ServiceController extends Controller
 
     public function destroy(int $id): JsonResponse
     {
-        $service = Services::find($id);
+        $service = Service::find($id);
         DB::beginTransaction();
         try {
             if (!$service) {
