@@ -20,10 +20,10 @@ class EducationController extends Controller
     {
         DB::beginTransaction();
         try {
-            Education::create($request->validated());
+            $education = Education::create($request->validated());
 
             DB::commit();
-            return Helpers::apiResponse(true, 'Education Created');
+            return Helpers::apiResponse(true, 'Education Created', $education);
         } catch (\Exception $e) {
             DB::rollback();
             throw $e;
@@ -41,7 +41,7 @@ class EducationController extends Controller
             $education->update($request->validated());
 
             DB::commit();
-            return Helpers::apiResponse(true, 'Education Updated');
+            return Helpers::apiResponse(true, 'Education Updated', $education);
         } catch (\Exception $e) {
             DB::rollback();
             throw $e;
