@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Route;
 Route::group(['namespace' => 'Api\v1', 'prefix' => 'v1', 'middleware' => ['cacheResponse']], function () {
     Route::post('auth/login', 'AuthController@login')->name('auth:login');
 
-    Route::post('auth/request_reset_password', 'AuthController@request_reset_password');
+    Route::post('auth/request_reset_password', 'AuthController@request_reset_password')->name('auth.password.reset.request');
 
     Route::group(['middleware' => 'auth:api'], function () {
         Route::get('auth/me', 'AuthController@me')->name('auth:me');
