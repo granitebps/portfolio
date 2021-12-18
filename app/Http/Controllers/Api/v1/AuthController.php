@@ -45,9 +45,6 @@ class AuthController extends Controller
     {
         /** @var User $user */
         $user = Auth::user();
-        if (!$user) {
-            return Helpers::apiResponse(false, 'Unauthorized', [], 401);
-        }
         return Helpers::apiResponse(true, '', $user->load('profile'));
     }
 
