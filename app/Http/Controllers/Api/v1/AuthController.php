@@ -43,11 +43,12 @@ class AuthController extends Controller
 
     public function me(): JsonResponse
     {
+        /** @var User $user */
         $user = Auth::user();
         if (!$user) {
             return Helpers::apiResponse(false, 'Unauthorized', [], 401);
         }
-        return Helpers::apiResponse(true, '', $user);
+        return Helpers::apiResponse(true, '', $user->load('profile'));
     }
 
     public function logout(Request $request): JsonResponse
