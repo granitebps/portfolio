@@ -69,6 +69,7 @@ class GalleryController extends Controller
             'extension' => 'required|string',
         ]);
 
+        // @phpstan-ignore-next-line
         $client = Storage::disk('s3')->getDriver()->getAdapter()->getClient();
         $bucket = config('filesystems.disks.s3.bucket');
 

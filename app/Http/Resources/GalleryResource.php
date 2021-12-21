@@ -5,6 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Storage;
 
+
 class GalleryResource extends JsonResource
 {
     /**
@@ -16,11 +17,17 @@ class GalleryResource extends JsonResource
     public function toArray($request)
     {
         return [
+            /** @phpstan-ignore-next-line */
             'id' => $this->id,
+            /** @phpstan-ignore-next-line */
             'name' => $this->name,
+            /** @phpstan-ignore-next-line */
             'created_at' => $this->created_at,
+            /** @phpstan-ignore-next-line */
             'ext' => $this->ext,
+            /** @phpstan-ignore-next-line */
             'size' => $this->size,
+            /** @phpstan-ignore-next-line */
             'file' => $this->getFileUrl($this->file)
         ];
     }
