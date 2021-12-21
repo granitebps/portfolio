@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\GalleryRequest;
+use App\Http\Resources\GalleryResource;
 use App\Models\Gallery;
 use App\Traits\Helpers;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -16,30 +18,20 @@ class GalleryController extends Controller
     public function index(): JsonResponse
     {
         $galeries = Gallery::latest('created_at')->get();
-        return Helpers::apiResponse(true, '', $galeries);
+        return Helpers::apiResponse(true, '', GalleryResource::collection($galeries));
     }
 
     public function store(GalleryRequest $request): JsonResponse
     {
         DB::beginTransaction();
         try {
-            $file = $request->file;
-            $fileFullname = $file->getClientOriginalName();
-            $filename = Str::slug(pathinfo($fileFullname, PATHINFO_FILENAME));
-            $ext = pathinfo($fileFullname, PATHINFO_EXTENSION);
-            $size = $file->getSize();
-
-            $nama_file = time() . '_' . $filename . '.' . $ext;
-
-            // Save File
-            $awsPath = 'galeries/' . $nama_file;
-            Storage::putFileAs('galeries', $file, $nama_file);
+            $input = $request->validated();
 
             $data = Gallery::create([
-                'name' => $nama_file,
-                'file' => $awsPath,
-                'ext' => $ext,
-                'size' => $size
+                'name' => $input['name'],
+                'file' => $input['file'],
+                'ext' => $input['ext'],
+                'size' => $input['size']
             ]);
 
             DB::commit();
@@ -69,5 +61,35 @@ class GalleryController extends Controller
             DB::rollback();
             throw $e;
         }
+    }
+
+    public function getAwsUrl(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'extension' => 'required|string',
+        ]);
+
+        $client = Storage::disk('s3')->getDriver()->getAdapter()->getClient();
+        $bucket = config('filesystems.disks.s3.bucket');
+
+        $filename = Str::uuid() . '.' . $data['extension'];
+        $path = 'galeries/' . $filename;
+
+        $command = $client->getCommand('PutObject', [
+            'Bucket' => $bucket,
+            'Key' => $path, // file name in s3 bucket which you want to access
+            'ACL' => 'public-read',
+        ]);
+
+        $request = $client->createPresignedRequest($command, '+60 minutes');
+
+        $url = (string) $request->getUri();
+
+        return Helpers::apiResponse(true, 'Generate AWS URL Successfully', [
+            'url' => $url,
+            'file' => $path,
+            'name' => $filename,
+            'content_url' => Storage::url($filename)
+        ]);
     }
 }

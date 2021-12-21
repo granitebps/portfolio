@@ -24,21 +24,10 @@ class GalleryRequest extends FormRequest
     public function rules()
     {
         return [
-            'file' => 'required|file|max:102400',
-        ];
-    }
-
-    /**
-     * Get the error messages for the defined validation rules.
-     *
-     * @return array
-     */
-    public function messages()
-    {
-        return [
-            'file.required' => 'File is required',
-            'file.file' => 'File is not valid',
-            'file.max' => 'File is too big. Max size is :max kilobytes',
+            'name' => 'required|string',
+            'file' => 'required|string',
+            'ext' => 'required|string',
+            'size' => 'required|integer'
         ];
     }
 }

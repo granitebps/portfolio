@@ -44,6 +44,7 @@ Route::group(['namespace' => 'Api\v1', 'prefix' => 'v1', 'middleware' => ['cache
 
         Route::apiResource('blog', 'BlogController')->except(['index', 'show']);
 
+        Route::post('gallery/aws', 'GalleryController@getAwsUrl')->name('gallery.aws');
         Route::apiResource('gallery', 'GalleryController')->except(['update', 'show']);
 
         Route::apiResource('certification', 'CertificationController')->except(['index', 'show']);
