@@ -9,14 +9,14 @@ on:
     branches: [master]
 
 jobs:
-  ci:
+  test:
     runs-on: ubuntu-latest
 
     services:
       mysql:
         image: mysql:5.7
         env:
-          MYSQL_ROOT_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          MYSQL_ROOT_PASSWORD: password
           MYSQL_DATABASE: db_test
         ports:
           - 33306:3306
@@ -43,27 +43,21 @@ jobs:
         env:
           DB_DATABASE: db_test
           DB_PORT: 33306
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_PASSWORD: password
         run: |
           php artisan migrate
           ./vendor/bin/pest
 
   deploy:
-    needs: ci
+    needs: test
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
-      - name: Deploy to production
-        env:
-          PRIVATE_KEY: ${{ secrets.AWS_PRIVATE_KEY  }}
-          HOSTNAME: ${{ secrets.HOSTNAME  }}
-          USER_NAME: ${{ secrets.USER_NAME  }}
-
-        run: |
-          echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-          ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} '
-
-            #Now we have got the access of EC2 and we will start the deploy .
-            sudo ./deploy-portfolio.sh
-          '
+      - name: Deploy Production
+        if: github.ref == 'refs/heads/master'
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: ./deploy-portfolio.sh
