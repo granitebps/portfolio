@@ -26,7 +26,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('backup:clean')->weeklyOn(1, '8:00');
-        $schedule->command('backup:run --only-db')->weeklyOn(1, '8:00');
+        $schedule->command('backup:run --only-db')->weeklyOn(1, '8:00')->pingOnSuccess(config('services.better_uptime.heartbeats_url'));
         $schedule->job(new DeleteUnusedToken())->daily()->timezone('Asia/Jakarta');
     }
 

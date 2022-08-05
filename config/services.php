@@ -30,4 +30,8 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'better_uptime' => [
+        'heartbeats_url' => env('BETTER_UPTIME_HEARTBEATS')
+    ]
+
 ];
