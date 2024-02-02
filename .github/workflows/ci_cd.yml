@@ -48,16 +48,16 @@ jobs:
           php artisan migrate
           ./vendor/bin/pest
 
-  deploy:
-    needs: test
-    runs-on: ubuntu-latest
+  # deploy:
+  #   needs: test
+  #   runs-on: ubuntu-latest
 
-    steps:
-      - name: Deploy Production
-        if: github.ref == 'refs/heads/master'
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
-          script: ./deploy-portfolio.sh
+  #   steps:
+  #     - name: Deploy Production
+  #       if: github.ref == 'refs/heads/master'
+  #       uses: appleboy/ssh-action@master
+  #       with:
+  #         host: ${{ secrets.SSH_HOST }}
+  #         username: ${{ secrets.SSH_USERNAME }}
+  #         key: ${{ secrets.SSH_KEY }}
+  #         script: ./deploy-portfolio.sh
