@@ -3,7 +3,9 @@
 namespace App\Traits;
 
 use Illuminate\Http\JsonResponse;
-use Intervention\Image\Facades\Image;
+use Intervention\Image\Laravel\Facades\Image;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
 
 trait Helpers
 {
@@ -30,11 +32,12 @@ trait Helpers
      * Compress image using Image Intervention
      *
      * @param \Illuminate\Http\UploadedFile $image
-     * @return \Intervention\Image\Image
+     * @return \Intervention\Image\Laravel\Facades\Image
      */
     public static function compressImageIntervention($image)
     {
-        $jpg = Image::make($image)->encode('jpg', 75);
+        $manager = new ImageManager(new Driver());
+        $jpg = $manager->read($image)->toJpeg(75);
         return $jpg;
     }
 }

@@ -4,12 +4,12 @@ use App\Models\Gallery;
 use App\Models\Profile;
 use Illuminate\Testing\Fluent\AssertableJson;
 
-use function Pest\Faker\faker;
+use function Pest\Faker\fake;
 use function Pest\Laravel\delete;
 use function Pest\Laravel\get;
 use function Pest\Laravel\post;
 
-it('can get list of gallery when authenticated', function (Profile $profile) {
+it('can get list of gallery when authenticated', function (Profile $profile, Gallery $gallery) {
     $token = $profile->user->createToken(config('app.name'))->plainTextToken;
 
     get(
@@ -44,7 +44,7 @@ it('can store a gallery when authenticated', function (Profile $profile) {
             'name' => $gallery->name,
             'ext' => $gallery->ext,
             'size' => $gallery->size,
-            'file' => faker()->imageUrl()
+            'file' => fake()->imageUrl()
         ],
         headers: [
             'Authorization' => "Bearer $token",

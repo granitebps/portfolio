@@ -84,11 +84,11 @@ class ProfileController extends Controller
                 'email' => $request->email,
                 'name' => $request->name,
             ]);
-            $phone = (string) PhoneNumber::make($request->phone, 'ID');
+            $phone = new PhoneNumber($request->phone, 'ID');
             $user->profile->update([
                 'about' => $request->about,
                 'birth' => $request->birth,
-                'phone' => $phone,
+                'phone' => $phone->formatForCountry('ID'),
                 'address' => $request->address,
                 'nationality' => $request->nationality,
                 'languages' => $request->languages,
