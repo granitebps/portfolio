@@ -104,13 +104,13 @@ jobs:
             composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
 
             # Move the .env file into the deployment directory
-            mv -f $TMP_ENV_DIR/.env $DEPLOY_DIR/.env
+            mv $TMP_ENV_DIR/.env $DEPLOY_DIR/.env
 
             php artisan migrate --force
             php artisan optimize
             echo "" | sudo -S service php8.1-fpm reload
 
             # Clean up temporary files
-            rm -rf $TMP_ENV_DIR
+            # rm -rf $TMP_ENV_DIR
 
             echo "Deployment to $DEPLOY_DIR completed for branch ${{ github.ref_name }}!"
