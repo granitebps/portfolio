@@ -54,6 +54,19 @@ jobs:
     if: github.ref_name == 'master'
 
     steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Install Infisical CLI
+        run: |
+          curl -fsSL https://infisical.com/cli/install.sh | bash
+
+      - name: Fetch Secrets with Infisical
+        env:
+          INFISICAL_SERVICE_TOKEN: ${{ secrets.INFISICAL_SERVICE_TOKEN }}
+        run: |
+          infisical export --env=production --output .env
+
       - name: Deploy API to Linode
         uses: appleboy/ssh-action@master
         with:
