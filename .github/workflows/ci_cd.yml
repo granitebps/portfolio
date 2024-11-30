@@ -71,6 +71,8 @@ jobs:
             cp env-repo/portfolio/.dev.env .env
           fi
 
+          ls -lah
+
           # Clean up
           rm -rf env-repo
 
@@ -80,7 +82,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
-          source: ./.env
+          source: .env
           target: /tmp/portfolio/${{ github.ref_name }}/.env
 
       - name: Deploy API to Linode
