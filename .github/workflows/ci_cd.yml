@@ -57,15 +57,22 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Install Infisical CLI
-        run: |
-          curl -fsSL https://infisical.com/cli/install.sh | bash
-
-      - name: Fetch Secrets with Infisical
+      - name: Fetch .env File from Private Repo
         env:
-          INFISICAL_SERVICE_TOKEN: ${{ secrets.INFISICAL_SERVICE_TOKEN }}
+          GIT_AUTH_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
-          infisical export --env=production --output .env
+          # Clone the private repo containing .env files
+          git clone https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/granitebps/env.git env-repo
+          
+          # Copy the correct .env file based on the branch
+          if [ "${{ github.ref_name }}" = "master" ]; then
+            cp env-repo/portfolio/.master.env .env
+          elif [ "${{ github.ref_name }}" = "dev" ]; then
+            cp env-repo/portfolio/.dev.env .env
+          fi
+
+          # Clean up
+          rm -rf env-repo
 
       - name: Deploy API to Linode
         uses: appleboy/ssh-action@master
@@ -85,6 +92,7 @@ jobs:
             git fetch origin ${{ github.ref_name }}
             git reset --hard origin/${{ github.ref_name }}
             composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
+            cp ./.env $DEPLOY_DIR/.env
             php artisan migrate --force
             php artisan optimize
             echo "" | sudo -S service php8.1-fpm reload
