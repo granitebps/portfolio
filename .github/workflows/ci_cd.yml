@@ -71,7 +71,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           source: env-repo/portfolio/*
-          target: /tmp/portfolio
+          target: /tmp
 
       - name: Deploy API to Linode
         uses: appleboy/ssh-action@master
@@ -82,7 +82,7 @@ jobs:
           script: |
             # Determine Deployment Directory
             DEPLOY_DIR="/var/www/portfolio"
-            TMP_ENV_DIR="/tmp/portfolio"
+            TMP_ENV_DIR="/tmp/env-repo/portfolio"
             ENV_FILE=".master.env"
 
             if [ "${{ github.ref_name }}" = "dev" ]; then
@@ -108,6 +108,6 @@ jobs:
             echo "" | sudo -S service php8.1-fpm reload
 
             # Clean up temporary files
-            # rm -rf $TMP_ENV_DIR
+            # rm -rf /tmp/env-repo
 
             echo "Deployment to $DEPLOY_DIR completed for branch ${{ github.ref_name }}!"
