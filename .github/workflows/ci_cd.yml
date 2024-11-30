@@ -92,7 +92,7 @@ jobs:
           script: |
             # Determine Deployment Directory
             DEPLOY_DIR="/var/www/portfolio"
-            TMP_ENV_DIR="/tmp/simextrack-api/${{ github.ref_name }}"
+            TMP_ENV_DIR="/tmp/portfolio/${{ github.ref_name }}"
 
             echo "Deploying to $DEPLOY_DIR for branch ${{ github.ref_name }}..."
 
