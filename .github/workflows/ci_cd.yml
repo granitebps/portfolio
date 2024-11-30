@@ -74,6 +74,15 @@ jobs:
           # Clean up
           rm -rf env-repo
 
+      - name: Transfer .env File to Server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          source: ./.env
+          target: /tmp/portfolio/${{ github.ref_name }}/.env
+
       - name: Deploy API to Linode
         uses: appleboy/ssh-action@master
         with:
@@ -83,6 +92,7 @@ jobs:
           script: |
             # Determine Deployment Directory
             DEPLOY_DIR="/var/www/portfolio"
+            TMP_ENV_DIR="/tmp/simextrack-api/${{ github.ref_name }}"
 
             echo "Deploying to $DEPLOY_DIR for branch ${{ github.ref_name }}..."
 
@@ -92,9 +102,15 @@ jobs:
             git fetch origin ${{ github.ref_name }}
             git reset --hard origin/${{ github.ref_name }}
             composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
-            cp ./.env $DEPLOY_DIR/.env
+
+            # Move the .env file into the deployment directory
+            mv -f $TMP_ENV_DIR/.env $DEPLOY_DIR/.env
+
             php artisan migrate --force
             php artisan optimize
             echo "" | sudo -S service php8.1-fpm reload
+
+            # Clean up temporary files
+            rm -rf $TMP_ENV_DIR
 
             echo "Deployment to $DEPLOY_DIR completed for branch ${{ github.ref_name }}!"
