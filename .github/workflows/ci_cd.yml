@@ -63,18 +63,6 @@ jobs:
         run: |
           # Clone the private repo containing .env files
           git clone https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/granitebps/env.git env-repo
-          
-          # Copy the correct .env file based on the branch
-          if [ "${{ github.ref_name }}" = "master" ]; then
-            cp env-repo/portfolio/.master.env .env
-          elif [ "${{ github.ref_name }}" = "dev" ]; then
-            cp env-repo/portfolio/.dev.env .env
-          fi
-
-          ls -lah
-
-          # Clean up
-          rm -rf env-repo
 
       - name: Transfer .env File to Server
         uses: appleboy/scp-action@v0.1.7
@@ -82,8 +70,8 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
-          source: .env
-          target: /tmp/portfolio/${{ github.ref_name }}/.env
+          source: env-repo/portfolio
+          target: /tmp/portfolio
 
       - name: Deploy API to Linode
         uses: appleboy/ssh-action@master
@@ -94,7 +82,13 @@ jobs:
           script: |
             # Determine Deployment Directory
             DEPLOY_DIR="/var/www/portfolio"
-            TMP_ENV_DIR="/tmp/portfolio/${{ github.ref_name }}"
+            TMP_ENV_DIR="/tmp/portfolio"
+            ENV_FILE=".master.env"
+
+            if [ "${{ github.ref_name }}" = "dev" ]; then
+              DEPLOY_DIR="/var/www/portfolio-dev"
+              ENV_FILE=".dev.env"
+            fi
 
             echo "Deploying to $DEPLOY_DIR for branch ${{ github.ref_name }}..."
 
@@ -106,7 +100,8 @@ jobs:
             composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
 
             # Move the .env file into the deployment directory
-            mv $TMP_ENV_DIR/.env $DEPLOY_DIR/.env
+            cp $TMP_ENV_DIR/$ENV_FILE $TMP_ENV_DIR/.env
+            mv -f $TMP_ENV_DIR/.env $DEPLOY_DIR/.env
 
             php artisan migrate --force
             php artisan optimize
