@@ -108,6 +108,6 @@ jobs:
             echo "" | sudo -S service php8.1-fpm reload
 
             # Clean up temporary files
-            # rm -rf /tmp/env-repo
+            rm -rf /tmp/env-repo
 
             echo "Deployment to $DEPLOY_DIR completed for branch ${{ github.ref_name }}!"
