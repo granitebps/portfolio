@@ -34,8 +34,10 @@ class AuthController extends Controller
         $token = $user->createToken(config('app.name'));
 
         $user = $user;
+        $data['id'] = $user->id;
         $data['token'] = $token->plainTextToken;
         $data['name'] = $user->name;
+        $data['email'] = $user->email;
         $data['avatar'] = $user->profile->avatar;
 
         return Helpers::apiResponse(true, '', $data);
