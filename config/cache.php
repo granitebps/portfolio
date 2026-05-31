@@ -111,6 +111,8 @@ return [
     |
     */
 
-    'serializable_classes' => false,
+    'serializable_classes' => [
+        Illuminate\Http\JsonResponse::class,
+    ],
 
 ];
