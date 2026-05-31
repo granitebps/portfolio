@@ -113,6 +113,7 @@ return [
 
     'serializable_classes' => [
         Illuminate\Http\JsonResponse::class,
+        Symfony\Component\HttpFoundation\ResponseHeaderBag::class,
     ],
 
 ];
