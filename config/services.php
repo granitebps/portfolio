@@ -32,6 +32,10 @@ return [
 
     'better_uptime' => [
         'heartbeats_url' => env('BETTER_UPTIME_HEARTBEATS')
-    ]
+    ],
+
+    'resend' => [
+        'key' => env('RESEND_API_KEY'),
+    ],
 
 ];

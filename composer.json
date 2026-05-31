@@ -20,6 +20,7 @@
         "league/flysystem-aws-s3-v3": "^3.23",
         "predis/predis": "^2.2",
         "propaganistas/laravel-phone": "^5.1",
+        "resend/resend-laravel": "^1.4",
         "sentry/sentry-laravel": "^4.2",
         "spatie/laravel-backup": "^8.5",
         "symfony/http-client": "^6.4",
