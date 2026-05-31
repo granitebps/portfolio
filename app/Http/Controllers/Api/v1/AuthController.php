@@ -66,13 +66,12 @@ class AuthController extends Controller
             'email' => 'required|string|email|max:255|exists:users,email'
         ]);
 
-        DB::beginTransaction();
-        try {
-            $user = User::where('email', $request->email)->first();
-            if (!$user) {
-                return Helpers::apiResponse(false, 'User Not Found', [], 400);
-            }
+        $user = User::where('email', $request->email)->first();
+        if (!$user) {
+            return Helpers::apiResponse(false, 'User Not Found', [], 400);
+        }
 
+        DB::transaction(function () use ($user) {
             $token = bin2hex(random_bytes(50));
             ResetPassword::create([
                 'user_id' => $user->id,
@@ -82,14 +81,9 @@ class AuthController extends Controller
             ]);
 
             $user->notify(new ResetPasswordNotification($user, $token));
+        });
 
-            DB::commit();
-
-            return Helpers::apiResponse(true, 'Send Reset Password Request Email');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            throw $e;
-        }
+        return Helpers::apiResponse(true, 'Send Reset Password Request Email');
     }
 
     public function reset_password_form(string $token): View|Factory
@@ -143,22 +137,17 @@ class AuthController extends Controller
             ]);
         }
 
-        DB::beginTransaction();
-        try {
+        DB::transaction(function () use ($user, $request, $reset) {
             $user->update([
                 'password' => Hash::make($request->password)
             ]);
             $reset->update([
                 'is_valid' => false
             ]);
+        });
 
-            DB::commit();
-            return view('reset_password')->with([
-                'success' => true,
-            ]);
-        } catch (\Exception $e) {
-            DB::rollback();
-            return back()->withErrors(['error' => 'Something Wrong!']);
-        }
+        return view('reset_password')->with([
+            'success' => true,
+        ]);
     }
 }

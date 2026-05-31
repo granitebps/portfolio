@@ -33,7 +33,7 @@ jobs:
       - name: Setup PHP with PECL extension
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.1"
+          php-version: "8.3"
       - name: Laravel Setup
         run: |
           cp .env.example .env
@@ -106,7 +106,7 @@ jobs:
 
             php artisan migrate --force
             php artisan optimize
-            echo "" | sudo -S service php8.1-fpm reload
+            echo "" | sudo -S service php8.3-fpm reload
 
             # Clean up temporary files
             rm -rf /tmp/portfolio

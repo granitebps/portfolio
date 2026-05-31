@@ -20,79 +20,56 @@ class TechnologyController extends Controller
 
     public function store(TechnologyRequest $request): JsonResponse
     {
-        DB::beginTransaction();
-        try {
-            $pic = $request->pic;
+        $tech = DB::transaction(function () use ($request) {
             $nama_pic = time() . '_' . md5(uniqid()) . '.jpg';
-
-            $jpg = Helpers::compressImageIntervention($pic);
-
+            $jpg = Helpers::compressImageIntervention($request->pic);
             $aws_tech = 'tech/' . $nama_pic;
             Storage::put($aws_tech, $jpg);
 
-            $tech = Technology::create([
+            return Technology::create([
                 'name' => $request->name,
                 'pic' => $aws_tech,
             ]);
+        });
 
-            DB::commit();
-            return Helpers::apiResponse(true, 'Technology Created', $tech);
-        } catch (\Exception $e) {
-            DB::rollback();
-            throw $e;
-        }
+        return Helpers::apiResponse(true, 'Technology Created', $tech);
     }
 
     public function update(TechnologyRequest $request, int $id): JsonResponse
     {
-        DB::beginTransaction();
-        try {
-            $tech = Technology::find($id);
-            if (!$tech) {
-                return Helpers::apiResponse(false, 'Technology Not Found', [], 404);
-            }
+        $tech = Technology::find($id);
+        if (!$tech) {
+            return Helpers::apiResponse(false, 'Technology Not Found', [], 404);
+        }
+
+        DB::transaction(function () use ($request, $tech) {
             if ($request->hasFile('pic')) {
-                $pic = $request->pic;
                 $nama_pic = time() . '_' . md5(uniqid()) . '.jpg';
-
-                $jpg = Helpers::compressImageIntervention($pic);
-
+                $jpg = Helpers::compressImageIntervention($request->pic);
                 $aws_tech = 'tech/' . $nama_pic;
                 Storage::put($aws_tech, $jpg);
-
                 Storage::delete($tech->pic);
-
                 $tech->pic = $aws_tech;
             }
             $tech->name = $request->name;
             $tech->save();
+        });
 
-            DB::commit();
-            return Helpers::apiResponse(true, 'Technology Updated', $tech);
-        } catch (\Exception $e) {
-            DB::rollback();
-            throw $e;
-        }
+        return Helpers::apiResponse(true, 'Technology Updated', $tech);
     }
 
     public function destroy(int $id): JsonResponse
     {
-        DB::beginTransaction();
-        try {
-            $tech = Technology::find($id);
-            if (!$tech) {
-                return Helpers::apiResponse(false, 'Technology Not Found', [], 404);
-            }
-
-            Storage::delete($tech->pic);
-
-            $tech->delete();
-
-            DB::commit();
-            return Helpers::apiResponse(true, 'Technology Deleted');
-        } catch (\Exception $e) {
-            DB::rollback();
-            throw $e;
+        $tech = Technology::find($id);
+        if (!$tech) {
+            return Helpers::apiResponse(false, 'Technology Not Found', [], 404);
         }
+
+        DB::transaction(function () use ($tech) {
+            Storage::delete($tech->pic);
+            $tech->delete();
+        });
+
+        return Helpers::apiResponse(true, 'Technology Deleted');
     }
 }

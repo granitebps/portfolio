@@ -20,53 +20,32 @@ class MessageController extends Controller
 
     public function store(MessageRequest $request): JsonResponse
     {
-        DB::beginTransaction();
-        try {
-            $message = Message::create($request->validated());
+        $message = DB::transaction(fn () => Message::create($request->validated()));
 
-            DB::commit();
-            return Helpers::apiResponse(true, 'Message Created', $message);
-        } catch (\Exception $e) {
-            DB::rollback();
-            throw $e;
-        }
+        return Helpers::apiResponse(true, 'Message Created', $message);
     }
 
     public function destroy(int $id): JsonResponse
     {
-        DB::beginTransaction();
-        try {
-            $message = Message::find($id);
-            if (!$message) {
-                return Helpers::apiResponse(false, 'Message Not Found', [], 404);
-            }
-
-            $message->delete();
-
-            DB::commit();
-            return Helpers::apiResponse(true, 'Message Deleted', []);
-        } catch (\Exception $e) {
-            DB::rollback();
-            throw $e;
+        $message = Message::find($id);
+        if (!$message) {
+            return Helpers::apiResponse(false, 'Message Not Found', [], 404);
         }
+
+        DB::transaction(fn () => $message->delete());
+
+        return Helpers::apiResponse(true, 'Message Deleted', []);
     }
 
     public function markRead(Request $request, int $id): JsonResponse
     {
-        DB::beginTransaction();
-        try {
-            $message = Message::find($id);
-            if (!$message) {
-                return Helpers::apiResponse(false, 'Message Not Found', [], 404);
-            }
-
-            $message->update(['is_read' => true]);
-
-            DB::commit();
-            return Helpers::apiResponse(true, 'Message Mark As Read', []);
-        } catch (\Exception $e) {
-            DB::rollback();
-            throw $e;
+        $message = Message::find($id);
+        if (!$message) {
+            return Helpers::apiResponse(false, 'Message Not Found', [], 404);
         }
+
+        DB::transaction(fn () => $message->update(['is_read' => true]));
+
+        return Helpers::apiResponse(true, 'Message Mark As Read', []);
     }
 }

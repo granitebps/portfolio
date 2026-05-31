@@ -21,7 +21,7 @@ php artisan cache:clear
 php artisan optimize
 
 # Reload PHP to update opcache
-echo "" | sudo -S service php8.1-fpm reload
+echo "" | sudo -S service php8.3-fpm reload
 
 # Restart Horizon
 # cd /etc/supervisor/ && supervisorctl restart horizon

@@ -23,8 +23,7 @@ class BlogController extends Controller
 
     public function store(BlogRequest $request): JsonResponse
     {
-        DB::beginTransaction();
-        try {
+        $blog = DB::transaction(function () use ($request) {
             $image = $request->image;
             $nama_image = time() . '_' . md5(uniqid()) . '.jpg';
 
@@ -33,22 +32,16 @@ class BlogController extends Controller
             $aws_blog = 'blog/' . $nama_image;
             Storage::put($aws_blog, $jpg);
 
-            $user = auth()->user();
-
-            $blog = Blog::create([
-                'user_id' => $user->id,
+            return Blog::create([
+                'user_id' => auth()->id(),
                 'title' => $request->title,
                 'slug' => Str::slug($request->title),
                 'body' => $request->body,
                 'image' => $aws_blog,
             ]);
+        });
 
-            DB::commit();
-            return Helpers::apiResponse(true, 'Blog Created', $blog);
-        } catch (\Exception $e) {
-            DB::rollback();
-            throw $e;
-        }
+        return Helpers::apiResponse(true, 'Blog Created', $blog);
     }
 
     public function show(int $id, string $slug): JsonResponse
@@ -62,22 +55,20 @@ class BlogController extends Controller
 
     public function update(BlogRequest $request, int $id): JsonResponse
     {
-        DB::beginTransaction();
-        try {
-            $blog = Blog::find($id);
-            if (!$blog) {
-                return Helpers::apiResponse(false, 'Blog Not Found', [], 404);
-            }
+        $blog = Blog::find($id);
+        if (!$blog) {
+            return Helpers::apiResponse(false, 'Blog Not Found', [], 404);
+        }
+
+        DB::transaction(function () use ($request, $blog) {
             if ($request->hasFile('image')) {
                 $old_foto = $blog->image;
-                $image = $request->image;
                 $nama_image = time() . '_' . md5(uniqid()) . '.jpg';
 
-                $jpg = Helpers::compressImageIntervention($image);
+                $jpg = Helpers::compressImageIntervention($request->image);
 
                 $aws_blog = 'blog/' . $nama_image;
                 Storage::put($aws_blog, $jpg);
-
                 Storage::delete($old_foto);
 
                 $blog->image = $aws_blog;
@@ -86,33 +77,23 @@ class BlogController extends Controller
             $blog->slug = Str::slug($request->title);
             $blog->body = $request->body;
             $blog->save();
+        });
 
-            DB::commit();
-            return Helpers::apiResponse(true, 'Blog Updated', $blog);
-        } catch (\Exception $e) {
-            DB::rollback();
-            throw $e;
-        }
+        return Helpers::apiResponse(true, 'Blog Updated', $blog);
     }
 
     public function destroy(int $id): JsonResponse
     {
-        DB::beginTransaction();
-        try {
-            $blog = Blog::find($id);
-            if (!$blog) {
-                return Helpers::apiResponse(false, 'Blog Not Found', [], 404);
-            }
-
-            Storage::delete($blog->image);
-
-            $blog->delete();
-
-            DB::commit();
-            return Helpers::apiResponse(true, 'Blog Deleted');
-        } catch (\Exception $e) {
-            DB::rollback();
-            throw $e;
+        $blog = Blog::find($id);
+        if (!$blog) {
+            return Helpers::apiResponse(false, 'Blog Not Found', [], 404);
         }
+
+        DB::transaction(function () use ($blog) {
+            Storage::delete($blog->image);
+            $blog->delete();
+        });
+
+        return Helpers::apiResponse(true, 'Blog Deleted');
     }
 }

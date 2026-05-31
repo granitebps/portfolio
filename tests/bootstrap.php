@@ -27,3 +27,8 @@ $console = tap($app->make(Kernel::class))->bootstrap();
 foreach ($commands as $command) {
     $console->call($command);
 }
+
+// The bootstrap above registers Laravel's error/exception handlers via HandleExceptions::bootstrap().
+// These handlers persist and prevent PHPUnit's ErrorHandler from registering itself (it bails out
+// when it finds an existing handler). Clean them up so PHPUnit can manage handlers per-test.
+Illuminate\Foundation\Bootstrap\HandleExceptions::flushState();

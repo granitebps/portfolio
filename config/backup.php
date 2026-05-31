@@ -40,6 +40,12 @@ return [
                  * Determines if it should avoid unreadable folders.
                  */
                 'ignore_unreadable_directories' => false,
+
+                /*
+                 * This path is used to make the path of the included files relative.
+                 * If not set, the root of the backup will be used.
+                 */
+                'relative_path' => null,
             ],
 
             /*

@@ -23,44 +23,31 @@ class GalleryController extends Controller
 
     public function store(GalleryRequest $request): JsonResponse
     {
-        DB::beginTransaction();
-        try {
-            $input = $request->validated();
+        $input = $request->validated();
 
-            $data = Gallery::create([
-                'name' => $input['name'],
-                'file' => $input['file'],
-                'ext' => $input['ext'],
-                'size' => $input['size']
-            ]);
+        $data = DB::transaction(fn () => Gallery::create([
+            'name' => $input['name'],
+            'file' => $input['file'],
+            'ext' => $input['ext'],
+            'size' => $input['size']
+        ]));
 
-            DB::commit();
-            return Helpers::apiResponse(true, 'File Uploaded', $data);
-        } catch (\Exception $e) {
-            DB::rollback();
-            throw $e;
-        }
+        return Helpers::apiResponse(true, 'File Uploaded', $data);
     }
 
     public function destroy(int $id): JsonResponse
     {
-        DB::beginTransaction();
-        try {
-            $gallery = Gallery::find($id);
-            if (!$gallery) {
-                return Helpers::apiResponse(false, 'File Not Found', [], 404);
-            }
-
-            Storage::delete($gallery->file);
-
-            $gallery->delete();
-
-            DB::commit();
-            return Helpers::apiResponse(true, 'File Deleted');
-        } catch (\Exception $e) {
-            DB::rollback();
-            throw $e;
+        $gallery = Gallery::find($id);
+        if (!$gallery) {
+            return Helpers::apiResponse(false, 'File Not Found', [], 404);
         }
+
+        DB::transaction(function () use ($gallery) {
+            Storage::delete($gallery->file);
+            $gallery->delete();
+        });
+
+        return Helpers::apiResponse(true, 'File Deleted');
     }
 
     public function getAwsUrl(Request $request): JsonResponse

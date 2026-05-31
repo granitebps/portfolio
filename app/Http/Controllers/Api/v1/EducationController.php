@@ -19,51 +19,32 @@ class EducationController extends Controller
 
     public function store(EducationRequest $request): JsonResponse
     {
-        DB::beginTransaction();
-        try {
-            $education = Education::create($request->validated());
+        $education = DB::transaction(fn () => Education::create($request->validated()));
 
-            DB::commit();
-            return Helpers::apiResponse(true, 'Education Created', $education);
-        } catch (\Exception $e) {
-            DB::rollback();
-            throw $e;
-        }
+        return Helpers::apiResponse(true, 'Education Created', $education);
     }
 
     public function update(EducationRequest $request, int $id): JsonResponse
     {
-        DB::beginTransaction();
-        try {
-            $education = Education::find($id);
-            if (!$education) {
-                return Helpers::apiResponse(false, 'Education Not Found', [], 404);
-            }
-            $education->update($request->validated());
-
-            DB::commit();
-            return Helpers::apiResponse(true, 'Education Updated', $education);
-        } catch (\Exception $e) {
-            DB::rollback();
-            throw $e;
+        $education = Education::find($id);
+        if (!$education) {
+            return Helpers::apiResponse(false, 'Education Not Found', [], 404);
         }
+
+        DB::transaction(fn () => $education->update($request->validated()));
+
+        return Helpers::apiResponse(true, 'Education Updated', $education);
     }
 
     public function destroy(int $id): JsonResponse
     {
-        DB::beginTransaction();
-        try {
-            $education = Education::find($id);
-            if (!$education) {
-                return Helpers::apiResponse(false, 'Education Not Found', [], 404);
-            }
-            $education->delete();
-
-            DB::commit();
-            return Helpers::apiResponse(true, 'Education Deleted');
-        } catch (\Exception $e) {
-            DB::rollback();
-            throw $e;
+        $education = Education::find($id);
+        if (!$education) {
+            return Helpers::apiResponse(false, 'Education Not Found', [], 404);
         }
+
+        DB::transaction(fn () => $education->delete());
+
+        return Helpers::apiResponse(true, 'Education Deleted');
     }
 }

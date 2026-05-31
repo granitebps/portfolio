@@ -19,51 +19,32 @@ class ExperienceController extends Controller
 
     public function store(ExperienceRequest $request): JsonResponse
     {
-        DB::beginTransaction();
-        try {
-            $experience = Experience::create($request->validated());
+        $experience = DB::transaction(fn () => Experience::create($request->validated()));
 
-            DB::commit();
-            return Helpers::apiResponse(true, 'Experience Created', $experience);
-        } catch (\Exception $e) {
-            DB::rollback();
-            throw $e;
-        }
+        return Helpers::apiResponse(true, 'Experience Created', $experience);
     }
 
     public function update(ExperienceRequest $request, int $id): JsonResponse
     {
-        DB::beginTransaction();
-        try {
-            $experience = Experience::find($id);
-            if (!$experience) {
-                return Helpers::apiResponse(false, 'Experience Not Found', [], 404);
-            }
-            $experience->update($request->validated());
-
-            DB::commit();
-            return Helpers::apiResponse(true, 'Experience Updated', $experience);
-        } catch (\Exception $e) {
-            DB::rollback();
-            throw $e;
+        $experience = Experience::find($id);
+        if (!$experience) {
+            return Helpers::apiResponse(false, 'Experience Not Found', [], 404);
         }
+
+        DB::transaction(fn () => $experience->update($request->validated()));
+
+        return Helpers::apiResponse(true, 'Experience Updated', $experience);
     }
 
     public function destroy(int $id): JsonResponse
     {
-        DB::beginTransaction();
-        try {
-            $experience = Experience::find($id);
-            if (!$experience) {
-                return Helpers::apiResponse(false, 'Experience Not Found', [], 404);
-            }
-            $experience->delete();
-
-            DB::commit();
-            return Helpers::apiResponse(true, 'Experience Deleted');
-        } catch (\Exception $e) {
-            DB::rollback();
-            throw $e;
+        $experience = Experience::find($id);
+        if (!$experience) {
+            return Helpers::apiResponse(false, 'Experience Not Found', [], 404);
         }
+
+        DB::transaction(fn () => $experience->delete());
+
+        return Helpers::apiResponse(true, 'Experience Deleted');
     }
 }

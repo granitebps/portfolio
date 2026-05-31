@@ -24,15 +24,11 @@ class PortfolioController extends Controller
 
     public function store(PortfolioRequest $request): JsonResponse
     {
-        DB::beginTransaction();
-        try {
+        $portfolio = DB::transaction(function () use ($request) {
             $folderName = Str::slug($request->name, '-');
 
-            $thumbnail = $request->thumbnail;
             $nama_thumbnail = time() . '_thumbnail-' . md5(uniqid()) . '.jpg';
-
-            $jpg = Helpers::compressImageIntervention($thumbnail);
-
+            $jpg = Helpers::compressImageIntervention($request->thumbnail);
             $aws_thumbnail = 'portfolio/' . $folderName . '/' . $nama_thumbnail;
             Storage::put($aws_thumbnail, $jpg);
 
@@ -44,52 +40,41 @@ class PortfolioController extends Controller
                 'thumbnail' => $aws_thumbnail
             ]);
 
-            $pic = $request->pic;
-            foreach ($pic as $image) {
+            foreach ($request->pic as $image) {
                 $nama_image = time() . '_' . md5(uniqid()) . '.jpg';
-
                 $jpg = Helpers::compressImageIntervention($image);
-
                 $aws_pic = 'portfolio/' . $folderName . '/' . $nama_image;
                 Storage::put($aws_pic, $jpg);
-
-                $portfolio->pic()->create([
-                    'pic' => $aws_pic
-                ]);
+                $portfolio->pic()->create(['pic' => $aws_pic]);
             }
 
-            DB::commit();
-            return Helpers::apiResponse(true, 'Portfolio Created', $portfolio);
-        } catch (\Exception $e) {
-            DB::rollback();
-            throw $e;
-        }
+            return $portfolio;
+        });
+
+        return Helpers::apiResponse(true, 'Portfolio Created', $portfolio);
     }
 
     public function update(PortfolioRequest $request, int $id): JsonResponse
     {
-        DB::beginTransaction();
-        try {
-            $portfolio = Portfolio::find($id);
-            if (!$portfolio) {
-                return Helpers::apiResponse(false, 'Portfolio Not Found', [], 404);
-            }
+        $portfolio = Portfolio::find($id);
+        if (!$portfolio) {
+            return Helpers::apiResponse(false, 'Portfolio Not Found', [], 404);
+        }
 
+        DB::transaction(function () use ($request, $portfolio) {
             $oldFolderName = Str::slug($portfolio->name, '-');
             $folderName = Str::slug($request->name, '-');
+
             if ($request->name !== $portfolio->name) {
-                $oldImages = Storage::allFiles('portfolio/' . $oldFolderName);
-                foreach ($oldImages as $oldImage) {
+                foreach (Storage::allFiles('portfolio/' . $oldFolderName) as $oldImage) {
                     $newLoc = str_replace('portfolio/' . $oldFolderName, 'portfolio/' . $folderName, $oldImage);
                     Storage::copy($oldImage, $newLoc);
                 }
 
-                $newThumb = str_replace('portfolio/' . $oldFolderName, 'portfolio/' . $folderName, $portfolio->thumbnail);
-                $portfolio->thumbnail = $newThumb;
+                $portfolio->thumbnail = str_replace('portfolio/' . $oldFolderName, 'portfolio/' . $folderName, $portfolio->thumbnail);
 
                 foreach ($portfolio->pic as $value) {
-                    $newPic = str_replace('portfolio/' . $oldFolderName, 'portfolio/' . $folderName, $value->pic);
-                    $value->pic = $newPic;
+                    $value->pic = str_replace('portfolio/' . $oldFolderName, 'portfolio/' . $folderName, $value->pic);
                     $value->save();
                 }
 
@@ -97,19 +82,15 @@ class PortfolioController extends Controller
             }
 
             if ($request->hasFile('thumbnail')) {
-                $thumbnail = $request->thumbnail;
                 $nama_thumbnail = time() . '_thumbnail-' . md5(uniqid()) . '.jpg';
-
-                $jpg = Helpers::compressImageIntervention($thumbnail);
-
+                $jpg = Helpers::compressImageIntervention($request->thumbnail);
                 $oldThubmnail = str_replace('portfolio/' . $oldFolderName, 'portfolio/' . $folderName, $portfolio->thumbnail);
                 Storage::delete($oldThubmnail);
-
                 $aws_thumbnail = 'portfolio/' . $folderName . '/' . $nama_thumbnail;
                 Storage::put($aws_thumbnail, $jpg);
-
                 $portfolio->thumbnail = $aws_thumbnail;
             }
+
             $portfolio->name = $request->name;
             $portfolio->desc = $request->desc;
             $portfolio->type = $request->type;
@@ -117,71 +98,46 @@ class PortfolioController extends Controller
             $portfolio->save();
 
             if ($request->hasFile('pic')) {
-                $pic = $request->pic;
-                foreach ($pic as $image) {
+                foreach ($request->pic as $image) {
                     $nama_image = time() . '_' . md5(uniqid()) . '.jpg';
-
                     $jpg = Helpers::compressImageIntervention($image);
-
                     $aws_pic = 'portfolio/' . $folderName . '/' . $nama_image;
                     Storage::put($aws_pic, $jpg);
-
-                    $portfolio->pic()->create([
-                        'pic' => $aws_pic
-                    ]);
+                    $portfolio->pic()->create(['pic' => $aws_pic]);
                 }
             }
+        });
 
-            DB::commit();
-            return Helpers::apiResponse(true, 'Portfolio Updated', $portfolio);
-        } catch (\Exception $e) {
-            DB::rollback();
-            throw $e;
-        }
+        return Helpers::apiResponse(true, 'Portfolio Updated', $portfolio);
     }
 
     public function destroy(int $id): JsonResponse
     {
-        DB::beginTransaction();
-        try {
-            $portfolio = Portfolio::find($id);
-            if (!$portfolio) {
-                return Helpers::apiResponse(false, 'Portfolio Not Found', [], 404);
-            }
+        $portfolio = Portfolio::find($id);
+        if (!$portfolio) {
+            return Helpers::apiResponse(false, 'Portfolio Not Found', [], 404);
+        }
 
-            // $folderName = Str::slug($portfolio->name, '-');
-
-            // Storage::deleteDirectory('portfolio/' . $folderName);
-
+        DB::transaction(function () use ($portfolio) {
             $portfolio->pic()->delete();
             $portfolio->delete();
+        });
 
-            DB::commit();
-            return Helpers::apiResponse(true, 'Portfolio Deleted');
-        } catch (\Exception $e) {
-            DB::rollback();
-            throw $e;
-        }
+        return Helpers::apiResponse(true, 'Portfolio Deleted');
     }
 
     public function destroy_photo(int $id): JsonResponse
     {
-        DB::beginTransaction();
-        try {
-            $portfolio = PortfolioPic::find($id);
-            if (!$portfolio) {
-                return Helpers::apiResponse(false, 'Portfolio Picture Not Found', [], 404);
-            }
-
-            Storage::delete($portfolio->pic);
-
-            $portfolio->delete();
-
-            DB::commit();
-            return Helpers::apiResponse(true, 'Portfolio Picture Deleted');
-        } catch (\Exception $e) {
-            DB::rollback();
-            throw $e;
+        $portfolio = PortfolioPic::find($id);
+        if (!$portfolio) {
+            return Helpers::apiResponse(false, 'Portfolio Picture Not Found', [], 404);
         }
+
+        DB::transaction(function () use ($portfolio) {
+            Storage::delete($portfolio->pic);
+            $portfolio->delete();
+        });
+
+        return Helpers::apiResponse(true, 'Portfolio Picture Deleted');
     }
 }

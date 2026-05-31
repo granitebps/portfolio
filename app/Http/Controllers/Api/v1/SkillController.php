@@ -20,53 +20,32 @@ class SkillController extends Controller
 
     public function store(SkillRequest $request): JsonResponse
     {
-        DB::beginTransaction();
-        try {
-            $skill = Skill::create($request->validated());
+        $skill = DB::transaction(fn () => Skill::create($request->validated()));
 
-            DB::commit();
-            return Helpers::apiResponse(true, 'Skill Created', $skill);
-        } catch (\Exception $e) {
-            DB::rollback();
-            throw $e;
-        }
+        return Helpers::apiResponse(true, 'Skill Created', $skill);
     }
 
     public function update(SkillRequest $request, int $id): JsonResponse
     {
-        DB::beginTransaction();
-        try {
-            $skill = Skill::find($id);
-            if (!$skill) {
-                return Helpers::apiResponse(false, 'Skill Not Found', [], 404);
-            }
-
-            $skill->update($request->validated());
-
-            DB::commit();
-            return Helpers::apiResponse(true, 'Skill Updated', $skill);
-        } catch (\Exception $e) {
-            DB::rollback();
-            throw $e;
+        $skill = Skill::find($id);
+        if (!$skill) {
+            return Helpers::apiResponse(false, 'Skill Not Found', [], 404);
         }
+
+        DB::transaction(fn () => $skill->update($request->validated()));
+
+        return Helpers::apiResponse(true, 'Skill Updated', $skill);
     }
 
     public function destroy(int $id): JsonResponse
     {
-        DB::beginTransaction();
-        try {
-            $skill = Skill::find($id);
-            if (!$skill) {
-                return Helpers::apiResponse(false, 'Skill Not Found', [], 404);
-            }
-
-            $skill->delete();
-
-            DB::commit();
-            return Helpers::apiResponse(true, 'Skill Deleted', []);
-        } catch (\Exception $e) {
-            DB::rollback();
-            throw $e;
+        $skill = Skill::find($id);
+        if (!$skill) {
+            return Helpers::apiResponse(false, 'Skill Not Found', [], 404);
         }
+
+        DB::transaction(fn () => $skill->delete());
+
+        return Helpers::apiResponse(true, 'Skill Deleted', []);
     }
 }

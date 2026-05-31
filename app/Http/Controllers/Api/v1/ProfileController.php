@@ -26,7 +26,12 @@ class ProfileController extends Controller
         if (!$auth) {
             return Helpers::apiResponse(false, 'Unauthenticated', [], 401);
         }
+
         $user = User::with('profile')->find($auth->id);
+        if (!$user) {
+            return Helpers::apiResponse(false, 'User Not Found', [], 404);
+        }
+
         $this->validate($request, [
             'username' => 'required|string|max:255|unique:users,username,' . $user->id,
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
@@ -48,42 +53,27 @@ class ProfileController extends Controller
             'medium' => 'required|url|string|max:255',
             'cv' => 'mimes:pdf|file|max:2048'
         ]);
-        DB::beginTransaction();
-        try {
-            if (!$user) {
-                return Helpers::apiResponse(false, 'User Not Found', [], 404);
-            }
 
+        DB::transaction(function () use ($request, $user) {
             if ($request->hasFile('avatar')) {
-                $avatar = $request->avatar;
-                $nama_avatar = 'avatar.jpg';
-
-                $jpg = Helpers::compressImageIntervention($avatar);
-
+                $jpg = Helpers::compressImageIntervention($request->avatar);
                 Storage::deleteDirectory('avatar');
-
-                $aws_avatar = 'avatar/' . $nama_avatar;
-                Storage::put($aws_avatar, $jpg);
-
-                $user->profile->update([
-                    'avatar' => $aws_avatar,
-                ]);
+                Storage::put('avatar/avatar.jpg', $jpg);
+                $user->profile->update(['avatar' => 'avatar/avatar.jpg']);
             }
+
             if ($request->hasFile('cv')) {
-                $cv = $request->cv;
-                $cvName = time() . '_' . 'cv.pdf';
-
                 Storage::deleteDirectory('cv');
-                $aws_cv = Storage::putFileAs('cv', $cv, $cvName);
-                $user->profile->update([
-                    'cv' => $aws_cv,
-                ]);
+                $aws_cv = Storage::putFileAs('cv', $request->cv, time() . '_cv.pdf');
+                $user->profile->update(['cv' => $aws_cv]);
             }
+
             $user->update([
                 'username' => $request->username,
                 'email' => $request->email,
                 'name' => $request->name,
             ]);
+
             $phone = new PhoneNumber($request->phone, 'ID');
             $user->profile->update([
                 'about' => $request->about,
@@ -101,16 +91,12 @@ class ProfileController extends Controller
                 'linkedin' => $request->linkedin,
                 'medium' => $request->medium,
             ]);
-            DB::commit();
+        });
 
-            return Helpers::apiResponse(true, 'Profile Updated', [
-                'name' => $user->name,
-                'avatar' => $user->profile->avatar,
-            ]);
-        } catch (\Exception $e) {
-            DB::rollback();
-            throw $e;
-        }
+        return Helpers::apiResponse(true, 'Profile Updated', [
+            'name' => $user->name,
+            'avatar' => $user->profile->avatar,
+        ]);
     }
 
     public function password(Request $request): JsonResponse
@@ -119,22 +105,14 @@ class ProfileController extends Controller
             'password' => 'required|confirmed|string|min:8|max:255',
             'old_password' => 'required|string|min:8|max:255'
         ]);
+
         $user = User::first();
         if (!Hash::check($request->old_password, $user->password)) {
             return Helpers::apiResponse(false, 'Old Password Does Not Match', [], 400);
-        } else {
-            DB::beginTransaction();
-            try {
-                $user->update([
-                    'password' => Hash::make($request->password)
-                ]);
-
-                DB::commit();
-                return Helpers::apiResponse(true, 'Password Changed');
-            } catch (\Exception $e) {
-                DB::rollback();
-                throw $e;
-            }
         }
+
+        DB::transaction(fn () => $user->update(['password' => Hash::make($request->password)]));
+
+        return Helpers::apiResponse(true, 'Password Changed');
     }
 }

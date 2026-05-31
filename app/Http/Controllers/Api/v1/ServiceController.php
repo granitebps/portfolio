@@ -19,52 +19,32 @@ class ServiceController extends Controller
 
     public function store(ServiceRequest $request): JsonResponse
     {
-        DB::beginTransaction();
-        try {
-            $service = Service::create($request->validated());
+        $service = DB::transaction(fn () => Service::create($request->validated()));
 
-            DB::commit();
-            return Helpers::apiResponse(true, 'Service Created', $service);
-        } catch (\Exception $e) {
-            DB::rollback();
-            throw $e;
-        }
+        return Helpers::apiResponse(true, 'Service Created', $service);
     }
 
     public function update(ServiceRequest $request, int $id): JsonResponse
     {
-        DB::beginTransaction();
-        try {
-            $service = Service::find($id);
-            if (!$service) {
-                return Helpers::apiResponse(false, 'Service Not Found', [], 404);
-            }
-
-            $service->update($request->validated());
-
-            DB::commit();
-            return Helpers::apiResponse(true, 'Service Updated', $service);
-        } catch (\Exception $e) {
-            DB::rollback();
-            throw $e;
+        $service = Service::find($id);
+        if (!$service) {
+            return Helpers::apiResponse(false, 'Service Not Found', [], 404);
         }
+
+        DB::transaction(fn () => $service->update($request->validated()));
+
+        return Helpers::apiResponse(true, 'Service Updated', $service);
     }
 
     public function destroy(int $id): JsonResponse
     {
         $service = Service::find($id);
-        DB::beginTransaction();
-        try {
-            if (!$service) {
-                return Helpers::apiResponse(false, 'Service Not Found', [], 404);
-            }
-            $service->delete();
-
-            DB::commit();
-            return Helpers::apiResponse(true, 'Service Deleted');
-        } catch (\Exception $e) {
-            DB::rollback();
-            throw $e;
+        if (!$service) {
+            return Helpers::apiResponse(false, 'Service Not Found', [], 404);
         }
+
+        DB::transaction(fn () => $service->delete());
+
+        return Helpers::apiResponse(true, 'Service Deleted');
     }
 }
