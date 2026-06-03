@@ -38,9 +38,6 @@ pipeline {
                     sh """
                         cd ${deployDir}
 
-                        # Ensure remote uses SSH so jenkins key works for private repo
-                        git remote set-url origin git@github.com:granitebps/portfolio.git
-
                         # Clear stale cache before pulling
                         php${PHP_VERSION} artisan optimize:clear
 
