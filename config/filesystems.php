@@ -66,6 +66,17 @@ return [
             'visibility' => 'public',
         ],
 
+        's3-backup' => [
+            'driver' => 's3',
+            'key' => env('BACKUP_AWS_ACCESS_KEY_ID'),
+            'secret' => env('BACKUP_AWS_SECRET_ACCESS_KEY'),
+            'region' => env('BACKUP_AWS_DEFAULT_REGION', 'auto'),
+            'bucket' => env('BACKUP_AWS_BUCKET', 's3-backup'),
+            'endpoint' => env('BACKUP_AWS_ENDPOINT'),
+            'visibility' => 'private',
+            'throw' => true,
+        ],
+
         'hosting' => [
             'driver' => 'local',
             'root'   => public_path('images'),

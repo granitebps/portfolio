@@ -67,3 +67,34 @@ Keep both command-line PHP and PHP-FPM on PHP 8.3, and check the [Laravel server
 During deployment, run `composer install --no-dev --prefer-dist --optimize-autoloader` using PHP 8.3, followed by `composer check-platform-reqs --no-dev` to validate the actual server extensions rather than the emulated Composer platform. Reload PHP-FPM and restart long-running Horizon workers after the release. Existing deployment scripts still target PHP 8.3.
 
 The update was verified locally with SQLite and isolated service settings. Production MySQL, Redis, object storage, mail, and backup integrations require environment-specific verification; no deployment was performed.
+
+## Private R2 backups
+
+Public media continues to use the existing `s3` disk and `AWS_*` settings. Backups, cleanup, and backup monitoring use the separate `s3-backup` disk and `BACKUP_AWS_*` settings. Supply dedicated backup credentials before deploying. Failed backup disk writes throw exceptions.
+
+Before deploying this configuration:
+
+1. Create a private R2 bucket, for example `s3-backup`. Leave its public development URL (`r2.dev`) disabled and do not attach a public custom domain. R2 bucket settings enforce privacy; Laravel's `visibility` setting does not implement object ACLs on R2. See [Cloudflare's public-access documentation](https://developers.cloudflare.com/r2/buckets/public-buckets/).
+2. Create an R2 **Object Read & Write** token scoped only to that bucket. Backup retention cleanup needs object deletion permission as well as listing and writing. Keep the existing public-media token separate. See [R2 API tokens](https://developers.cloudflare.com/r2/api/tokens/).
+3. Add the following settings to the deployment environment or its private environment-file source. Replace the example values with the new bucket's credentials and your account's S3 API endpoint. The bucket name can differ from the Laravel disk name.
+
+   ```dotenv
+   BACKUP_AWS_ACCESS_KEY_ID=<backup-access-key-id>
+   BACKUP_AWS_SECRET_ACCESS_KEY=<backup-secret-access-key>
+   BACKUP_AWS_DEFAULT_REGION=auto
+   BACKUP_AWS_BUCKET=s3-backup
+   BACKUP_AWS_ENDPOINT=https://<account-id>.r2.cloudflarestorage.com
+   ```
+
+4. Rebuild configuration with `php artisan config:cache` using PHP 8.3 after supplying these values. The existing Jenkins deployment obtains `.env` from its private source; update that source before deploying so it includes the backup settings. This repository's actual `.env` has not been modified.
+
+The scheduled backup remains database-only, every Monday at 08:00 in the application's configured timezone. Retention settings are unchanged. Backup monitoring now checks `s3-backup` and allows eight days between successful backups, providing one day's grace beyond the weekly interval. `backup:monitor` is not currently scheduled by the application.
+
+Verify the configured environment before relying on the new destination:
+
+- Run `php artisan backup:run --only-db` and confirm a new archive appears only in the private bucket. This reads the configured database and can send backup notifications and the configured success heartbeat; run it intentionally in the target environment.
+- Check that anonymous requests cannot download an object from the private bucket, while existing public media URLs still work.
+- Download an archive with authorized credentials and restore it into a disposable database to verify recoverability.
+- Run `php artisan backup:monitor` to check the new destination; it may send configured notifications.
+
+Historical backups remain in their original bucket. Copy and verify any archives you want to retain before separately authorizing retirement of public copies and any cached copies. Adding the private destination does not protect existing public backup objects. See [Spatie's backup disk documentation](https://spatie.be/docs/laravel-backup/v10/installation-and-setup).
